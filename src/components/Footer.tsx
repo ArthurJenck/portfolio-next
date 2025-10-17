@@ -4,14 +4,14 @@ import "../styles/Footer.scss"
 const Footer = () => {
     return (
         <footer>
-            <ImgLink for="logo" />
+            <ImgLink type="logo" />
             <p>
                 Merci d'être passé, ça vous a plu ?
                 <span>N'hésitez pas à me le dire !</span>
             </p>
             <div className="socials">
-                <ImgLink for="linkedin" />
-                <ImgLink for="github" />
+                <ImgLink type="linkedin" />
+                <ImgLink type="github" />
             </div>
         </footer>
     )

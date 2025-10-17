@@ -29,9 +29,9 @@ const Header = () => {
             </h1>
             {/* Le stopPropagation évite le scroll en cliquant sur les liens extenes */}
             <div className="socials" onClick={(e) => e.stopPropagation()}>
-                <ImgLink for="linkedin" />
-                <ImgLink for="github" />
-                <ImgLink for="cv" />
+                <ImgLink type="linkedin" />
+                <ImgLink type="github" />
+                <ImgLink type="cv" />
             </div>
             <Image
                 src={Chevron}

@@ -21,7 +21,7 @@ const Burger = () => {
             </div>
             {/* Cliquer sur le background du menu burger doit le fermer */}
             <div className="burger-menu" onClick={() => setIsOpen(!isOpen)}>
-                <ImgLink for="logo" />
+                <ImgLink type="logo" />
                 <ul>
                     <li>
                         {/* Le preventDefault sert à éviter le rechargement de la page en cliquant sur le lien. On utilise alors la fonction scrollTo pour remonter en haut de la page et nettoyer l'url */}
@@ -49,9 +49,9 @@ const Burger = () => {
                     </li>
                 </ul>
                 <div className="socials">
-                    <ImgLink for="linkedin" />
-                    <ImgLink for="github" />
-                    <ImgLink for="cv" />
+                    <ImgLink type="linkedin" />
+                    <ImgLink type="github" />
+                    <ImgLink type="cv" />
                 </div>
             </div>
         </div>

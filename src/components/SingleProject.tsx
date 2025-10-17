@@ -113,13 +113,13 @@ const SingleProject = ({
                     <div className="project-item__links">
                         {gitLink ? (
                             <ImgLink
-                                for="github"
+                                type="github"
                                 link={gitLink}
-                                otherAlt="Lien vers le repository GitHub du projet"
+                                alt="Lien vers le repository GitHub du projet"
                             />
                         ) : null}
                         {webLink ? (
-                            <ImgLink for="projet" link={webLink} />
+                            <ImgLink type="projet" link={webLink} />
                         ) : null}
                     </div>
                 </div>

@@ -12,7 +12,7 @@ const error404 = () => {
                 <p>Vous êtes perdu ?</p>
                 <a href="/">Revenir en lieu sûr</a>
             </div>
-            <ImgLink for="logo" link="/" />
+            <ImgLink type="logo" link="/" />
         </div>
     )
 }

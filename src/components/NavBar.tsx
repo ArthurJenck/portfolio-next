@@ -35,8 +35,13 @@ const NavBar = () => {
 
     return (
         <nav className="fixed top-8 left-[4vw] right-[4vw] z-50 h-16 md:h-fit flex justify-between items-center pointer-events-none">
-            <ImgLink for="logo" className="size-[5vw] block" />
-            <Burger />
+            <ImgLink
+                type="logo"
+                className="size-[5vw] block pointer-events-auto"
+            />
+            <div className="pointer-events-auto">
+                <Burger />
+            </div>
         </nav>
     )
 }
