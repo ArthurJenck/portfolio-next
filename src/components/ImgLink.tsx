@@ -9,8 +9,14 @@ import "../styles/ImgLink.scss"
 import { isMobileDevice, scrollTo } from "../hooks"
 import Link from "next/link"
 import Image from "next/image"
+import { cn } from "@/lib/utils"
 
-const ImgLink = (props: { for: string; link?: string; otherAlt?: string }) => {
+const ImgLink = (props: {
+    for: string
+    link?: string
+    otherAlt?: string
+    className?: string
+}) => {
     let link = "/"
     let linkMobile = ""
     let icon = Logo
@@ -56,11 +62,20 @@ const ImgLink = (props: { for: string; link?: string; otherAlt?: string }) => {
         return (
             <a
                 href={props.for === "cv" && isMobile ? linkMobile : link}
-                className={props.for === "logo" ? "logo-link" : "socials-link"}
+                className={cn(
+                    props.for === "logo" ? "logo-link" : "socials-link",
+                    props.className
+                )}
                 target={props.for === "logo" ? "" : "_blank"}
                 rel={props.for !== "logo" ? "noopener noreferrer" : undefined}
             >
-                <Image src={icon} alt={alt} width={50} height={50} />
+                <Image
+                    src={icon}
+                    alt={alt}
+                    width={100}
+                    height={100}
+                    style={{ width: "100%", height: "100%" }}
+                />
             </a>
         )
     }
@@ -78,9 +93,19 @@ const ImgLink = (props: { for: string; link?: string; otherAlt?: string }) => {
                       }
                     : () => {}
             }
-            className={props.for === "logo" ? "logo-link" : "socials-link"}
+            className={cn(
+                props.for === "logo" ? "logo-link" : "socials-link",
+                props.className
+            )}
         >
-            <Image src={icon} alt={alt} width={50} height={50} />
+            <Image
+                src={icon}
+                alt={alt}
+                width={100}
+                height={100}
+                className="aspect-square max-w-full max-h-full"
+                style={{ width: "100%", height: "100%" }}
+            />
         </Link>
     )
 }

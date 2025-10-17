@@ -1,0 +1,18 @@
+.logo-link,
+.socials-link {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+
+.socials-link {
+  transition: transform 0.2s ease-out;
+}
+.socials-link:hover {
+  transform: scale(1.2);
+}
+@media screen and (max-width: 768px) {
+  .socials-link:hover {
+    transform: scale(1);
+  }
+}/*# sourceMappingURL=ImgLink.css.map */

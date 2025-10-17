@@ -1,6 +1,5 @@
 "use client"
 
-import "../styles/NavBar.scss"
 import { useDebounce, isMobileDevice } from "../hooks"
 import ImgLink from "./ImgLink"
 import Burger from "./Burger"
@@ -35,8 +34,8 @@ const NavBar = () => {
     }, [])
 
     return (
-        <nav>
-            <ImgLink for="logo" />
+        <nav className="fixed top-8 left-[4vw] right-[4vw] z-50 h-16 md:h-fit flex justify-between items-center pointer-events-none">
+            <ImgLink for="logo" className="size-[5vw] block" />
             <Burger />
         </nav>
     )

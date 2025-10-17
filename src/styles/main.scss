@@ -5,8 +5,6 @@
 html,
 * {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
     // Tout le texte est par défaut dans le blanc spécial des variables colors et dans la font indiquée
     font-family: fonts.$default;
     color: colors.$white;

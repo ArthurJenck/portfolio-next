@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import "./globals.css"
 import "../styles/main.scss"
 
 export const metadata: Metadata = {
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
     },
     icons: {
         icon: [
-            { url: "/favicon.ico" },
+            { url: "/favicon.ico", type: "image/x-icon" },
             { url: "/favicon.svg", type: "image/svg+xml" },
         ],
     },
