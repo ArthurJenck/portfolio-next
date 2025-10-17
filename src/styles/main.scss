@@ -1,18 +1,16 @@
 // @import remplacé par @use
-@use "../styles/variables/fonts";
 @use "../styles/variables/colors";
 
 html,
 * {
     box-sizing: border-box;
     // Tout le texte est par défaut dans le blanc spécial des variables colors et dans la font indiquée
-    font-family: fonts.$default;
-    color: colors.$white;
+    color: var(--white);
     scroll-behavior: smooth;
 }
 
 body {
-    background-color: colors.$main;
+    background-color: var(--primary);
     h2 {
         font-size: clamp(2rem, 5vw, 5vw);
         position: relative;
@@ -31,7 +29,7 @@ body {
         background-color: rgba(0, 0, 0, 0);
     }
     ::-webkit-scrollbar-thumb {
-        background-color: colors.$white;
+        background-color: var(--white);
         border-radius: 5px;
     }
 }

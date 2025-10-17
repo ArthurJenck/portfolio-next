@@ -1,6 +1,13 @@
 import type { Metadata } from "next"
+import { Sora } from "next/font/google"
 import "./globals.css"
 import "../styles/main.scss"
+
+const sora = Sora({
+    subsets: ["latin"],
+    weight: ["100", "200", "300", "400", "500", "600", "700", "800"],
+    display: "swap",
+})
 
 export const metadata: Metadata = {
     title: "Arthur Jenck",
@@ -55,7 +62,7 @@ export default function RootLayout({
                     }}
                 />
             </head>
-            <body>{children}</body>
+            <body className={sora.className}>{children}</body>
         </html>
     )
 }

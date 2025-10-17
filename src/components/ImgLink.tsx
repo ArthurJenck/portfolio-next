@@ -70,7 +70,7 @@ const ImgLink = ({
     // Animations communes pour les liens sociaux (uniquement desktop)
     const animationProps = {
         transition: { type: "spring" as const, stiffness: 400, damping: 12 },
-        whileHover: { scale: 1.2 },
+        whileHover: { scale: 1.1 },
         whileTap: { scale: 0.95 },
     }
 
@@ -177,31 +177,31 @@ const ImgLink = ({
             </Link>
 
             {/* Version desktop : avec animations */}
-            <motion.div
+            <Link
+                href={link}
                 className={cn("select-none hidden md:block", className)}
+                onClick={
+                    isLogoWithoutLink
+                        ? (e) => {
+                              e.preventDefault()
+                              scrollTo(0)
+                          }
+                        : undefined
+                }
             >
-                <Link
-                    href={link}
-                    onClick={
-                        isLogoWithoutLink
-                            ? (e) => {
-                                  e.preventDefault()
-                                  scrollTo(0)
-                              }
-                            : undefined
-                    }
+                <motion.div
+                    {...animationProps}
+                    className={cn("select-none hidden md:block", className)}
                 >
-                    <motion.div {...animationProps}>
-                        <Image
-                            src={icon}
-                            alt={alt}
-                            width={100}
-                            height={100}
-                            style={{ width: "100%", height: "100%" }}
-                        />
-                    </motion.div>
-                </Link>
-            </motion.div>
+                    <Image
+                        src={icon}
+                        alt={alt}
+                        width={100}
+                        height={100}
+                        style={{ width: "100%", height: "100%" }}
+                    />
+                </motion.div>
+            </Link>
         </>
     )
 }

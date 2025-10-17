@@ -14,21 +14,28 @@ const Header = () => {
             .querySelector("header")!
             .style.setProperty("--h1-weight", JSON.stringify(e.pageY))
     }
-
+    //
     return (
         <header
             // Au clic, on scroll jusqu'à la section suivante
             onClick={() => scrollTo(window.innerHeight)}
             onMouseMove={(e) => handleH1Wght(e)}
             onMouseOver={(e) => handleH1Wght(e)}
+            className="flex flex-col items-center justify-center scroll-smooth h-svh"
         >
-            <h1>
+            <h1 className="md:max-w-[50vw] text-center text-[clamp(1rem, 23vw, 100px)] lg:text-[11.5vw] leading-[90%]">
                 Arthur
                 <br />
-                Jenck <span>Développeur Web Front-End</span>
+                Jenck{" "}
+                <span className="hero-typing size-fit block mx-auto tracking-normal leading-normal whitespace-nowrap overflow-hidden border-white border-r-2 text-[clamp(10px, 3.5vw, 1rem)] md:text-[1.5vw]">
+                    Développeur Web Front-End
+                </span>
             </h1>
             {/* Le stopPropagation évite le scroll en cliquant sur les liens extenes */}
-            <div className="socials" onClick={(e) => e.stopPropagation()}>
+            <div
+                className="socials flex justify-center items-center gap-6 lg:gap-[1.5vw] mt-6 lg:mt-[1.5vw]"
+                onClick={(e) => e.stopPropagation()}
+            >
                 <ImgLink
                     type="linkedin"
                     className="w-[clamp(1rem, 14.5vw, 4rem)] md:w-[3.5vw]"
@@ -45,7 +52,7 @@ const Header = () => {
             <Image
                 src={Chevron}
                 alt="Passer à la suite"
-                className="chevron"
+                className="chevron absolute bottom-0 left-1/2 transform -translate-x-1/2 cursor-pointer w-8 md:w-[1.5vw]"
                 width={40}
                 height={40}
             />
