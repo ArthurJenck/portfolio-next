@@ -146,7 +146,6 @@
   width: 400vw;
   height: 400vw;
   transition-duration: 0.5s;
-  cursor: default;
 }
 .burger.open .burger-menu {
   opacity: 1;
