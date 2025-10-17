@@ -23,11 +23,11 @@ const Header = () => {
             onMouseOver={(e) => handleH1Wght(e)}
             className="flex flex-col items-center justify-center scroll-smooth h-svh"
         >
-            <h1 className="md:max-w-[50vw] text-center text-[clamp(1rem, 23vw, 100px)] lg:text-[11.5vw] leading-[90%]">
+            <h1 className="md:max-w-[50vw] text-center text-[clamp(1rem,23vw,100px)] lg:text-[11.5vw] leading-[90%]">
                 Arthur
                 <br />
                 Jenck{" "}
-                <span className="hero-typing size-fit block mx-auto tracking-normal leading-normal whitespace-nowrap overflow-hidden border-white border-r-2 text-[clamp(10px, 3.5vw, 1rem)] md:text-[1.5vw]">
+                <span className="hero-typing size-fit block mx-auto tracking-normal leading-normal whitespace-nowrap overflow-hidden border-white border-r-2 text-[clamp(10px,3.5vw,1rem)] md:text-[1.5vw]">
                     Développeur Web Front-End
                 </span>
             </h1>
@@ -38,15 +38,15 @@ const Header = () => {
             >
                 <ImgLink
                     type="linkedin"
-                    className="w-[clamp(1rem, 14.5vw, 4rem)] md:w-[3.5vw]"
+                    className="w-[clamp(1rem,14.5vw,4rem)] md:w-[clamp(3rem,3.5vw,3.5vw)]"
                 />
                 <ImgLink
                     type="github"
-                    className="w-[clamp(1rem, 14.5vw, 4rem)] md:w-[3.5vw]"
+                    className="w-[clamp(1rem,14.5vw,4rem)] md:w-[clamp(3rem,3.5vw,3.5vw)]"
                 />
                 <ImgLink
                     type="cv"
-                    className="w-[clamp(1rem, 14.5vw, 4rem)] md:w-[3.5vw]"
+                    className="w-[clamp(1rem,14.5vw,4rem)] md:w-[clamp(3rem,3.5vw,3.5vw)]"
                 />
             </div>
             <Image

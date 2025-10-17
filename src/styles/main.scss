@@ -1,6 +1,4 @@
 // @import remplacé par @use
-@use "../styles/variables/colors";
-
 html,
 * {
     box-sizing: border-box;
@@ -11,15 +9,6 @@ html,
 
 body {
     background-color: var(--primary);
-    h2 {
-        font-size: clamp(2rem, 5vw, 5vw);
-        position: relative;
-        left: 50%;
-        transform: translateX(-50%);
-        top: 0;
-        width: fit-content;
-        letter-spacing: 2px;
-    }
 }
 
 // Hors mobile, la barre de scroll est stylisée

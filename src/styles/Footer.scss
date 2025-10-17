@@ -1,11 +1,9 @@
-@use "./variables/colors";
-
 footer {
     position: relative;
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    background-color: colors.$secondary;
+    background-color: var(--secondary);
     padding: 2vw 4vw;
     gap: 1.5vw;
 

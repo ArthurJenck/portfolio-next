@@ -1,8 +1,6 @@
-@use "../styles/variables/colors";
-
 #about {
     // Le overflow-y est nécessaire pour cacher les projets au-dessus
-    background-color: colors.$main;
+    background-color: var(--primary);
     position: relative;
     padding-bottom: 10vh;
 
@@ -13,7 +11,7 @@
         width: 100%;
         height: 2px;
         bottom: -1px;
-        background-color: colors.$main;
+        background-color: var(--primary);
         display: block;
         z-index: 0;
     }
