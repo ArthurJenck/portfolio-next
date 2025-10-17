@@ -1,48 +1,57 @@
 "use client"
 
-import { useDebounce, isMobileDevice } from "../hooks"
 import ImgLink from "./ImgLink"
 import Burger from "./Burger"
+import { useScroll, useMotionValue, useSpring, motion } from "framer-motion"
 import { useEffect } from "react"
 
 const NavBar = () => {
-    const changeNavOpacity = () => {
-        // En mobile, le logo de la nav disparaît après avoir scrollé
-        const navLogoOpacity = document.querySelector(".logo-link")!
-        scrollY > 0
-            ? navLogoOpacity.setAttribute(
-                  "style",
-                  "opacity:0; pointer-events: none"
-              )
-            : navLogoOpacity.setAttribute("style", "opacity:1")
-    }
+    // Utilisation de useScroll de Framer Motion (optimisé avec requestAnimationFrame)
+    const { scrollY } = useScroll()
 
-    // On ajoute un debounce sur les fonctions onScroll pour éviter la surcharge d'événements et de lag
-    const debouncedChangeNavOpac = useDebounce(changeNavOpacity, 10)
+    // Crée une MotionValue pour l'opacité
+    const logoOpacityTarget = useMotionValue(1)
 
+    // Ajoute un spring pour adoucir la transition
+    const logoOpacity = useSpring(logoOpacityTarget, {
+        stiffness: 300,
+        damping: 30,
+    })
+
+    // Met à jour l'opacité selon le scroll
     useEffect(() => {
-        // On n'ajoute l'écouteur d'événement que si l'appareil est un téléphone ou une tablette
-        if (isMobileDevice()) {
-            window.addEventListener("scroll", debouncedChangeNavOpac, {
-                passive: true,
-            })
-
-            return () => {
-                window.removeEventListener("scroll", debouncedChangeNavOpac)
-            }
-        }
+        return scrollY.on("change", (latest) => {
+            logoOpacityTarget.set(latest > 0 ? 0 : 1)
+        })
     }, [])
 
     return (
-        <nav className="fixed top-8 left-[4vw] right-[4vw] z-50 h-16 md:h-fit flex justify-between items-center pointer-events-none">
-            <ImgLink
-                type="logo"
-                className="size-[5vw] block pointer-events-auto"
-            />
-            <div className="pointer-events-auto">
-                <Burger />
-            </div>
-        </nav>
+        <>
+            {/* Version mobile : logo qui disparaît au scroll */}
+            <nav className="md:hidden fixed top-8 left-[4vw] right-[4vw] z-50 h-16 flex justify-between items-center pointer-events-none">
+                <motion.div
+                    style={{ opacity: logoOpacity }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="pointer-events-auto"
+                >
+                    <ImgLink type="logo" className="size-[4rem]" />
+                </motion.div>
+                <div className="pointer-events-auto">
+                    <Burger />
+                </div>
+            </nav>
+
+            {/* Version desktop : logo toujours visible */}
+            <nav className="hidden md:flex fixed top-8 left-[4vw] right-[4vw] z-50 h-fit justify-between items-center pointer-events-none">
+                <ImgLink
+                    type="logo"
+                    className="size-[5vw] pointer-events-auto"
+                />
+                <div className="pointer-events-auto">
+                    <Burger />
+                </div>
+            </nav>
+        </>
     )
 }
 

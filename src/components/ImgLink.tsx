@@ -1,12 +1,12 @@
 "use client"
 
+import { motion } from "framer-motion"
 import Logo from "../assets/icons/logo.svg"
 import linkedinIcon from "../assets/icons/linkedin-icon.svg"
 import githubIcon from "../assets/icons/github-icon.svg"
 import cvIcon from "../assets/icons/cv-icon.svg"
 import extLinkIcon from "../assets/icons/ext-link.svg"
-import "../styles/ImgLink.scss"
-import { isMobileDevice, scrollTo } from "../hooks"
+import { scrollTo } from "../hooks"
 import Link from "next/link"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
@@ -16,7 +16,6 @@ interface ImgLinkProps {
     link?: string
     alt?: string
     className?: string
-    size?: number
 }
 
 const ImgLink = ({
@@ -24,7 +23,6 @@ const ImgLink = ({
     link: customLink,
     alt: customAlt,
     className,
-    size = 100,
 }: ImgLinkProps) => {
     // Configuration des liens et icônes selon le type
     const getLinkConfig = () => {
@@ -65,56 +63,146 @@ const ImgLink = ({
 
     const { link, linkMobile, icon, alt } = getLinkConfig()
 
-    // Pour les liens externes (linkedin, github, projets) ou pour logo avec lien spécifique
+    // Pour les liens externes (linkedin, github, projets)
     const isExternal = type !== "logo" && type !== "cv"
     const isLogoWithoutLink = type === "logo" && !customLink
-    const isMobile = isMobileDevice()
 
-    if (isExternal || (type === "cv" && isMobile)) {
+    // Animations communes pour les liens sociaux (uniquement desktop)
+    const animationProps = {
+        transition: { type: "spring" as const, stiffness: 400, damping: 12 },
+        whileHover: { scale: 1.2 },
+        whileTap: { scale: 0.95 },
+    }
+
+    if (isExternal) {
         return (
-            <a
-                href={type === "cv" && isMobile ? linkMobile : link}
-                className={cn("socials-link", className)}
-                target="_blank"
-                rel="noopener noreferrer"
+            <>
+                {/* Version mobile : sans animation */}
+                <a
+                    href={link}
+                    className={cn("select-none md:hidden", className)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <Image
+                        src={icon}
+                        alt={alt}
+                        width={100}
+                        height={100}
+                        style={{ width: "100%", height: "100%" }}
+                    />
+                </a>
+
+                {/* Version desktop : avec animations */}
+                <motion.a
+                    href={link}
+                    className={cn("select-none hidden md:block", className)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    {...animationProps}
+                >
+                    <Image
+                        src={icon}
+                        alt={alt}
+                        width={100}
+                        height={100}
+                        style={{ width: "100%", height: "100%" }}
+                    />
+                </motion.a>
+            </>
+        )
+    }
+
+    // Le CV a deux versions : mobile (téléchargement direct) et desktop (page avec lecteur)
+    if (type === "cv") {
+        return (
+            <>
+                {/* Version mobile : lien direct vers le PDF */}
+                <motion.a
+                    href={linkMobile}
+                    className={cn("select-none block md:hidden", className)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <Image
+                        src={icon}
+                        alt={alt}
+                        width={100}
+                        height={100}
+                        style={{ width: "100%", height: "100%" }}
+                    />
+                </motion.a>
+
+                {/* Version desktop : lien vers la page CV avec animations */}
+                <motion.div className={cn("hidden md:block", className)}>
+                    <Link href={link} className="select-none">
+                        <motion.div {...animationProps}>
+                            <Image
+                                src={icon}
+                                alt={alt}
+                                width={100}
+                                height={100}
+                                style={{ width: "100%", height: "100%" }}
+                            />
+                        </motion.div>
+                    </Link>
+                </motion.div>
+            </>
+        )
+    }
+
+    // Logo ou lien interne
+    return (
+        <>
+            {/* Version mobile : sans animation */}
+            <Link
+                href={link}
+                onClick={
+                    isLogoWithoutLink
+                        ? (e) => {
+                              e.preventDefault()
+                              scrollTo(0)
+                          }
+                        : undefined
+                }
+                className={cn("select-none block md:hidden", className)}
             >
                 <Image
                     src={icon}
                     alt={alt}
-                    width={size}
-                    height={size}
+                    width={100}
+                    height={100}
                     style={{ width: "100%", height: "100%" }}
                 />
-            </a>
-        )
-    }
+            </Link>
 
-    return (
-        // Le CV est un cas particulier, la version bureau amenant vers une page différente avec un lecteur de PDF, la version mobile faisant télécharger le document
-        <Link
-            href={link}
-            // Dans le cas où le composant représente le logo et sert de to-top, on retire le chargement de la page
-            onClick={
-                isLogoWithoutLink
-                    ? (e) => {
-                          e.preventDefault()
-                          scrollTo(0)
-                      }
-                    : () => {}
-            }
-            className={cn(
-                type === "logo" ? "logo-link" : "socials-link",
-                className
-            )}
-        >
-            <Image
-                src={icon}
-                alt={alt}
-                width={size}
-                height={size}
-                style={{ width: "100%", height: "100%" }}
-            />
-        </Link>
+            {/* Version desktop : avec animations */}
+            <motion.div
+                className={cn("select-none hidden md:block", className)}
+            >
+                <Link
+                    href={link}
+                    onClick={
+                        isLogoWithoutLink
+                            ? (e) => {
+                                  e.preventDefault()
+                                  scrollTo(0)
+                              }
+                            : undefined
+                    }
+                >
+                    <motion.div {...animationProps}>
+                        <Image
+                            src={icon}
+                            alt={alt}
+                            width={100}
+                            height={100}
+                            style={{ width: "100%", height: "100%" }}
+                        />
+                    </motion.div>
+                </Link>
+            </motion.div>
+        </>
     )
 }
 
