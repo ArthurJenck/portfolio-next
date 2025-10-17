@@ -1,11 +1,10 @@
 "use client"
 
-import { useState } from "react"
-import SingleProject from "../components/SingleProject"
-import TechFilter, { techArrayProps } from "../components/TechFilter"
+import { techArrayProps } from "../components/TechFilter"
 import { projectsArr } from "../data/projects"
 import { techsArr } from "../data/techs"
 import "../styles/Projets.scss"
+import SectionTitle from "@/components/SectionTitle"
 
 const Projets = () => {
     // On trie ensuite ces projets par date
@@ -20,61 +19,39 @@ const Projets = () => {
         }),
     ]
 
-    // Le tableau de techs à utiliser sera ensuite mis à jour
-    const [toUseTechs, setToUseTechs] = useState(baseTechs)
-    // Quand aucun filtre n'a été cliqué, c'est un cas particulier nécessitant d'afficher tous les projets
-    const [noFiltersClicked, setNoFiltersClicked] = useState(true)
     // Les techs indiquées comme actives et donc comme filtres seront ajoutées dans ce tableau
     const activeTechs = [] as Array<techArrayProps>
 
-    let noProjectShown = true
-
     return (
         <section id="projets">
-            <h2>Projets</h2>
-            <TechFilter
+            <SectionTitle title="Projets" />
+            {/* <TechFilter
                 toUseTechs={toUseTechs}
                 setToUseTechs={setToUseTechs}
                 noFiltersClicked={noFiltersClicked}
                 setNoFiltersClicked={setNoFiltersClicked}
-            />
+            /> */}
             {/* Sur chaque rendu, on vérifie les filtres actifs */}
             {datedProjects.map((project, index) => {
                 activeTechs.length = 0
-                toUseTechs.forEach((tech) => {
-                    tech.active ? activeTechs.push(tech) : null
-                })
                 // Si le projet contient tous les filtres demandés, ou bien qu'aucun filtre n'est cliqué, alors le projet est affiché
-                if (
-                    activeTechs.every((tech) => project.techs.includes(tech)) ||
-                    noFiltersClicked
-                ) {
-                    noProjectShown = false
+                if (activeTechs.every((tech) => project.techs.includes(tech))) {
                     return (
-                        <SingleProject
-                            key={`projet-${index}`}
-                            name={project.name}
-                            desc={project.desc}
-                            techs={project.techs}
-                            gitLink={project.gitLink}
-                            webLink={project.webLink}
-                            picDesk={project.picDesk.src}
-                            picSmol={project.picSmol.src}
-                            picMobile={project.picMobile.src}
-                        />
+                        // <SingleProject
+                        //     key={`projet-${index}`}
+                        //     name={project.name}
+                        //     desc={project.desc}
+                        //     techs={project.techs}
+                        //     gitLink={project.gitLink}
+                        //     webLink={project.webLink}
+                        //     picDesk={project.picDesk.src}
+                        //     picSmol={project.picSmol.src}
+                        //     picMobile={project.picMobile.src}
+                        // />
+                        null
                     )
                 }
             })}
-            {noProjectShown ? (
-                <div className="no-proj-shown">
-                    <p>
-                        Aucun projet disponible pour les filtres sélectionnés.
-                    </p>
-                    <button onClick={() => setNoFiltersClicked(true)}>
-                        Réinitialiser les filtres
-                    </button>
-                </div>
-            ) : null}
         </section>
     )
 }

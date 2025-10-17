@@ -1,62 +1,26 @@
 "use client"
 
-import spiral from "../assets/images/spiral.svg"
-import { useEffect } from "react"
-import { isMobileDevice } from "../hooks"
-import "../styles/About.scss"
-import Image from "next/image"
+import SectionTitle from "@/components/SectionTitle"
+import AsciiPortrait from "@/components/AsciiPortrait"
 
-const About = ({
-    spiralTurn = (e: React.MouseEvent) => {
-        e
-    },
-}) => {
-    const isMobile = isMobileDevice()
-
-    // En mobile et tablette, l'animation de la spirale est déclenchée au scroll
-    const spiralTurnMobile = () => {
-        const spiralImg = document.querySelector(
-            ".about-content>img"
-        ) as HTMLImageElement
-        spiralImg.style.transform = `rotate(-${scrollY / 2}deg)`
-    }
-
-    // L'écouteur d'événement est ajouté qu'en mobile ou tablette
-    useEffect(() => {
-        if (isMobile) {
-            spiralTurnMobile()
-            window.addEventListener("scroll", spiralTurnMobile)
-
-            return () => {
-                window.removeEventListener("scroll", spiralTurnMobile)
-            }
-        }
-    }, [])
-
+const About = () => {
     return (
-        <section
-            id="about"
-            // En version tablette, une autre fonction fait tourner la spirale lors du déplacement de la souris
-            onMouseMove={
-                !isMobile
-                    ? (e) => {
-                          spiralTurn(e)
-                      }
-                    : () => {}
-            }
-        >
-            <h2>À propos</h2>
-            <div className="about-content">
-                <Image
+        <section id="about" className="relative pb-[10vh]">
+            <SectionTitle title="Qui suis-je ?" className="pt-12" />
+            <div className="flex flex-col xl:flex-row justify-center items-center max-w-[70vw] lg:max-w-[60vw] gap-20 py-[8vh] mx-auto">
+                {/* <Image
                     src={spiral}
                     alt=""
                     aria-hidden
                     width={400}
                     height={400}
-                />
-                <div className="about-content__text">
-                    <h3>Je sais centrer une div</h3>
-                    <p>
+                /> */}
+                <AsciiPortrait />
+                <div>
+                    <h3 className="text-2xl lg:text-3xl font-bold mb-5">
+                        Je sais centrer une div
+                    </h3>
+                    <p className="mb-4">
                         Fou amoureux du développement web, j'y pense le jour et
                         j'en rêve la nuit. Ma relation avec le dev a débuté il y
                         a plusieurs années, et ma soif d'apprendre s'intensifie

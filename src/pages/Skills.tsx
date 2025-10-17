@@ -6,7 +6,7 @@ const Skills = () => {
     const categs = [...new Set(skillsArr.map((skill) => skill.categ))]
 
     return (
-        <section className="py-16 relative">
+        <section id="skills" className="py-16 relative">
             <SectionTitle title="Compétences" />
             {/* Chaque catégorie (Front-end, Back...) aura sa propre partie */}
             {categs.map((categ, id) => {

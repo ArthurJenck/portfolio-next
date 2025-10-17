@@ -10,7 +10,7 @@ interface SkillTypeProps {
 const SkillType = ({ categ }: SkillTypeProps) => {
     // Si l'appareil est un mobile, on retire le "-end" de Front-end et Back-end
     return (
-        <div className="w-fit relative left-[5.5vw] lg:left-[15vw] top-0 mt-[5svh] lg:mt-[20svh]">
+        <div className="w-fit relative left-[5.5vw] lg:left-[15vw] top-0 mt-[5svh] lg:mt-[8svh] 3xl:mt-[15svh]">
             <h3 className="md:hidden font-bold sticky top-[50svh] text-[clamp(1.2rem,2.5vw,2.5vw)] float-left text-right tracking-[2px] min-w-16">
                 {categ.split("-")[0]}
             </h3>

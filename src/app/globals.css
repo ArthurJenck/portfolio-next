@@ -7,7 +7,24 @@
     --white: #fdfdfe;
 }
 
+html,
+* {
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
 body {
     background: var(--primary);
     color: var(--white);
+}
+
+@media screen and (min-width: 768px) {
+    ::-webkit-scrollbar {
+        width: 8px;
+        background-color: rgba(0, 0, 0, 0);
+    }
+    ::-webkit-scrollbar-thumb {
+        background-color: var(--white);
+        border-radius: 5px;
+    }
 }
