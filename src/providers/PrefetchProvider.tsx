@@ -32,29 +32,29 @@ export function PrefetchProvider({ children }: PrefetchProviderProps) {
         typeof dehydrate
     > | null>(null)
 
-    useEffect(() => {
-        const prefetchData = async () => {
-            // Prefetch all data
-            await Promise.all([
-                queryClient.prefetchQuery({
-                    queryKey: queryKeys.skills,
-                    queryFn: getSkills,
-                }),
-                queryClient.prefetchQuery({
-                    queryKey: queryKeys.projects,
-                    queryFn: getProjects,
-                }),
-                queryClient.prefetchQuery({
-                    queryKey: queryKeys.techs,
-                    queryFn: getTechs,
-                }),
-            ])
+    // useEffect(() => {
+    //     const prefetchData = async () => {
+    //         // Prefetch all data
+    //         await Promise.all([
+    //             queryClient.prefetchQuery({
+    //                 queryKey: queryKeys.skills,
+    //                 queryFn: getSkills,
+    //             }),
+    //             queryClient.prefetchQuery({
+    //                 queryKey: queryKeys.projects,
+    //                 queryFn: getProjects,
+    //             }),
+    //             queryClient.prefetchQuery({
+    //                 queryKey: queryKeys.techs,
+    //                 queryFn: getTechs,
+    //             }),
+    //         ])
 
-            setDehydratedState(dehydrate(queryClient))
-        }
+    //         setDehydratedState(dehydrate(queryClient))
+    //     }
 
-        prefetchData()
-    }, [queryClient])
+    //     prefetchData()
+    // }, [queryClient])
 
     if (!dehydratedState) {
         return <>{children}</>
