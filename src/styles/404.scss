@@ -1,19 +1,20 @@
 #page-404 {
-    div {
-        a {
-            &::after {
-                content: "";
-                width: 100%;
-                height: 2px;
-                background-color: var(--white);
-                display: block;
-                position: absolute;
-                bottom: 3px;
-            }
+    .not-found__link {
+        position: relative;
+        font-size: clamp(0.85rem, 2vw, 2rem);
 
-            &:hover::after {
-                animation: underline 0.3s ease-in-out;
-            }
+        &::after {
+            content: "";
+            width: 100%;
+            height: 2px;
+            background-color: var(--white);
+            display: block;
+            position: absolute;
+            bottom: 3px;
+        }
+
+        &:hover::after {
+            animation: underline 0.3s ease-in-out;
         }
     }
 }

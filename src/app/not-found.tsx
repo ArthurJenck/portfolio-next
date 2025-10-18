@@ -19,10 +19,7 @@ const NotFound = () => {
                 <p className="text-[clamp(0.85rem,2vw,2rem)] relative">
                     Vous êtes perdu ?
                 </p>
-                <Link
-                    href="/"
-                    className="text-[clamp(0.85rem,2vw,2rem)] relative"
-                >
+                <Link href="/" className="not-found__link">
                     Revenir en lieu sûr
                 </Link>
             </div>
