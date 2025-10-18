@@ -2,8 +2,8 @@
 
 const AsciiPortrait = () => {
     return (
-        <div className="relative cursor-none w-[380px]">
-            <pre className="whitespace-pre-wrap text-[5px] bg-white text-black leading-none">
+        <div className="relative cursor-none w-[min(380px,100%)] md:w-[380px] @container md:@container-normal">
+            <pre className="whitespace-pre-wrap size-full md:size-auto text-[1.32cqw] md:text-[5px] bg-white text-black leading-[1.1] md:leading-none">
                 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

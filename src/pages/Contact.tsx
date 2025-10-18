@@ -1,52 +1,48 @@
 import React from "react"
 import "../styles/Contact.scss"
-import CopyBtn from "../components/CopyBtn"
+import ContactLink from "../components/ContactLink"
 import SectionTitle from "@/components/SectionTitle"
 
 const Contact = () => {
-    const mail = "contact@arthurjenck.com"
-    const tel = "0610790509"
-    const linkedinLink = "https://www.linkedin.com/in/arthurjenck/"
-    const githubLink = "https://github.com/ArthurJenck/"
+    const contactLinks = [
+        {
+            id: "mail",
+            href: "mailto:contact@arthurjenck.com",
+            displayText: "contact@arthurjenck.com",
+            copyText: "contact@arthurjenck.com",
+        },
+        {
+            id: "tel",
+            href: "tel:0610790509",
+            displayText: "06.10.79.05.09",
+            copyText: "0610790509",
+        },
+        {
+            id: "linkedin",
+            href: "https://www.linkedin.com/in/arthurjenck/",
+            displayText: "linkedin.com/in/arthurjenck",
+            copyText: "https://www.linkedin.com/in/arthurjenck/",
+        },
+        {
+            id: "github",
+            href: "https://github.com/ArthurJenck/",
+            displayText: "github.com/ArthurJenck",
+            copyText: "https://github.com/ArthurJenck/",
+        },
+    ]
 
     return (
-        <section id="contact">
+        <section id="contact" className="relative z-0 md:pb-[15vh]">
             <SectionTitle title="On prend un café ?" />
-            <ul className="about-links">
-                <li>
-                    {/* Le lien doit directement permettre d'envoyer un mail */}
-                    <a href={`mailto:${mail}`} target="_blank">
-                        {mail}
-                    </a>
-                    <CopyBtn />
-                </li>
-                <li>
-                    {/* Le clic ouvre directement l'application de téléphone */}
-                    <a href={`tel:${tel}`}>
-                        {tel.replace(/(.{2})/g, "$&" + ".").slice(0, -1)}
-                    </a>
-                    <CopyBtn />
-                </li>
-                <li>
-                    <a href={linkedinLink} target="_blank">
-                        {/* Avant d'être affichés, on enlève sur cette instance les schémas d'url */}
-                        {linkedinLink
-                            .replace("https://", "")
-                            .replace("www.", "")
-                            .slice(0, -1)}
-                    </a>
-                    <CopyBtn />
-                </li>
-                <li>
-                    <a href={githubLink} target="_blank">
-                        {/* Avant d'être affichés, on enlève sur cette instance les schémas d'url */}
-                        {githubLink
-                            .replace("https://", "")
-                            .replace("www.", "")
-                            .slice(0, -1)}
-                    </a>
-                    <CopyBtn />
-                </li>
+            <ul className="about-links flex flex-col items-start md:items-center text-base md:text-xl ml-[13vw] md:ml-0 mt-4 md:mt-6 pb-16 md:pb-0">
+                {contactLinks.map((link) => (
+                    <ContactLink
+                        key={link.id}
+                        href={link.href}
+                        displayText={link.displayText}
+                        copyText={link.copyText}
+                    />
+                ))}
             </ul>
         </section>
     )

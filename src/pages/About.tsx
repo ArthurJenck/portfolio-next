@@ -5,16 +5,9 @@ import AsciiPortrait from "@/components/AsciiPortrait"
 
 const About = () => {
     return (
-        <section id="about" className="relative pb-[10vh]">
-            <SectionTitle title="Qui suis-je ?" className="pt-12" />
-            <div className="flex flex-col xl:flex-row justify-center items-center max-w-[70vw] lg:max-w-[60vw] gap-20 py-[8vh] mx-auto">
-                {/* <Image
-                    src={spiral}
-                    alt=""
-                    aria-hidden
-                    width={400}
-                    height={400}
-                /> */}
+        <section id="about">
+            <SectionTitle title="Qui suis-je ?" />
+            <div className="flex flex-col xl:flex-row justify-center items-center max-w-[70vw] lg:max-w-[60vw] gap-10 md:gap-20 py-[5svh] md:py-[8vh] mx-auto">
                 <AsciiPortrait />
                 <div>
                     <h3 className="text-2xl lg:text-3xl font-bold mb-5">
