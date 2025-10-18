@@ -183,7 +183,7 @@ export const ProjectsCarousel: React.FC = () => {
                 className="absolute inset-0"
                 style={{
                     perspective: "1000px",
-                    perspectiveOrigin: "50% 40%",
+                    perspectiveOrigin: "50% 30%",
                 }}
                 animate={{ scale: isDragging ? DRAG_SCALE : 1 }}
                 transition={CONTAINER_SCALE_TRANSITION}

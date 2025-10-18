@@ -1,6 +1,6 @@
 export const ITEM_WIDTH = 504
 export const ITEM_GAP = 80
-export const VIEW_PADDING = 120
+export const VIEW_PADDING = 300
 export const TILE_HEIGHT = 283
 
 export const SUBTITLE_UNDERLINE_W = 25
