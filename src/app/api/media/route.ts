@@ -2,17 +2,17 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
-import Tech from '@/models/Tech'
+import Media from '@/models/Media'
 
 export async function GET() {
   try {
     await connectDB()
-    const techs = await Tech.find().sort({ order: 1 })
+    const media = await Media.find().sort({ createdAt: -1 })
     
-    return NextResponse.json(techs)
+    return NextResponse.json(media)
   } catch (error) {
-    console.error('Error fetching techs:', error)
-    return NextResponse.json({ error: 'Failed to fetch techs' }, { status: 500 })
+    console.error('Error fetching media:', error)
+    return NextResponse.json({ error: 'Failed to fetch media' }, { status: 500 })
   }
 }
 
@@ -23,11 +23,12 @@ export async function POST(request: Request) {
   try {
     await connectDB()
     const body = await request.json()
-    const tech = await Tech.create(body)
+    const mediaItem = await Media.create(body)
     
-    return NextResponse.json(tech, { status: 201 })
+    return NextResponse.json(mediaItem, { status: 201 })
   } catch (error) {
-    console.error('Error creating tech:', error)
-    return NextResponse.json({ error: 'Failed to create tech' }, { status: 500 })
+    console.error('Error creating media:', error)
+    return NextResponse.json({ error: 'Failed to create media' }, { status: 500 })
   }
 }
+
