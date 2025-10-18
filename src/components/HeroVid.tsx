@@ -9,68 +9,97 @@ import Image from "next/image"
 const BG_Webm = "/videos/portfolio-bg.webm"
 const BG_Mp4 = "/videos/portfolio-bg.mp4"
 
-// Bug de lecture des vidéos sur Safari & iphone
+// Bug de lecture des vidéos sur Safari & iPhone
 const isSafari = () => {
+    if (typeof window === "undefined") return false
     const ua = navigator.userAgent.toLowerCase()
-    return ua.indexOf("safar") > -1 && ua.indexOf("chrome") < 0
+    return ua.indexOf("safari") > -1 && ua.indexOf("chrome") < 0
 }
 
 const HeroVid = () => {
-    const ref = useRef<HTMLDivElement>(null)
+    const videoRef = useRef<HTMLVideoElement>(null)
     const [shouldUseImg, setShouldUseImg] = useState(false)
 
     useEffect(() => {
-        // Les attributs doivent être forcés afin que la vidéo se lance sur les appareils Apple
-        if (isSafari() && ref.current) {
-            const player = ref.current.children[0] as HTMLVideoElement
-            if (player) {
-                player.controls = false
-                player.playsInline = true
-                player.muted = true
-                player.setAttribute("muted", "")
+        const video = videoRef.current
+        if (!video) return
 
-                // On vérifie si la vidéo se joue bien, sinon on affiche l'image de remplacement
-                setTimeout(() => {
-                    player
-                        .play()
-                        .then(() => {})
-                        .catch(() => {
-                            ref.current!.style.display = "none"
-                            setShouldUseImg(true)
+        const initVideo = async () => {
+            try {
+                // Force les attributs manuellement pour Safari/iOS
+                // Safari ne respecte pas toujours les attributs JSX React
+                video.muted = true
+                video.playsInline = true
+                video.autoplay = true
+                video.setAttribute("muted", "true")
+                video.setAttribute("playsinline", "true")
+                video.setAttribute("autoplay", "true")
+
+                // Pour Safari, forcer aussi les attributs webkit
+                if (isSafari()) {
+                    video.setAttribute("webkit-playsinline", "true")
+                    video.setAttribute("x-webkit-airplay", "deny")
+
+                    await new Promise((resolve) => setTimeout(resolve, 100))
+                }
+
+                // Attendre que la vidéo soit chargée
+                if (video.readyState < 2) {
+                    await new Promise((resolve) => {
+                        video.addEventListener("loadeddata", resolve, {
+                            once: true,
                         })
-                }, 0)
+                    })
+                }
+
+                // Forcer le play() après navigation ou au montage
+                await video.play()
+            } catch (error) {
+                console.warn(
+                    "Vidéo ne peut pas être lancée, fallback image:",
+                    error
+                )
+                setShouldUseImg(true)
+            }
+        }
+
+        // Lancer l'initialisation
+        initVideo()
+
+        // Cleanup
+        return () => {
+            if (video) {
+                video.pause()
             }
         }
     }, [])
 
-    // Selon si on devrait utiliser l'image ou non, on affiche soit le placeholder soit la vidéo
-    return shouldUseImg ? (
-        <Image
-            src={PlaceHolder}
-            alt="Image de fond"
+    if (shouldUseImg) {
+        return (
+            <Image
+                src={PlaceHolder}
+                alt="Image de fond"
+                className="hero-bg"
+                fill
+                priority
+                style={{ objectFit: "cover" }}
+            />
+        )
+    }
+
+    return (
+        <video
+            ref={videoRef}
             className="hero-bg"
-            fill
-            priority
-            style={{ objectFit: "cover" }}
-        />
-    ) : (
-        <div
-            ref={ref}
-            dangerouslySetInnerHTML={{
-                __html: `
-                <video
-                loop
-                muted
-                autoplay
-                playsinline
-                class="hero-bg"
-                aria-hidden="true"
-                >
-                <source src="${BG_Webm}" type="video/webm" />
-                <source src="${BG_Mp4}" type="video/mp4" />
-            `,
-            }}
-        ></div>
+            loop
+            muted
+            autoPlay
+            playsInline
+            aria-hidden="true"
+        >
+            <source src={BG_Webm} type="video/webm" />
+            <source src={BG_Mp4} type="video/mp4" />
+        </video>
     )
 }
 
