@@ -32,7 +32,7 @@ const Contact = () => {
     ]
 
     return (
-        <section id="contact" className="relative z-0 md:pb-[15vh]">
+        <section id="contact" className="relative z-0 md:pb-[12vh]">
             <SectionTitle title="On prend un café ?" />
             <ul className="about-links flex flex-col items-start md:items-center text-base md:text-xl ml-[13vw] md:ml-0 mt-4 md:mt-6 pb-16 md:pb-0">
                 {contactLinks.map((link) => (
