@@ -33,6 +33,10 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# Payload CMS
+/public/uploads
+payload-types.ts
+
 # vercel
 .vercel
 
