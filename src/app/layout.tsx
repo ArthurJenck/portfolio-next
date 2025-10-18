@@ -3,6 +3,7 @@ import { Sora } from "next/font/google"
 import "./globals.css"
 import { QueryProvider } from "@/providers/QueryProvider"
 import { PrefetchProvider } from "@/providers/PrefetchProvider"
+import { cn } from "@/lib/utils"
 
 const sora = Sora({
     subsets: ["latin"],
@@ -63,7 +64,7 @@ export default function RootLayout({
                     }}
                 />
             </head>
-            <body className={sora.className}>
+            <body className={cn("overflow-x-hidden", sora.className)}>
                 <QueryProvider>
                     <PrefetchProvider>{children}</PrefetchProvider>
                 </QueryProvider>

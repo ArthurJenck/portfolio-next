@@ -31,7 +31,7 @@ import odaceMob from "../assets/images/projects-mobile/odace.webp"
 
 import { techsArr } from "./techs"
 
-export const projectsArr = [
+export const projects = [
     {
         name: "Bergamotte",
         date: new Date("2023-01-19"),
