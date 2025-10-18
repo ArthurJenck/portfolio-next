@@ -2,7 +2,6 @@
 
 import PlaceHolder from "../assets/images/hero-placeholder.png"
 import { useState, useEffect, useRef } from "react"
-import "../styles/HeroVid.scss"
 import Image from "next/image"
 
 // Chemins vers les vidéos dans le dossier public
@@ -90,7 +89,7 @@ const HeroVid = () => {
     return (
         <video
             ref={videoRef}
-            className="hero-bg"
+            className="size-full object-cover absolute top-0 left-0 z-[-1] brightness-30"
             loop
             muted
             autoPlay

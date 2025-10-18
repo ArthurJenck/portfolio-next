@@ -1,6 +1,3 @@
-"use client"
-
-import "../styles/Projets.scss"
 import SectionTitle from "@/components/SectionTitle"
 
 const Projets = () => {
