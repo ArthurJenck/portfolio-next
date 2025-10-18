@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useScroll } from "@/hooks/useScroll"
 import { FastTravelSection } from "./fastTravelConfig"
+import { cn } from "@/lib/utils"
 
 interface FastTravelLinkProps {
     section: FastTravelSection
@@ -30,11 +31,14 @@ const FastTravelLink = ({ section, isActive }: FastTravelLinkProps) => {
     }
 
     return (
-        <li>
+        <li className="fast-travel__link relative rounded-full">
             <Link
                 href={section.href}
                 onClick={handleClick}
-                className={isActive ? "current" : ""}
+                className={cn(
+                    "block rounded-full w-[2.5vw] aspect-square border-2 border-white",
+                    isActive && "current"
+                )}
                 aria-label={section.label}
             />
         </li>

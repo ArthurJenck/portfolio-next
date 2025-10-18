@@ -87,7 +87,7 @@ const FastTravel = () => {
 
     return (
         <ul
-            className="fast-travel"
+            className="hidden md:flex flex-col gap-[2vw] fixed right-[4vw] top-3/7 -translate-y-1/2 opacity-0 invisible transition-all duration-200 z-4"
             style={{
                 visibility: isVisible ? "visible" : "hidden",
                 opacity: isVisible ? 1 : 0,
