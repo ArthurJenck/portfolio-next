@@ -22,7 +22,7 @@ const Projets = () => {
     const activeTechs = [] as Array<string>
 
     return (
-        <section id="projets">
+        <section id="projets" className="h-screen">
             <SectionTitle title="Projets" />
             {/* <TechFilter
                 toUseTechs={toUseTechs}

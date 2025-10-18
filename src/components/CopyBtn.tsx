@@ -51,7 +51,6 @@ const CopyBtn = ({ copyText, isHovered }: CopyBtnProps) => {
             <div
                 className="md:hidden w-3.5 absolute -right-6 top-1/2 -translate-y-1/2 cursor-pointer pointer-events-auto"
                 onClick={handleCopyClick}
-                aria-hidden
             >
                 {isError ? (
                     <X size={24} className="w-full h-auto text-red-500" />
@@ -66,7 +65,6 @@ const CopyBtn = ({ copyText, isHovered }: CopyBtnProps) => {
             <motion.div
                 className="hidden md:block w-3.5 absolute -right-6 top-1/2 -translate-y-1/2 cursor-pointer pointer-events-auto"
                 onClick={handleCopyClick}
-                aria-hidden
                 animate={{ opacity: shouldBeVisible ? 1 : 0 }}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}

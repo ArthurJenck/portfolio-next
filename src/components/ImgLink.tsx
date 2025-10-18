@@ -170,6 +170,7 @@ const ImgLink = ({
                 className={cn("select-none block md:hidden", className)}
             >
                 <Image
+                    priority
                     src={icon}
                     alt={alt}
                     width={100}
@@ -196,6 +197,7 @@ const ImgLink = ({
                     className={cn("select-none hidden md:block", className)}
                 >
                     <Image
+                        priority
                         src={icon}
                         alt={alt}
                         width={100}
