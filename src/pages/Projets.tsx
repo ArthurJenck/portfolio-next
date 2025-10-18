@@ -1,6 +1,5 @@
 "use client"
 
-import { techArrayProps } from "../components/TechFilter"
 import { projectsArr } from "../data/projects"
 import { techsArr } from "../data/techs"
 import "../styles/Projets.scss"
@@ -20,7 +19,7 @@ const Projets = () => {
     ]
 
     // Les techs indiquées comme actives et donc comme filtres seront ajoutées dans ce tableau
-    const activeTechs = [] as Array<techArrayProps>
+    const activeTechs = [] as Array<string>
 
     return (
         <section id="projets">
@@ -32,7 +31,7 @@ const Projets = () => {
                 setNoFiltersClicked={setNoFiltersClicked}
             /> */}
             {/* Sur chaque rendu, on vérifie les filtres actifs */}
-            {datedProjects.map((project, index) => {
+            {/* {datedProjects.map((project, index) => {
                 activeTechs.length = 0
                 // Si le projet contient tous les filtres demandés, ou bien qu'aucun filtre n'est cliqué, alors le projet est affiché
                 if (activeTechs.every((tech) => project.techs.includes(tech))) {
@@ -51,7 +50,7 @@ const Projets = () => {
                         null
                     )
                 }
-            })}
+            })} */}
         </section>
     )
 }

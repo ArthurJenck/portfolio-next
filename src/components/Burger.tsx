@@ -4,11 +4,13 @@ import { useState } from "react"
 import { motion } from "framer-motion"
 import ImgLink from "./ImgLink"
 import "../styles/Burger.scss"
-import { scrollTo } from "../hooks"
+import { useScroll } from "../hooks/useScroll"
 
 const Burger = () => {
     // Checker si le menu Burger est ouvert ou non
     const [isOpen, setIsOpen] = useState(false)
+
+    const scrollTo = useScroll()
 
     return (
         // S'il est ouvert, le menu burger obtient la class open

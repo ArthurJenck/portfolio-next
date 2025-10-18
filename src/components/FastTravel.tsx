@@ -2,15 +2,16 @@
 
 import { useEffect, useState } from "react"
 import "../styles/FastTravel.scss"
-import { useDebounce, useIsMounted, scrollTo } from "../hooks"
+import { useDebounce } from "../hooks/useDebounce"
+import { useScroll } from "../hooks/useScroll"
 
 const FastTravel = () => {
     // De nombreux états sont utilisés ici, pour l'opacité et la visibilité de l'élément ainsi que vérifier la section visionnée par l'utilisateur
     const [fastTravVis, setFastTravVis] = useState("hidden")
     const [fastTravOpac, setFastTravOpac] = useState(0)
     const [currentSection, setCurrentSection] = useState("accueil")
-    // Le hook isMounted vérifie si le composant est bien rendu
-    const isMounted = useIsMounted()
+
+    const scrollTo = useScroll()
 
     const checkCurrentSect = () => {
         // On récupère l'emplacement vertical de chaque section sur la page, et on retire une partie de la hauteur de la page pour "remonter" la section prise en compte par le composant
@@ -33,38 +34,22 @@ const FastTravel = () => {
 
         // Tout en haut de la page, le composant est masqué. Il est important d'ajouter le hook isMounted avant chaque modification d'état par convention React
         if (scrollY < window.innerHeight / 3) {
-            if (isMounted.current) {
-                setFastTravVis("hidden")
-                setFastTravOpac(0)
-            }
+            setFastTravVis("hidden")
+            setFastTravOpac(0)
         } else {
-            if (isMounted.current) {
-                setFastTravVis("visible")
-                setFastTravOpac(1)
-            }
+            setFastTravVis("visible")
+            setFastTravOpac(1)
         }
         // On vérifie ensuite où se situe l'utilisateur dans le scroll vertical de la page et on modifie la section indiquée par le composant accordément
-        if (scrollY >= 0 && scrollY <= skillsTop && isMounted.current) {
+        if (scrollY >= 0 && scrollY <= skillsTop) {
             setCurrentSection("accueil")
-        } else if (
-            scrollY > skillsTop &&
-            scrollY < projetsTop &&
-            isMounted.current
-        ) {
+        } else if (scrollY > skillsTop && scrollY < projetsTop) {
             setCurrentSection("skills")
-        } else if (
-            scrollY >= projetsTop &&
-            scrollY < aboutTop &&
-            isMounted.current
-        ) {
+        } else if (scrollY >= projetsTop && scrollY < aboutTop) {
             setCurrentSection("projets")
-        } else if (
-            scrollY > aboutTop &&
-            scrollY <= contactTop &&
-            isMounted.current
-        ) {
+        } else if (scrollY > aboutTop && scrollY <= contactTop) {
             setCurrentSection("about")
-        } else if (isMounted.current) {
+        } else {
             setCurrentSection("contact")
         }
     }

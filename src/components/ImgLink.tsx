@@ -6,10 +6,10 @@ import linkedinIcon from "../assets/icons/linkedin-icon.svg"
 import githubIcon from "../assets/icons/github-icon.svg"
 import cvIcon from "../assets/icons/cv-icon.svg"
 import extLinkIcon from "../assets/icons/ext-link.svg"
-import { scrollTo } from "../hooks"
 import Link from "next/link"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
+import { useScroll } from "../hooks/useScroll"
 
 interface ImgLinkProps {
     type: "logo" | "linkedin" | "github" | "cv" | "projet"
@@ -24,6 +24,8 @@ const ImgLink = ({
     alt: customAlt,
     className,
 }: ImgLinkProps) => {
+    const scrollTo = useScroll()
+
     // Configuration des liens et icônes selon le type
     const getLinkConfig = () => {
         switch (type) {

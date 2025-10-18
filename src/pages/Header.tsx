@@ -2,12 +2,14 @@
 
 import ImgLink from "../components/ImgLink"
 import Chevron from "../assets/icons/chevron.svg"
-import { scrollTo } from "../hooks"
+import { useScroll } from "../hooks/useScroll"
 import "../styles/Header.scss"
 import HeroVid from "../components/HeroVid"
 import Image from "next/image"
 
 const Header = () => {
+    const scrollTo = useScroll()
+
     // On récupère l'emplacement vertical de la souris et on le convertit en font-weight pour animer le titre
     const handleH1Wght = (e: React.MouseEvent) => {
         document
