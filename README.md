@@ -62,6 +62,7 @@ Premières réflexions en 2023
 Début du design de la maquette le 30 octobre 2024  
 Début du développement le 15 novembre 2024  
 Fin officielle du développement le 11 décembre 2024 (modifications régulières)
+Reprise en octobre 2025
 
 ### Auteur
 
