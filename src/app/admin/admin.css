@@ -1,5 +1,23 @@
 /* Styles custom pour l'interface admin */
 
+/* Assurer que les icônes Lucide sont bien colorées */
+.RaAppBar-toolbar svg {
+    color: inherit !important;
+}
+
+.RaMenuItemLink-root svg {
+    color: inherit !important;
+}
+
+/* Améliorer la visibilité des icônes dans les boutons d'action */
+.MuiButton-root svg {
+    color: inherit !important;
+}
+
+.MuiIconButton-root svg {
+    color: inherit !important;
+}
+
 /* Améliorer l'apparence générale des formulaires */
 .RaForm-root {
     max-width: 800px;

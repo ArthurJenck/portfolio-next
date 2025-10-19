@@ -40,6 +40,15 @@ export const darkTheme = {
                     backgroundColor: '#2c253e',
                     boxShadow: 'none',
                     borderBottom: '1px solid rgba(113, 78, 151, 0.2)',
+                    '& .MuiIconButton-root': {
+                        color: '#fdfdfe',
+                    },
+                    '& .MuiTypography-root': {
+                        color: '#fdfdfe',
+                    },
+                    '& svg': {
+                        color: '#fdfdfe',
+                    },
                 },
             },
         },
@@ -130,6 +139,15 @@ export const lightTheme = {
                     backgroundColor: '#ffffff',
                     boxShadow: 'none',
                     borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
+                    '& .MuiIconButton-root': {
+                        color: '#110f1e',
+                    },
+                    '& .MuiTypography-root': {
+                        color: '#110f1e',
+                    },
+                    '& svg': {
+                        color: '#110f1e',
+                    },
                 },
             },
         },

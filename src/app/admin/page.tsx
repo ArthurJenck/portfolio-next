@@ -13,6 +13,7 @@ import { ProjectList, ProjectEdit, ProjectCreate } from './resources/projects'
 import { SkillList, SkillEdit, SkillCreate } from './resources/skills'
 import { SkillCategoryList, SkillCategoryEdit, SkillCategoryCreate } from './resources/skill-categories'
 import { UserList, UserEdit, UserCreate } from './resources/users'
+import { ProjectIcon, SkillIcon, SkillCategoryIcon, UserIcon } from './components/CustomIcons'
 
 export default function AdminPage() {
     const [mounted, setMounted] = useState(false)
@@ -51,6 +52,7 @@ export default function AdminPage() {
                     list={ProjectList}
                     edit={ProjectEdit}
                     create={ProjectCreate}
+                    icon={ProjectIcon}
                     options={{ label: 'Projets' }}
                 />
                 <Resource
@@ -58,6 +60,7 @@ export default function AdminPage() {
                     list={SkillCategoryList}
                     edit={SkillCategoryEdit}
                     create={SkillCategoryCreate}
+                    icon={SkillCategoryIcon}
                     options={{ label: 'Catégories de compétences' }}
                 />
                 <Resource
@@ -65,6 +68,7 @@ export default function AdminPage() {
                     list={SkillList}
                     edit={SkillEdit}
                     create={SkillCreate}
+                    icon={SkillIcon}
                     options={{ label: 'Compétences' }}
                 />
                 <Resource
@@ -72,6 +76,7 @@ export default function AdminPage() {
                     list={UserList}
                     edit={UserEdit}
                     create={UserCreate}
+                    icon={UserIcon}
                     options={{ label: 'Utilisateurs' }}
                 />
             </Admin>
