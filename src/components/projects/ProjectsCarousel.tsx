@@ -203,14 +203,11 @@ export const ProjectsCarousel: React.FC = () => {
                     onPointerLeave={handlers.onPointerUp}
                 >
                     {projects.map((p, i) => {
-                        // Récupérer l'URL de la première image
-                        const imageUrl = typeof p.images?.[0] === 'string' ? p.images[0] : p.images?.[0]?.url || ''
-
                         return (
                             <ProjectTile
                                 key={p.id}
                                 projectId={p.id}
-                                imageUrl={imageUrl}
+                                imageUrl={p.image}
                                 width={ITEM_WIDTH}
                                 height={TILE_HEIGHT}
                                 color={'#f0f0f0'}
@@ -240,20 +237,16 @@ export const ProjectsCarousel: React.FC = () => {
                     initial={{ x: 0 }}
                 >
                     {projects.map((p, i) => {
-                        // Récupérer les noms des technologies
-                        const techNames =
-                            p.technologies
-                                ?.map((tech) => (typeof tech === 'string' ? tech : tech.title))
-                                .filter(Boolean)
-                                .join(', ') || ''
+                        // Récupérer les noms des compétences de la stack
+                        const stackNames = p.stack?.map((skill) => skill.name).join(', ') || ''
 
                         return (
                             <ProjectDescription
                                 key={`titles-${p.id}`}
                                 title={p.name}
                                 subtitle={p.name}
-                                description={p.description}
-                                tags={techNames}
+                                description={p.summary}
+                                tags={stackNames}
                                 isHovered={hovered === i}
                                 isDragging={isDragging}
                                 width={ITEM_WIDTH}

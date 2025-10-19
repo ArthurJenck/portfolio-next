@@ -1,7 +1,6 @@
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
 import { getSkills } from '@/api/skillsApi'
 import { getProjects } from '@/api/projectsApi'
-import { getTechs } from '@/api/techsApi'
 import { queryKeys } from '@/lib/queryKeys'
 import { getQueryClient } from '@/lib/get-query-client'
 import { ReactNode } from 'react'
@@ -23,10 +22,6 @@ export async function PrefetchProvider({ children }: PrefetchProviderProps) {
                 queryClient.prefetchQuery({
                     queryKey: queryKeys.projects,
                     queryFn: getProjects,
-                }),
-                queryClient.prefetchQuery({
-                    queryKey: queryKeys.techs,
-                    queryFn: getTechs,
                 }),
             ])
         } catch (error) {

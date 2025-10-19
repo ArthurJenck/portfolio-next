@@ -6,12 +6,13 @@ import {
     Create,
     SimpleForm,
     TextInput,
+    ReferenceArrayInput,
+    SelectArrayInput,
     required,
     useRecordContext,
     useRefresh,
     FunctionField,
 } from 'react-admin'
-import { FileUploadInput } from '../components/FileUploadInput'
 
 const ReorderButtons = () => {
     const record = useRecordContext()
@@ -21,11 +22,11 @@ const ReorderButtons = () => {
         if (!record) return
 
         try {
-            const response = await fetch('/api/skills/reorder', {
+            const response = await fetch('/api/skill-categories/reorder', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    skillId: record.id,
+                    categoryId: record.id,
                     direction,
                 }),
             })
@@ -72,32 +73,46 @@ const ReorderButtons = () => {
     )
 }
 
-export const SkillList = () => (
+export const SkillCategoryList = () => (
     <List>
         <Datagrid rowClick="edit">
             <TextField source="name" label="Nom" />
-            <TextField source="icon" label="Icône" />
+            <TextField source="truncatedName" label="Nom tronqué" />
             <FunctionField label="Ordre" render={() => <ReorderButtons />} />
         </Datagrid>
     </List>
 )
 
-export const SkillEdit = () => (
+export const SkillCategoryEdit = () => (
     <Edit>
         <SimpleForm>
-            <TextInput source="name" label="Nom de la compétence" validate={required()} />
-            <FileUploadInput source="icon" label="Icône" required />
-            <TextInput source="description" label="Description" multiline rows={3} />
+            <TextInput source="name" label="Nom" validate={required()} />
+            <TextInput
+                source="truncatedName"
+                label="Nom tronqué"
+                validate={required()}
+                helperText="Version courte pour mobile (ex: 'Front' pour 'Front-end')"
+            />
+            <ReferenceArrayInput source="skills" reference="skills" label="Compétences">
+                <SelectArrayInput optionText="name" />
+            </ReferenceArrayInput>
         </SimpleForm>
     </Edit>
 )
 
-export const SkillCreate = () => (
+export const SkillCategoryCreate = () => (
     <Create>
         <SimpleForm>
-            <TextInput source="name" label="Nom de la compétence" validate={required()} />
-            <FileUploadInput source="icon" label="Icône" required />
-            <TextInput source="description" label="Description" multiline rows={3} />
+            <TextInput source="name" label="Nom" validate={required()} />
+            <TextInput
+                source="truncatedName"
+                label="Nom tronqué"
+                validate={required()}
+                helperText="Version courte pour mobile (ex: 'Front' pour 'Front-end')"
+            />
+            <ReferenceArrayInput source="skills" reference="skills" label="Compétences">
+                <SelectArrayInput optionText="name" />
+            </ReferenceArrayInput>
         </SimpleForm>
     </Create>
 )
