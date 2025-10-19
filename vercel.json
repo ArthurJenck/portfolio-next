@@ -1,7 +1,0 @@
-{
-    "env": {
-        "MONGODB_URI": "@mongodb-uri",
-        "PAYLOAD_SECRET": "@payload-secret",
-        "NEXT_PUBLIC_API_URL": "@next-public-api-url"
-    }
-}
