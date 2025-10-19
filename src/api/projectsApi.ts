@@ -3,9 +3,7 @@ import { ProjectResponse, DetailedProjectType } from '@/types/ProjectTypes'
 const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
 
 export async function getProjects(): Promise<ProjectResponse> {
-    const res = await fetch(`${API_URL}/api/projects`, {
-        next: { revalidate: 60 }, // Revalidate every 60 seconds
-    })
+    const res = await fetch(`${API_URL}/api/projects`)
 
     if (!res.ok) {
         throw new Error('Failed to fetch projects')
@@ -15,9 +13,7 @@ export async function getProjects(): Promise<ProjectResponse> {
 }
 
 export async function getProject(id: string): Promise<DetailedProjectType> {
-    const res = await fetch(`${API_URL}/api/projects/${id}`, {
-        next: { revalidate: 60 },
-    })
+    const res = await fetch(`${API_URL}/api/projects/${id}`)
 
     if (!res.ok) {
         throw new Error('Failed to fetch project')
