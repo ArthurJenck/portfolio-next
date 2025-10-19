@@ -50,7 +50,6 @@ Puis lancez le projet avec :
 
 Mode clair / sombre  
 Version ENG / FR  
-Re-création sous Next.js
 
 ### Liens utiles
 
