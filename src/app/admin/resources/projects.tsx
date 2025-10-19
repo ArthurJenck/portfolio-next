@@ -14,119 +14,10 @@ import {
     ReferenceArrayInput,
     SelectArrayInput,
     required,
-    useRecordContext,
-    useRefresh,
     FunctionField,
-    useInput,
 } from 'react-admin'
-import { useState } from 'react'
-
-const ReorderButtons = () => {
-    const record = useRecordContext()
-    const refresh = useRefresh()
-
-    const handleReorder = async (direction: 'up' | 'down') => {
-        if (!record) return
-
-        try {
-            const response = await fetch('/api/projects/reorder', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    projectId: record.id,
-                    direction,
-                }),
-            })
-
-            if (response.ok) {
-                refresh()
-            }
-        } catch (error) {
-            console.error('Error reordering:', error)
-        }
-    }
-
-    if (!record) return null
-
-    return (
-        <div style={{ display: 'flex', gap: '4px' }}>
-            <button
-                onClick={(e) => {
-                    e.stopPropagation()
-                    handleReorder('up')
-                }}
-                style={{
-                    padding: '4px 8px',
-                    cursor: 'pointer',
-                    border: '1px solid #ccc',
-                }}
-            >
-                ↑
-            </button>
-            <button
-                onClick={(e) => {
-                    e.stopPropagation()
-                    handleReorder('down')
-                }}
-                style={{
-                    padding: '4px 8px',
-                    cursor: 'pointer',
-                    border: '1px solid #ccc',
-                }}
-            >
-                ↓
-            </button>
-        </div>
-    )
-}
-
-const ImageUploadInput = ({ source }: { source: string }) => {
-    const { field } = useInput({ source })
-    const [uploading, setUploading] = useState(false)
-
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]
-        if (!file) return
-
-        setUploading(true)
-        try {
-            const formData = new FormData()
-            formData.append('file', file)
-
-            const response = await fetch('/api/upload', {
-                method: 'POST',
-                body: formData,
-            })
-
-            if (response.ok) {
-                const data = await response.json()
-                field.onChange(data.url)
-            }
-        } catch (error) {
-            console.error('Upload error:', error)
-        } finally {
-            setUploading(false)
-        }
-    }
-
-    return (
-        <div>
-            <label>
-                <strong>Image du projet *</strong>
-            </label>
-            <br />
-            <input type="file" accept="image/*" onChange={handleFileChange} disabled={uploading} />
-            {uploading && <p>Upload en cours...</p>}
-            {field.value && (
-                <div style={{ marginTop: '10px' }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={field.value} alt="Preview" style={{ maxWidth: '200px', border: '1px solid #ccc' }} />
-                </div>
-            )}
-            <input type="hidden" {...field} />
-        </div>
-    )
-}
+import { ReorderButtons } from '../components/ReorderButtons'
+import { FileUploadInput } from '../components/FileUploadInput'
 
 export const ProjectList = () => (
     <List>
@@ -140,7 +31,7 @@ export const ProjectList = () => (
             </ReferenceArrayField>
             <TextField source="githubLink" label="GitHub" />
             <TextField source="webLink" label="Site Web" />
-            <FunctionField label="Ordre" render={() => <ReorderButtons />} />
+            <FunctionField label="Ordre" render={() => <ReorderButtons resourceName="projects" />} />
         </Datagrid>
     </List>
 )
@@ -166,7 +57,7 @@ export const ProjectEdit = () => (
                 validate={required()}
                 helperText="Description détaillée pour la page du projet"
             />
-            <ImageUploadInput source="image" />
+            <FileUploadInput source="image" label="Image du projet" required />
             <ReferenceArrayInput source="stack" reference="skills" label="Stack">
                 <SelectArrayInput optionText="name" />
             </ReferenceArrayInput>
@@ -197,7 +88,7 @@ export const ProjectCreate = () => (
                 validate={required()}
                 helperText="Description détaillée pour la page du projet"
             />
-            <ImageUploadInput source="image" />
+            <FileUploadInput source="image" label="Image du projet" required />
             <ReferenceArrayInput source="stack" reference="skills" label="Stack">
                 <SelectArrayInput optionText="name" />
             </ReferenceArrayInput>

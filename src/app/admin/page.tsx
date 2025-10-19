@@ -5,6 +5,8 @@ import { Admin, Resource } from 'react-admin'
 import { SessionProvider } from 'next-auth/react'
 import dataProvider from './dataProvider'
 import authProvider from './authProvider'
+import { lightTheme, darkTheme } from './theme'
+import './admin.css'
 
 // Import des composants personnalisés
 import { ProjectList, ProjectEdit, ProjectCreate } from './resources/projects'
@@ -37,7 +39,13 @@ export default function AdminPage() {
 
     return (
         <SessionProvider>
-            <Admin dataProvider={dataProvider} authProvider={authProvider}>
+            <Admin
+                dataProvider={dataProvider}
+                authProvider={authProvider}
+                lightTheme={lightTheme}
+                darkTheme={darkTheme}
+                defaultTheme="dark"
+            >
                 <Resource
                     name="projects"
                     list={ProjectList}

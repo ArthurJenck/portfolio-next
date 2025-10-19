@@ -1,0 +1,90 @@
+/* Styles custom pour l'interface admin */
+
+/* Améliorer l'apparence générale des formulaires */
+.RaForm-root {
+    max-width: 800px;
+}
+
+/* Meilleure apparence pour les inputs de formulaire */
+.MuiTextField-root {
+    margin-bottom: 16px !important;
+}
+
+/* Améliorer l'espacement des listes */
+.RaList-content {
+    padding: 16px;
+}
+
+/* Améliorer l'apparence des Datagrids */
+.RaDatagrid-table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.RaDatagrid-headerCell {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+}
+
+/* Améliorer le hover des lignes de tableau */
+.RaDatagrid-rowCell {
+    transition: background-color 0.2s ease;
+}
+
+/* Meilleure apparence pour le menu latéral */
+.RaSidebar-root {
+    border-right: 1px solid rgba(113, 78, 151, 0.1);
+}
+
+/* Améliorer l'apparence des chips */
+.MuiChip-root {
+    border-radius: 6px !important;
+    font-weight: 500;
+}
+
+/* Améliorer l'apparence des boutons d'action */
+.RaToolbar-root {
+    gap: 8px;
+    padding: 16px 0 !important;
+}
+
+/* Meilleure apparence pour les boutons de pagination */
+.RaPagination-root {
+    padding: 16px 0;
+}
+
+/* Améliorer l'apparence du login */
+.RaLogin-card {
+    border-radius: 12px !important;
+    padding: 32px !important;
+}
+
+/* Assurer que les classes Tailwind fonctionnent */
+.dark {
+    color-scheme: dark;
+}
+
+/* Améliorer l'apparence des SelectArrayInput */
+.MuiAutocomplete-root {
+    margin-bottom: 16px;
+}
+
+/* Meilleure apparence pour les ReferenceArrayFields */
+.RaReferenceArrayField-root {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+/* Améliorer l'affichage mobile */
+@media (max-width: 768px) {
+    .RaList-content {
+        padding: 8px;
+    }
+
+    .RaForm-root {
+        padding: 16px;
+    }
+}
