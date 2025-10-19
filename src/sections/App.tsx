@@ -1,15 +1,13 @@
-'use client'
-
 import NavBar from '../components/NavBar'
 import Header from '../sections/Header'
 import Skills from '../sections/Skills'
-import About from '../sections/About'
-import Contact from '../sections/Contact'
-import Footer from '../components/Footer'
+import FastTravel from '../components/FastTravel/FastTravel'
 import Projets from '../sections/Projets'
-import FastTravel from '@/components/FastTravel/FastTravel'
+import About from './About'
+import Contact from './Contact'
+import Footer from '../components/Footer'
 
-const Home = () => {
+const App = () => {
     return (
         <>
             <NavBar />
@@ -24,4 +22,4 @@ const Home = () => {
     )
 }
 
-export default Home
+export default App

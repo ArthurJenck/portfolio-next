@@ -1,5 +1,17 @@
-import { useRouter } from "next/navigation"
-import { useEffect, useRef } from "react"
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { useEffect, useRef } from 'react'
+
+interface AnimeInstance {
+    (params: Record<string, unknown>): void
+    remove: (targets: unknown) => void
+}
+
+declare global {
+    interface Window {
+        anime?: AnimeInstance
+    }
+}
 
 interface ProjectTileProps {
     width: number
@@ -14,7 +26,7 @@ interface ProjectTileProps {
 const ProjectTile: React.FC<ProjectTileProps> = ({
     width,
     height,
-    color = "#ffffff",
+    color = '#ffffff',
     imageUrl,
     projectId,
     onHoverStart,
@@ -40,23 +52,22 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
         const totalItems = stackItems.length
 
         const removeAnimeTargets = () => {
-            if (typeof window !== "undefined" && (window as any).anime) {
-                const anime = (window as any).anime
+            if (typeof window !== 'undefined' && window.anime) {
+                const anime = window.anime
                 anime.remove(stackItems)
                 anime.remove(img)
             }
         }
 
         const animateIn = () => {
-            if (typeof window === "undefined" || !(window as any).anime) return
-            const anime = (window as any).anime
+            if (typeof window === 'undefined' || !window.anime) return
+            const anime = window.anime
 
             removeAnimeTargets()
 
             stackItems.forEach((e, i) => {
                 if (e) {
-                    e.style.opacity =
-                        i !== totalItems - 1 ? String(0.2 * i + 0.2) : "1"
+                    e.style.opacity = i !== totalItems - 1 ? String(0.2 * i + 0.2) : '1'
                 }
             })
 
@@ -64,14 +75,14 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
                 targets: stackItems,
                 translateZ: [
                     {
-                        value: function (target: any, index: number) {
+                        value: function (_target: unknown, index: number) {
                             return index * 8 + 8
                         },
                         duration: 200,
                         easing: [0.42, 0, 1, 1],
                     },
                     {
-                        value: function (target: any, index: number) {
+                        value: function (_target: unknown, index: number) {
                             return index * 20 + 20
                         },
                         duration: 700,
@@ -80,7 +91,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
                 ],
                 rotateX: [
                     {
-                        value: function (target: any, index: number) {
+                        value: function (_target: unknown, index: number) {
                             return -1 * (index * 2 + 2)
                         },
                         duration: 200,
@@ -103,8 +114,8 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
         }
 
         const animateOut = () => {
-            if (typeof window === "undefined" || !(window as any).anime) return
-            const anime = (window as any).anime
+            if (typeof window === 'undefined' || !window.anime) return
+            const anime = window.anime
 
             removeAnimeTargets()
 
@@ -112,7 +123,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
                 targets: stackItems,
                 translateZ: [
                     {
-                        value: function (target: any, index: number) {
+                        value: function (_target: unknown, index: number) {
                             return index * 20 + 20 - 8
                         },
                         duration: 200,
@@ -126,7 +137,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
                 ],
                 rotateX: [
                     {
-                        value: function (target: any, index: number) {
+                        value: function (_target: unknown, index: number) {
                             return index * 2 + 2
                         },
                         duration: 200,
@@ -151,12 +162,12 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
         const onMouseEnter = () => animateIn()
         const onMouseLeave = () => animateOut()
 
-        stackEl.addEventListener("mouseenter", onMouseEnter)
-        stackEl.addEventListener("mouseleave", onMouseLeave)
+        stackEl.addEventListener('mouseenter', onMouseEnter)
+        stackEl.addEventListener('mouseleave', onMouseLeave)
 
         return () => {
-            stackEl.removeEventListener("mouseenter", onMouseEnter)
-            stackEl.removeEventListener("mouseleave", onMouseLeave)
+            stackEl.removeEventListener('mouseenter', onMouseEnter)
+            stackEl.removeEventListener('mouseleave', onMouseLeave)
             removeAnimeTargets()
         }
     }, [])
@@ -195,17 +206,13 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
     return (
         <div
             className="relative block flex-none cursor-pointer no-underline outline-none"
-            style={{ transformStyle: "preserve-3d", width }}
+            style={{ transformStyle: 'preserve-3d', width }}
             onMouseEnter={onHoverStart}
             onMouseLeave={onHoverEnd}
             onPointerDown={handlePointerDown}
             onPointerUp={handlePointerUp}
         >
-            <div
-                ref={stackRef}
-                className="relative w-full"
-                style={{ transformStyle: "preserve-3d", height }}
-            >
+            <div ref={stackRef} className="relative w-full" style={{ transformStyle: 'preserve-3d', height }}>
                 <div
                     ref={(el) => {
                         if (el) stackItemsRef.current[0] = el
@@ -241,7 +248,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
                     className="relative flex justify-center items-center overflow-hidden w-full h-full cursor-pointer origin-bottom"
                     style={{ backgroundColor: color }}
                 >
-                    <img
+                    <Image
                         draggable={false}
                         onDragStart={(e) => e.preventDefault()}
                         ref={imgRef}

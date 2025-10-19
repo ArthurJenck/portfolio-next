@@ -1,5 +1,5 @@
-import { useRef, useState } from "react"
-import { MotionValue, useAnimationControls } from "framer-motion"
+import { useRef, useState } from 'react'
+import { MotionValue, useAnimationControls } from 'framer-motion'
 import {
     DRAG_MULTIPLIER,
     IMAGE_INERTIA_SPRING,
@@ -12,17 +12,15 @@ import {
     TITLE_SNAP_TRANSITION,
     TITLE_SPRING,
     TITLE_START_DELAY_MS,
-} from "../components/projects/config"
+} from '../components/projects/config'
 
-const clamp = (value: number, min: number, max: number) =>
-    Math.max(min, Math.min(max, value))
+const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 
 interface UseCarouselDragOptions {
     xImages: MotionValue<number>
     imagesCtrl: ReturnType<typeof useAnimationControls>
     titlesCtrl: ReturnType<typeof useAnimationControls>
     dragBounds: { left: number; right: number }
-    viewportRef: React.RefObject<HTMLDivElement | null>
     onDragPositionChange?: (x: number) => void
 }
 
@@ -31,7 +29,6 @@ export const useCarouselDrag = ({
     imagesCtrl,
     titlesCtrl,
     dragBounds,
-    viewportRef,
     onDragPositionChange,
 }: UseCarouselDragOptions) => {
     const [isDragging, setIsDragging] = useState(false)
@@ -115,12 +112,10 @@ export const useCarouselDrag = ({
         }
 
         const velocity = velocityX.current
-        const targetX =
-            currentX + velocity * INERTIA_DURATION_MS * INERTIA_FACTOR
+        const targetX = currentX + velocity * INERTIA_DURATION_MS * INERTIA_FACTOR
         const clampedTargetX = clamp(targetX, dragBounds.left, dragBounds.right)
 
-        const hasSignificantVelocity =
-            Math.abs(velocity) > MIN_VELOCITY_FOR_INERTIA
+        const hasSignificantVelocity = Math.abs(velocity) > MIN_VELOCITY_FOR_INERTIA
 
         if (hasSignificantVelocity) {
             xImages.set(clampedTargetX)

@@ -1,68 +1,40 @@
-"use client"
-
-import {
-    QueryClient,
-    HydrationBoundary,
-    dehydrate,
-} from "@tanstack/react-query"
-import { getSkills } from "@/api/skillsApi"
-import { getProjects } from "@/api/projectsApi"
-import { getTechs } from "@/api/techsApi"
-import { queryKeys } from "@/lib/queryKeys"
-import { ReactNode, useEffect, useState } from "react"
+import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
+import { getSkills } from '@/api/skillsApi'
+import { getProjects } from '@/api/projectsApi'
+import { getTechs } from '@/api/techsApi'
+import { queryKeys } from '@/lib/queryKeys'
+import { getQueryClient } from '@/lib/get-query-client'
+import { ReactNode } from 'react'
 
 interface PrefetchProviderProps {
     children: ReactNode
 }
 
-export function PrefetchProvider({ children }: PrefetchProviderProps) {
-    const [queryClient] = useState(
-        () =>
-            new QueryClient({
-                defaultOptions: {
-                    queries: {
-                        staleTime: 1000 * 60 * 5, // 5 minutes
-                        refetchOnWindowFocus: false,
-                    },
-                },
-            })
-    )
+export async function PrefetchProvider({ children }: PrefetchProviderProps) {
+    const queryClient = getQueryClient()
 
-    const [dehydratedState, setDehydratedState] = useState<ReturnType<
-        typeof dehydrate
-    > | null>(null)
-
-    // useEffect(() => {
-    //     const prefetchData = async () => {
-    //         // Prefetch all data
-    //         await Promise.all([
-    //             queryClient.prefetchQuery({
-    //                 queryKey: queryKeys.skills,
-    //                 queryFn: getSkills,
-    //             }),
-    //             queryClient.prefetchQuery({
-    //                 queryKey: queryKeys.projects,
-    //                 queryFn: getProjects,
-    //             }),
-    //             queryClient.prefetchQuery({
-    //                 queryKey: queryKeys.techs,
-    //                 queryFn: getTechs,
-    //             }),
-    //         ])
-
-    //         setDehydratedState(dehydrate(queryClient))
-    //     }
-
-    //     prefetchData()
-    // }, [queryClient])
-
-    if (!dehydratedState) {
-        return <>{children}</>
+    if (process.env.NEXT_PHASE !== 'phase-production-build') {
+        try {
+            await Promise.all([
+                queryClient.prefetchQuery({
+                    queryKey: queryKeys.skills,
+                    queryFn: getSkills,
+                }),
+                queryClient.prefetchQuery({
+                    queryKey: queryKeys.projects,
+                    queryFn: getProjects,
+                }),
+                queryClient.prefetchQuery({
+                    queryKey: queryKeys.techs,
+                    queryFn: getTechs,
+                }),
+            ])
+        } catch (error) {
+            console.warn('Data prefetching failed:', error)
+        }
     }
 
-    return (
-        <HydrationBoundary state={dehydratedState}>
-            {children}
-        </HydrationBoundary>
-    )
+    const dehydratedState = dehydrate(queryClient)
+
+    return <HydrationBoundary state={dehydratedState}>{children}</HydrationBoundary>
 }

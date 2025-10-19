@@ -1,12 +1,13 @@
-import { DataProvider, fetchUtils } from 'react-admin'
+import { DataProvider, fetchUtils } from "react-admin"
 
-const apiUrl = '/api'
+const apiUrl = "/api"
 const httpClient = fetchUtils.fetchJson
 
 export default {
-  getList: (resource, params) => {
+  getList: (resource) => {
     const url = `${apiUrl}/${resource}`
     return httpClient(url).then(({ json }) => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       data: json.map((item: any) => ({ ...item, id: item._id })),
       total: json.length,
     }))
@@ -18,15 +19,17 @@ export default {
     })),
 
   getMany: (resource, params) => {
-    const query = params.ids.map(id => `id=${id}`).join('&')
+    const query = params.ids.map((id) => `id=${id}`).join("&")
     return httpClient(`${apiUrl}/${resource}?${query}`).then(({ json }) => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       data: json.map((item: any) => ({ ...item, id: item._id })),
     }))
   },
 
-  getManyReference: (resource, params) => {
+  getManyReference: (resource) => {
     const url = `${apiUrl}/${resource}`
     return httpClient(url).then(({ json }) => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       data: json.map((item: any) => ({ ...item, id: item._id })),
       total: json.length,
     }))
@@ -34,7 +37,7 @@ export default {
 
   create: (resource, params) =>
     httpClient(`${apiUrl}/${resource}`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(params.data),
     }).then(({ json }) => ({
       data: { ...json, id: json._id },
@@ -42,7 +45,7 @@ export default {
 
   update: (resource, params) =>
     httpClient(`${apiUrl}/${resource}/${params.id}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(params.data),
     }).then(({ json }) => ({
       data: { ...json, id: json._id },
@@ -50,34 +53,33 @@ export default {
 
   updateMany: (resource, params) => {
     return Promise.all(
-      params.ids.map(id =>
+      params.ids.map((id) =>
         httpClient(`${apiUrl}/${resource}/${id}`, {
-          method: 'PUT',
+          method: "PUT",
           body: JSON.stringify(params.data),
         })
       )
-    ).then(responses => ({
+    ).then((responses) => ({
       data: responses.map(({ json }) => json._id),
     }))
   },
 
   delete: (resource, params) =>
     httpClient(`${apiUrl}/${resource}/${params.id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     }).then(({ json }) => ({
       data: { ...json, id: params.id },
     })),
 
   deleteMany: (resource, params) => {
     return Promise.all(
-      params.ids.map(id =>
+      params.ids.map((id) =>
         httpClient(`${apiUrl}/${resource}/${id}`, {
-          method: 'DELETE',
+          method: "DELETE",
         })
       )
-    ).then(responses => ({
+    ).then(() => ({
       data: params.ids,
     }))
   },
 } as DataProvider
-
