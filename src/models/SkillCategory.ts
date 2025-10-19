@@ -16,7 +16,7 @@ const SkillCategorySchema = new Schema<ISkillCategory>(
         skills: [{ type: Schema.Types.ObjectId, ref: 'Skill' }],
         order: { type: Number, required: true, default: 0 },
     },
-    { timestamps: true }
+    { timestamps: true },
 )
 
 SkillCategorySchema.index({ order: 1 })

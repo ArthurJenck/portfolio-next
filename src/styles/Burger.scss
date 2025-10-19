@@ -2,7 +2,7 @@
     .burger-toggle {
         // Sert à agrandir la zone de hover
         &::before {
-            content: "";
+            content: '';
             width: 5rem;
             height: 4rem;
             position: absolute;
@@ -13,7 +13,7 @@
 
         // Le after est affiché au clic
         &::after {
-            content: "";
+            content: '';
             position: absolute;
             width: 0;
             height: 0;
@@ -32,7 +32,7 @@
             // Les before et after sont les barres du haut et du bas du bouton burger
             &::before,
             &::after {
-                content: "";
+                content: '';
                 position: absolute;
                 display: block;
                 width: 100%;
@@ -76,7 +76,7 @@
     .burger-link {
         // Les barres sous les liens sont créées en pseudo-éléments, permettant plus de contrôle sur les animations au hover
         &::after {
-            content: "";
+            content: '';
             display: block;
             width: 0;
             height: 2px;

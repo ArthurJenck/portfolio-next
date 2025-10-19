@@ -1,12 +1,9 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef } from 'react'
 
 type SomeFunction = (...args: unknown[]) => void
 type Timer = ReturnType<typeof setTimeout>
 
-export const useDebounce = <Func extends SomeFunction>(
-    func: Func,
-    delay = 500
-) => {
+export const useDebounce = <Func extends SomeFunction>(func: Func, delay = 500) => {
     const timer = useRef<Timer | undefined>(undefined)
 
     // On regarde l'état du timer pour savoir si on peut relancer la fonction

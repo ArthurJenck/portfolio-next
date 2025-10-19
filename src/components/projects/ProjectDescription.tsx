@@ -1,4 +1,4 @@
-import { motion } from "framer-motion"
+import { motion } from 'framer-motion'
 import {
     DESCRIPTION_OPACITY_TRANSITION,
     DESCRIPTION_TRANSLATE_Y,
@@ -6,7 +6,7 @@ import {
     SUBTITLE_UNDERLINE_W,
     TAGS_OPACITY_TRANSITION,
     TITLE_SCALE_TRANSITION,
-} from "./config"
+} from './config'
 
 interface ProjectDescriptionProps {
     title: string
@@ -34,7 +34,7 @@ export const ProjectDescription: React.FC<ProjectDescriptionProps> = ({
             <motion.div
                 animate={{ scale: inverseScale }}
                 transition={TITLE_SCALE_TRANSITION}
-                style={{ transformOrigin: "left top" }}
+                style={{ transformOrigin: 'left top' }}
             >
                 <div className="uppercase font-serif text-2xl">{title}</div>
                 <div className="italic font-serif -ml-[5px] px-[5px] relative text-xl">
@@ -42,12 +42,12 @@ export const ProjectDescription: React.FC<ProjectDescriptionProps> = ({
                     <span
                         className="absolute block"
                         style={{
-                            top: "100%",
+                            top: '100%',
                             left: 5,
                             width: SUBTITLE_UNDERLINE_W,
                             height: 1,
                             marginTop: 15,
-                            background: "#fff",
+                            background: '#fff',
                         }}
                     />
                 </div>
@@ -57,13 +57,9 @@ export const ProjectDescription: React.FC<ProjectDescriptionProps> = ({
                         className="text-xs w-[250px] text-white/90 transition-all"
                         style={{
                             opacity: isHovered ? 1 : 0,
-                            transform: `translateY(${
-                                isHovered ? 0 : DESCRIPTION_TRANSLATE_Y
-                            }px)`,
-                            transitionDuration:
-                                DESCRIPTION_OPACITY_TRANSITION.duration,
-                            transitionDelay:
-                                DESCRIPTION_OPACITY_TRANSITION.delay,
+                            transform: `translateY(${isHovered ? 0 : DESCRIPTION_TRANSLATE_Y}px)`,
+                            transitionDuration: DESCRIPTION_OPACITY_TRANSITION.duration,
+                            transitionDelay: DESCRIPTION_OPACITY_TRANSITION.delay,
                         }}
                     >
                         {description}
@@ -72,11 +68,8 @@ export const ProjectDescription: React.FC<ProjectDescriptionProps> = ({
                         className="text-[10px] uppercase w-[250px] text-neutral-500 transition-all"
                         style={{
                             opacity: isHovered ? 1 : 0,
-                            transform: `translateY(${
-                                isHovered ? 0 : DESCRIPTION_TRANSLATE_Y
-                            }px)`,
-                            transitionDuration:
-                                TAGS_OPACITY_TRANSITION.duration,
+                            transform: `translateY(${isHovered ? 0 : DESCRIPTION_TRANSLATE_Y}px)`,
+                            transitionDuration: TAGS_OPACITY_TRANSITION.duration,
                             transitionDelay: TAGS_OPACITY_TRANSITION.delay,
                         }}
                     >

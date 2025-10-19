@@ -1,33 +1,33 @@
-import React from "react"
-import "../styles/Contact.scss"
-import ContactLink from "../components/ContactLink"
-import SectionTitle from "@/components/SectionTitle"
+import React from 'react'
+import '../styles/Contact.scss'
+import ContactLink from '../components/ContactLink'
+import SectionTitle from '@/components/SectionTitle'
 
 const Contact = () => {
     const contactLinks = [
         {
-            id: "mail",
-            href: "mailto:contact@arthurjenck.com",
-            displayText: "contact@arthurjenck.com",
-            copyText: "contact@arthurjenck.com",
+            id: 'mail',
+            href: 'mailto:contact@arthurjenck.com',
+            displayText: 'contact@arthurjenck.com',
+            copyText: 'contact@arthurjenck.com',
         },
         {
-            id: "tel",
-            href: "tel:0610790509",
-            displayText: "06.10.79.05.09",
-            copyText: "0610790509",
+            id: 'tel',
+            href: 'tel:0610790509',
+            displayText: '06.10.79.05.09',
+            copyText: '0610790509',
         },
         {
-            id: "linkedin",
-            href: "https://www.linkedin.com/in/arthurjenck/",
-            displayText: "linkedin.com/in/arthurjenck",
-            copyText: "https://www.linkedin.com/in/arthurjenck/",
+            id: 'linkedin',
+            href: 'https://www.linkedin.com/in/arthurjenck/',
+            displayText: 'linkedin.com/in/arthurjenck',
+            copyText: 'https://www.linkedin.com/in/arthurjenck/',
         },
         {
-            id: "github",
-            href: "https://github.com/ArthurJenck/",
-            displayText: "github.com/ArthurJenck",
-            copyText: "https://github.com/ArthurJenck/",
+            id: 'github',
+            href: 'https://github.com/ArthurJenck/',
+            displayText: 'github.com/ArthurJenck',
+            copyText: 'https://github.com/ArthurJenck/',
         },
     ]
 

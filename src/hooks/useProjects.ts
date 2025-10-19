@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { useQuery } from "@tanstack/react-query"
-import { getProjects, getProject } from "@/api/projectsApi"
-import { queryKeys } from "@/lib/queryKeys"
+import { useQuery } from '@tanstack/react-query'
+import { getProjects, getProject } from '@/api/projectsApi'
+import { queryKeys } from '@/lib/queryKeys'
 
 export function useProjects() {
     return useQuery({

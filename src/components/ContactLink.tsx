@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import CopyBtn from "./CopyBtn"
-import Link from "next/link"
+import { useState } from 'react'
+import CopyBtn from './CopyBtn'
+import Link from 'next/link'
 
 interface ContactLinkProps {
     href: string

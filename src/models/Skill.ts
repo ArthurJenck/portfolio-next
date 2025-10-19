@@ -16,7 +16,7 @@ const SkillSchema = new Schema<ISkill>(
         description: String,
         order: { type: Number, required: true, default: 0 },
     },
-    { timestamps: true }
+    { timestamps: true },
 )
 
 SkillSchema.index({ order: 1 })

@@ -58,8 +58,8 @@ export default {
                 httpClient(`${apiUrl}/${resource}/${id}`, {
                     method: 'PUT',
                     body: JSON.stringify(params.data),
-                })
-            )
+                }),
+            ),
         ).then((responses) => ({
             data: responses.map(({ json }) => json._id),
         }))
@@ -77,8 +77,8 @@ export default {
             params.ids.map((id) =>
                 httpClient(`${apiUrl}/${resource}/${id}`, {
                     method: 'DELETE',
-                })
-            )
+                }),
+            ),
         ).then(() => ({
             data: params.ids,
         }))

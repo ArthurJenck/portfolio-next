@@ -1,13 +1,13 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
-import "../../styles/FastTravel.scss"
-import FastTravelLink from "./FastTravelLink"
-import { FAST_TRAVEL_SECTIONS } from "./fastTravelConfig"
+import { useEffect, useState } from 'react'
+import '../../styles/FastTravel.scss'
+import FastTravelLink from './FastTravelLink'
+import { FAST_TRAVEL_SECTIONS } from './fastTravelConfig'
 
 const FastTravel = () => {
     const [isVisible, setIsVisible] = useState(false)
-    const [currentSection, setCurrentSection] = useState("accueil")
+    const [currentSection, setCurrentSection] = useState('accueil')
 
     useEffect(() => {
         let ticking = false
@@ -21,11 +21,11 @@ const FastTravel = () => {
             setIsVisible(scrollY > windowHeight / 3)
 
             // Liste des sections à vérifier (dans l'ordre)
-            const sections = ["skills", "projets", "about", "contact"]
+            const sections = ['skills', 'projets', 'about', 'contact']
 
             // CAS 1 : Si on est en bas de page (moins de 50px de marge)
             if (scrollHeight - scrollY - windowHeight < 50) {
-                setCurrentSection("contact")
+                setCurrentSection('contact')
                 ticking = false
                 return
             }
@@ -33,13 +33,11 @@ const FastTravel = () => {
             // CAS 2 : Trouver la section active
             // On prend la DERNIÈRE section dont le top a atteint ou dépassé le milieu de l'écran
             // Cela garantit une transition fluide sans trou
-            let currentSectionId = "accueil"
+            let currentSectionId = 'accueil'
             const midPoint = windowHeight / 2
 
             for (const sectionId of sections) {
-                const element = document.querySelector<HTMLElement>(
-                    `#${sectionId}`
-                )
+                const element = document.querySelector<HTMLElement>(`#${sectionId}`)
                 if (element) {
                     const rect = element.getBoundingClientRect()
 
@@ -70,18 +68,15 @@ const FastTravel = () => {
         updateCurrentSection()
 
         // Écouter le scroll avec passive pour les performances
-        window.addEventListener("scroll", handleScroll, { passive: true })
+        window.addEventListener('scroll', handleScroll, { passive: true })
 
         // Écouter les scrolls programmatiques
-        window.addEventListener("scrollToComplete", handleScrollToComplete)
+        window.addEventListener('scrollToComplete', handleScrollToComplete)
 
         // Cleanup
         return () => {
-            window.removeEventListener("scroll", handleScroll)
-            window.removeEventListener(
-                "scrollToComplete",
-                handleScrollToComplete
-            )
+            window.removeEventListener('scroll', handleScroll)
+            window.removeEventListener('scrollToComplete', handleScrollToComplete)
         }
     }, [])
 
@@ -89,16 +84,12 @@ const FastTravel = () => {
         <ul
             className="hidden md:flex flex-col gap-[2vw] fixed right-[4vw] top-3/7 -translate-y-1/2 opacity-0 invisible transition-all duration-200 z-4"
             style={{
-                visibility: isVisible ? "visible" : "hidden",
+                visibility: isVisible ? 'visible' : 'hidden',
                 opacity: isVisible ? 1 : 0,
             }}
         >
             {FAST_TRAVEL_SECTIONS.map((section) => (
-                <FastTravelLink
-                    key={section.id}
-                    section={section}
-                    isActive={currentSection === section.id}
-                />
+                <FastTravelLink key={section.id} section={section} isActive={currentSection === section.id} />
             ))}
         </ul>
     )

@@ -1,18 +1,18 @@
-"use client"
+'use client'
 
-import PlaceHolder from "../assets/images/hero-placeholder.png"
-import { useState, useEffect, useRef } from "react"
-import Image from "next/image"
+import PlaceHolder from '../assets/images/hero-placeholder.png'
+import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
 
 // Chemins vers les vidéos dans le dossier public
-const BG_Webm = "/videos/portfolio-bg.webm"
-const BG_Mp4 = "/videos/portfolio-bg.mp4"
+const BG_Webm = '/videos/portfolio-bg.webm'
+const BG_Mp4 = '/videos/portfolio-bg.mp4'
 
 // Bug de lecture des vidéos sur Safari & iPhone
 const isSafari = () => {
-    if (typeof window === "undefined") return false
+    if (typeof window === 'undefined') return false
     const ua = navigator.userAgent.toLowerCase()
-    return ua.indexOf("safari") > -1 && ua.indexOf("chrome") < 0
+    return ua.indexOf('safari') > -1 && ua.indexOf('chrome') < 0
 }
 
 const HeroVid = () => {
@@ -30,14 +30,14 @@ const HeroVid = () => {
                 video.muted = true
                 video.playsInline = true
                 video.autoplay = true
-                video.setAttribute("muted", "true")
-                video.setAttribute("playsinline", "true")
-                video.setAttribute("autoplay", "true")
+                video.setAttribute('muted', 'true')
+                video.setAttribute('playsinline', 'true')
+                video.setAttribute('autoplay', 'true')
 
                 // Pour Safari, forcer aussi les attributs webkit
                 if (isSafari()) {
-                    video.setAttribute("webkit-playsinline", "true")
-                    video.setAttribute("x-webkit-airplay", "deny")
+                    video.setAttribute('webkit-playsinline', 'true')
+                    video.setAttribute('x-webkit-airplay', 'deny')
 
                     await new Promise((resolve) => setTimeout(resolve, 100))
                 }
@@ -45,7 +45,7 @@ const HeroVid = () => {
                 // Attendre que la vidéo soit chargée
                 if (video.readyState < 2) {
                     await new Promise((resolve) => {
-                        video.addEventListener("loadeddata", resolve, {
+                        video.addEventListener('loadeddata', resolve, {
                             once: true,
                         })
                     })
@@ -54,10 +54,7 @@ const HeroVid = () => {
                 // Forcer le play() après navigation ou au montage
                 await video.play()
             } catch (error) {
-                console.warn(
-                    "Vidéo ne peut pas être lancée, fallback image:",
-                    error
-                )
+                console.warn('Vidéo ne peut pas être lancée, fallback image:', error)
                 setShouldUseImg(true)
             }
         }
@@ -81,7 +78,7 @@ const HeroVid = () => {
                 className="hero-bg"
                 fill
                 priority
-                style={{ objectFit: "cover" }}
+                style={{ objectFit: 'cover' }}
             />
         )
     }

@@ -2,7 +2,7 @@
     a {
         // Les before indiquent le hover
         &::before {
-            content: "";
+            content: '';
             width: 2.5vw;
             aspect-ratio: 1/1;
             background-color: var(--white);
@@ -24,7 +24,7 @@
 
         // Les after sont des demi-cercle indiquant la section actuellement visionnée
         &::after {
-            content: "";
+            content: '';
             width: 2.5vw;
             aspect-ratio: 1/1;
             background-color: var(--white);
@@ -43,7 +43,7 @@
 
     // Chaque cercle a un before apparaissant au hover et montrant le titre de la section survolée
     &::before {
-        content: "Accueil";
+        content: 'Accueil';
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
@@ -58,16 +58,16 @@
         pointer-events: none;
     }
     &:nth-of-type(2)::before {
-        content: "Compétences";
+        content: 'Compétences';
     }
     &:nth-of-type(3)::before {
-        content: "Projets";
+        content: 'Projets';
     }
     &:nth-of-type(4)::before {
-        content: "À Propos";
+        content: 'À Propos';
     }
     &:nth-of-type(5)::before {
-        content: "Contact";
+        content: 'Contact';
     }
     &:hover::before {
         opacity: 1;
@@ -76,7 +76,7 @@
 
     // Ces after sont les barres verticales entre chaque cercle
     &::after {
-        content: "";
+        content: '';
         width: 2px;
         height: 2.1vw;
         background-color: var(--white);

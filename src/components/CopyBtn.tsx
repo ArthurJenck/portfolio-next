@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { Copy, Check, X } from "lucide-react"
-import { useState, useRef, useEffect } from "react"
-import { motion } from "framer-motion"
+import { Copy, Check, X } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { motion } from 'framer-motion'
 
 interface CopyBtnProps {
     copyText: string
@@ -24,7 +24,7 @@ const CopyBtn = ({ copyText, isHovered }: CopyBtnProps) => {
                 setIsCopied(false)
             }, 1000)
         } catch (error) {
-            console.error("Erreur lors de la copie:", error)
+            console.error('Erreur lors de la copie:', error)
             setIsError(true)
             setTimeout(() => {
                 setIsError(false)

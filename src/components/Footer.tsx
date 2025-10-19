@@ -1,4 +1,4 @@
-import ImgLink from "./ImgLink"
+import ImgLink from './ImgLink'
 
 const Footer = () => {
     return (
@@ -6,8 +6,7 @@ const Footer = () => {
             <div className="flex flex-col md:flex-row items-center gap-[1.5vw]">
                 <ImgLink type="logo" className="size-16" />
                 <p className="font-bold tracking-[1px] text-center md:text-left">
-                    Merci d'être passé, ça vous a plu ?
-                    <span className="block">N'hésitez pas à me le dire !</span>
+                    Merci d'être passé, ça vous a plu ?<span className="block">N'hésitez pas à me le dire !</span>
                 </p>
             </div>
             <div className="socials flex justify-center items-center gap-2">

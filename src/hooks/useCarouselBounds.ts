@@ -1,9 +1,6 @@
-import { useLayoutEffect, useState, RefObject } from "react"
+import { useLayoutEffect, useState, RefObject } from 'react'
 
-export const useCarouselBounds = (
-    viewportRef: RefObject<HTMLDivElement | null>,
-    contentWidth: number
-) => {
+export const useCarouselBounds = (viewportRef: RefObject<HTMLDivElement | null>, contentWidth: number) => {
     const [dragBounds, setDragBounds] = useState({ left: 0, right: 0 })
 
     useLayoutEffect(() => {

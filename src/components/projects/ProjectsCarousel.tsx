@@ -40,7 +40,7 @@ export const ProjectsCarousel: React.FC = () => {
 
     const contentWidth = useMemo(
         () => (projects?.length || 0) * ITEM_WIDTH + ((projects?.length || 0) - 1) * ITEM_GAP + VIEW_PADDING * 2,
-        [projects]
+        [projects],
     )
 
     const { dragBounds } = useCarouselBounds(viewportRef, contentWidth)
@@ -59,7 +59,7 @@ export const ProjectsCarousel: React.FC = () => {
     const scrollX = useTransform(
         scrollYProgress,
         [0, 1],
-        [0, dragBounds.left] // De 0 à la limite gauche (négative)
+        [0, dragBounds.left], // De 0 à la limite gauche (négative)
     )
 
     // Fonction pour calculer la position de scroll correspondant à une position X
@@ -85,7 +85,7 @@ export const ProjectsCarousel: React.FC = () => {
             const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
             return Math.max(sectionTop, Math.min(maxScroll, scrollPos))
         },
-        [dragBounds.left]
+        [dragBounds.left],
     )
 
     // Synchroniser la position avec le scroll (sauf si on drag)
@@ -107,7 +107,7 @@ export const ProjectsCarousel: React.FC = () => {
                 behavior: 'instant' as ScrollBehavior,
             })
         },
-        [getScrollPositionFromX]
+        [getScrollPositionFromX],
     )
 
     const { isDragging, handlers } = useCarouselDrag({

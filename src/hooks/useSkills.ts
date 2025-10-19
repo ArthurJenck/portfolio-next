@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { useQuery } from "@tanstack/react-query"
-import { getSkills } from "@/api/skillsApi"
-import { queryKeys } from "@/lib/queryKeys"
+import { useQuery } from '@tanstack/react-query'
+import { getSkills } from '@/api/skillsApi'
+import { queryKeys } from '@/lib/queryKeys'
 
 export function useSkills() {
     return useQuery({

@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import Link from "next/link"
-import { useScroll } from "@/hooks/useScroll"
-import { FastTravelSection } from "./fastTravelConfig"
-import { cn } from "@/lib/utils"
+import Link from 'next/link'
+import { useScroll } from '@/hooks/useScroll'
+import { FastTravelSection } from './fastTravelConfig'
+import { cn } from '@/lib/utils'
 
 interface FastTravelLinkProps {
     section: FastTravelSection
@@ -17,7 +17,7 @@ const FastTravelLink = ({ section, isActive }: FastTravelLinkProps) => {
         e.preventDefault()
 
         // Pour le lien accueil, on scroll en haut et on nettoie l'URL
-        if (section.id === "accueil") {
+        if (section.id === 'accueil') {
             scrollTo(0)
             return
         }
@@ -36,8 +36,8 @@ const FastTravelLink = ({ section, isActive }: FastTravelLinkProps) => {
                 href={section.href}
                 onClick={handleClick}
                 className={cn(
-                    "block rounded-full w-[2.5vw] aspect-square border-2 border-white",
-                    isActive && "current"
+                    'block rounded-full w-[2.5vw] aspect-square border-2 border-white',
+                    isActive && 'current',
                 )}
                 aria-label={section.label}
             />

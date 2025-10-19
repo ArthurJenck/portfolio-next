@@ -6,28 +6,28 @@ export interface FastTravelSection {
 
 export const FAST_TRAVEL_SECTIONS: FastTravelSection[] = [
     {
-        id: "accueil",
-        label: "lien vers accueil",
-        href: "/",
+        id: 'accueil',
+        label: 'lien vers accueil',
+        href: '/',
     },
     {
-        id: "skills",
-        label: "lien vers compétences",
-        href: "#skills",
+        id: 'skills',
+        label: 'lien vers compétences',
+        href: '#skills',
     },
     {
-        id: "projets",
-        label: "lien vers projets",
-        href: "#projets",
+        id: 'projets',
+        label: 'lien vers projets',
+        href: '#projets',
     },
     {
-        id: "about",
-        label: "lien vers à propos",
-        href: "#about",
+        id: 'about',
+        label: 'lien vers à propos',
+        href: '#about',
     },
     {
-        id: "contact",
-        label: "lien vers contact",
-        href: "#contact",
+        id: 'contact',
+        label: 'lien vers contact',
+        href: '#contact',
     },
 ]

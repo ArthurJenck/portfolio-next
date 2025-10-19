@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import { ProjectsCarousel } from "@/components/projects/ProjectsCarousel"
-import SectionTitle from "@/components/SectionTitle"
+import { ProjectsCarousel } from '@/components/projects/ProjectsCarousel'
+import SectionTitle from '@/components/SectionTitle'
 
 const Projets = () => {
     return (

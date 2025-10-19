@@ -5,7 +5,7 @@ $about-links-size-mobile: 1rem;
     .about-link {
         // Les before sont les barres verticales au-dessus de chaque élément de contact
         &::before {
-            content: "";
+            content: '';
             width: 1px;
             height: 3rem;
             display: block;
@@ -17,7 +17,7 @@ $about-links-size-mobile: 1rem;
         }
         // Les after sont les barres horizontales en-dessous de chaque élément, collées au before suivant
         &::after {
-            content: "";
+            content: '';
             width: 100%;
             height: 1px;
             background-color: var(--white);
@@ -28,7 +28,7 @@ $about-links-size-mobile: 1rem;
         // Au hover, on augmente la taille de sélection des éléments avec un autre pseudo-élément
         &:hover {
             a::after {
-                content: "";
+                content: '';
                 width: $about-links-size;
                 height: 100%;
                 position: absolute;

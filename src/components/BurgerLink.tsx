@@ -1,4 +1,4 @@
-import { useScroll } from "@/hooks/useScroll"
+import { useScroll } from '@/hooks/useScroll'
 
 interface BurgerLinkProps {
     href?: string

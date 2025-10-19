@@ -9,15 +9,15 @@ $base-appear-delay: 0.8s;
 header {
     h1 {
         // On affiche la font-weight avec la variable
-        font-variation-settings: "wght" var(--h1-weight, 800);
+        font-variation-settings: 'wght' var(--h1-weight, 800);
         opacity: 0;
         animation: appear 0.3s ease-out forwards $base-appear-delay;
 
         // Le span suivant imite la barre de typing sur le sous-titre du h1
         .hero-typing {
             opacity: 0;
-            animation: appear 0.3s ease-out calc($base-appear-delay + 0.2s)
-                    forwards,
+            animation:
+                appear 0.3s ease-out calc($base-appear-delay + 0.2s) forwards,
                 typing-cursor 1s step-end infinite;
         }
     }
@@ -30,19 +30,20 @@ header {
     .chevron {
         opacity: 0;
         // Le chevron bouge de haut en bas après son apparition
-        animation: appear 0.5s calc($base-appear-delay + 0.6s) forwards,
+        animation:
+            appear 0.5s calc($base-appear-delay + 0.6s) forwards,
             floating-chevron 1.5s ease-in-out infinite 0.9s;
     }
 
     @media screen and (max-width: 1024px) {
         h1 {
             // En tablette et téléphone, il n'y a plus d'animation de font-weight, elle est bloquée en bold
-            font-variation-settings: "wght" 700;
+            font-variation-settings: 'wght' 700;
         }
 
         .chevron {
-            animation: appear-chevron-mobile 0.5s
-                    calc($base-appear-delay + 0.6s) forwards,
+            animation:
+                appear-chevron-mobile 0.5s calc($base-appear-delay + 0.6s) forwards,
                 floating-chevron-mobile 1.5s ease-in-out infinite 0.9s;
         }
     }
