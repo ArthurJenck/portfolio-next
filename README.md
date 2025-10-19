@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<p align="center">
+<a href="https://arthurjenck.com/">
+  <img src="https://i.ibb.co/R4tzqky/logo.png" width="75">
+</a>
+</p>
 
-## Getting Started
+<h3 align="center"><a href="https://arthurjenck.com/">arthurjenck.com</a></h3>
 
-First, run the development server:
+# Portfolio personnel
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Réalisé dans le cadre du projet n°8 du parcours Développeur Web d'OpenClassrooms
+
+### Outils utilisés
+
+Carnet pour noter mes différentes idées et dessiner le wireframe  
+Figma pour la création de la maquette du projet  
+Codé en React Typescript, préprocessé en SCSS
+
+### Installation
+
+Utilisez votre gestionnaire de projets préféré pour installer les dépendances :
+
+#### NPM
+
+```sh
+> npm i
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+#### Yarn
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```sh
+> yarn
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Puis lancez le projet avec :
 
-## Learn More
+#### NPM
 
-To learn more about Next.js, take a look at the following resources:
+```sh
+> npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+#### Yarn
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```sh
+> yarn vite
+```
 
-## Deploy on Vercel
+### Futurs ajouts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Mode clair / sombre  
+Version ENG / FR  
+Re-création sous Next.js
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Liens utiles
+
+Maquette Figma du projet : [figma.com/design/](https://www.figma.com/design/JuFHi8HzvScTfFTQWZJnov/Portfolio-2.0)  
+Lien Google Drive contenant les scans de mon carnet : [drive.google.com/drive/folders/](https://drive.google.com/drive/folders/1f4fpOMN-B1Bi42T_U0PUSnKu0sPL1yy7?usp=sharing)
+
+### Dates du projet
+
+Premières réflexions en 2023  
+Début du design de la maquette le 30 octobre 2024  
+Début du développement le 15 novembre 2024  
+Fin officielle du développement le 11 décembre 2024 (modifications régulières)
+
+### Auteur
+
+Arthur Jenck  
+<https://arthurjenck.com/>  
+<https://www.linkedin.com/in/arthurjenck/>
+
+<img src="https://i.ibb.co/R4tzqky/logo.png" width="75">
