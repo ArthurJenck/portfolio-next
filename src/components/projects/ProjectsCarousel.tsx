@@ -36,6 +36,7 @@ export const ProjectsCarousel: React.FC = () => {
 
     const [hovered, setHovered] = useState<number | null>(null)
     const [isDraggingOrRecentlyDragged, setIsDraggingOrRecentlyDragged] = useState(false)
+    const isMountedRef = useRef(false)
     const dragEndTimeout = useRef<number | null>(null)
 
     const contentWidth = useMemo(
@@ -44,6 +45,13 @@ export const ProjectsCarousel: React.FC = () => {
     )
 
     const { dragBounds } = useCarouselBounds(viewportRef, contentWidth)
+
+    useEffect(() => {
+        isMountedRef.current = true
+        return () => {
+            isMountedRef.current = false
+        }
+    }, [])
 
     // Scroll-based animation : écouter le scroll de la section
     useEffect(() => {
@@ -90,7 +98,7 @@ export const ProjectsCarousel: React.FC = () => {
 
     // Synchroniser la position avec le scroll (sauf si on drag)
     useMotionValueEvent(scrollX, 'change', (latest) => {
-        if (!isDraggingOrRecentlyDragged) {
+        if (!isDraggingOrRecentlyDragged && isMountedRef.current) {
             // Utiliser .set() pour une mise à jour instantanée sans animation
             xImages.set(latest)
             imagesCtrl.set({ x: latest })
@@ -132,10 +140,12 @@ export const ProjectsCarousel: React.FC = () => {
                 setIsDraggingOrRecentlyDragged(false)
 
                 // Forcer une dernière synchronisation pour être sûr que tout est aligné
-                const currentScrollX = scrollX.get()
-                xImages.set(currentScrollX)
-                imagesCtrl.set({ x: currentScrollX })
-                titlesCtrl.set({ x: currentScrollX })
+                if (isMountedRef.current) {
+                    const currentScrollX = scrollX.get()
+                    xImages.set(currentScrollX)
+                    imagesCtrl.set({ x: currentScrollX })
+                    titlesCtrl.set({ x: currentScrollX })
+                }
             }, 300)
         }
     }, [isDragging, isDraggingOrRecentlyDragged, scrollX, xImages, imagesCtrl, titlesCtrl])
