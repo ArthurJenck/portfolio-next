@@ -4,6 +4,8 @@ import './globals.css'
 import { QueryProvider } from '@/providers/QueryProvider'
 import { PrefetchProvider } from '@/providers/PrefetchProvider'
 import { cn } from '@/lib/utils'
+import { SpeedInsights } from '@vercel/speed-insights/next'
+import { Analytics } from '@vercel/analytics/next'
 
 const sora = Sora({
     subsets: ['latin'],
@@ -66,7 +68,11 @@ export default function RootLayout({
             </head>
             <body className={cn('overflow-x-hidden', sora.className)}>
                 <QueryProvider>
-                    <PrefetchProvider>{children}</PrefetchProvider>
+                    <PrefetchProvider>
+                        {children}
+                        <Analytics />
+                        <SpeedInsights />
+                    </PrefetchProvider>
                 </QueryProvider>
             </body>
         </html>
