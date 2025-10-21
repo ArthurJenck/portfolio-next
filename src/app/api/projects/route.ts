@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import Project from '@/models/Project'
 import { Types } from 'mongoose'
+import { generateSlug } from '@/lib/utils'
 
 interface PopulatedSkill {
     _id: Types.ObjectId
@@ -21,6 +22,7 @@ export async function GET() {
         const response = projects.map((project) => ({
             id: project._id.toString(),
             name: project.name,
+            slug: project.slug,
             image: project.image,
             summary: project.summary,
             stack: (project.stack as unknown as PopulatedSkill[]).map((skill) => ({
@@ -45,6 +47,11 @@ export async function POST(request: Request) {
     try {
         await connectDB()
         const body = await request.json()
+
+        // Générer le slug si non fourni
+        if (!body.slug && body.name) {
+            body.slug = generateSlug(body.name)
+        }
 
         // Si order n'est pas fourni, prendre le max + 1
         if (body.order === undefined) {

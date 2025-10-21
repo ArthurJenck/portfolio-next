@@ -3,6 +3,7 @@ import { SkillChild } from './SkillsTypes'
 export interface DetailedProjectType {
     id: string
     name: string
+    slug: string
     image: string
     description: string
     stack: SkillChild[]
@@ -13,6 +14,7 @@ export interface DetailedProjectType {
 export interface MinimalProjectType {
     id: string
     name: string
+    slug: string
     image: string
     summary: string
     stack: SkillChild[]

@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import Project from '@/models/Project'
 import { Types } from 'mongoose'
+import { generateSlug } from '@/lib/utils'
 
 interface PopulatedSkill {
     _id: Types.ObjectId
@@ -12,6 +13,7 @@ interface PopulatedSkill {
     description?: string
 }
 
+// Route pour l'admin - récupération par ID
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
     try {
@@ -24,6 +26,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         const response = {
             id: project._id.toString(),
             name: project.name,
+            slug: project.slug,
             image: project.image,
             description: project.description,
             stack: (project.stack as unknown as PopulatedSkill[]).map((skill) => ({
@@ -51,6 +54,15 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     try {
         await connectDB()
         const body = await request.json()
+
+        // Si le nom change, regénérer le slug
+        if (body.name) {
+            const currentProject = await Project.findById(id)
+            if (currentProject && body.name !== currentProject.name) {
+                body.slug = generateSlug(body.name)
+            }
+        }
+
         const project = await Project.findByIdAndUpdate(id, body, { new: true })
 
         if (!project) return NextResponse.json({ error: 'Not found' }, { status: 404 })

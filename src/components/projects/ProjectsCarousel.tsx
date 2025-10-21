@@ -206,7 +206,7 @@ export const ProjectsCarousel: React.FC = () => {
                         return (
                             <ProjectTile
                                 key={p.id}
-                                projectId={p.id}
+                                projectSlug={p.slug}
                                 imageUrl={p.image}
                                 width={ITEM_WIDTH}
                                 height={TILE_HEIGHT}

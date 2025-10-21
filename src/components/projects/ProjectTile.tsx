@@ -18,7 +18,7 @@ interface ProjectTileProps {
     height: number
     color?: string
     imageUrl: string
-    projectId: string
+    projectSlug: string
     onHoverStart?: () => void
     onHoverEnd?: () => void
 }
@@ -28,7 +28,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
     height,
     color = '#ffffff',
     imageUrl,
-    projectId,
+    projectSlug,
     onHoverStart,
     onHoverEnd,
 }) => {
@@ -199,7 +199,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
         const holdDuration = Date.now() - pointerDownTime.current
 
         if (totalMovement < 5 && holdDuration < 100) {
-            router.push(`/project/${projectId}`)
+            router.push(`/project/${projectSlug}`)
         }
     }
 
@@ -255,6 +255,9 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
                         className="relative block flex-none max-w-none w-auto h-auto select-none pointer-events-none"
                         src={imageUrl}
                         alt="Image"
+                        width={504}
+                        height={283}
+                        style={{ width: '100%', height: '100%' }}
                     />
                 </div>
             </div>
