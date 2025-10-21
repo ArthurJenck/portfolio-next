@@ -19,6 +19,7 @@ import {
     ITEM_WIDTH,
     TILE_HEIGHT,
     TITLE_SCALE_TRANSITION,
+    TITLE_SPRING,
     TITLE_TOP_OFFSET,
     VIEW_PADDING,
 } from './config'
@@ -96,13 +97,37 @@ export const ProjectsCarousel: React.FC = () => {
         [dragBounds.left],
     )
 
-    // Synchroniser la position avec le scroll (sauf si on drag)
+    const lastScrollX = useRef<number>(0)
     useMotionValueEvent(scrollX, 'change', (latest) => {
+        if (isDragging) {
+            lastScrollX.current = latest
+            return
+        }
+
         if (!isDraggingOrRecentlyDragged && isMountedRef.current) {
-            // Utiliser .set() pour une mise à jour instantanée sans animation
             xImages.set(latest)
             imagesCtrl.set({ x: latest })
-            titlesCtrl.set({ x: latest })
+            titlesCtrl.start({
+                x: latest,
+                transition: TITLE_SPRING,
+            })
+            lastScrollX.current = latest
+        } else if (isDraggingOrRecentlyDragged && isMountedRef.current) {
+            const scrollDelta = Math.abs(latest - lastScrollX.current)
+            if (scrollDelta > 5) {
+                setIsDraggingOrRecentlyDragged(false)
+                if (dragEndTimeout.current) {
+                    window.clearTimeout(dragEndTimeout.current)
+                    dragEndTimeout.current = null
+                }
+                xImages.set(latest)
+                imagesCtrl.set({ x: latest })
+                titlesCtrl.start({
+                    x: latest,
+                    transition: TITLE_SPRING,
+                })
+                lastScrollX.current = latest
+            }
         }
     })
 
@@ -130,6 +155,7 @@ export const ProjectsCarousel: React.FC = () => {
     useEffect(() => {
         if (isDragging) {
             setIsDraggingOrRecentlyDragged(true)
+            lastScrollX.current = scrollX.get()
             if (dragEndTimeout.current) {
                 window.clearTimeout(dragEndTimeout.current)
             }
@@ -144,7 +170,11 @@ export const ProjectsCarousel: React.FC = () => {
                     const currentScrollX = scrollX.get()
                     xImages.set(currentScrollX)
                     imagesCtrl.set({ x: currentScrollX })
-                    titlesCtrl.set({ x: currentScrollX })
+                    titlesCtrl.start({
+                        x: currentScrollX,
+                        transition: TITLE_SPRING,
+                    })
+                    lastScrollX.current = currentScrollX
                 }
             }, 300)
         }

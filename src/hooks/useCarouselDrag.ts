@@ -11,7 +11,6 @@ import {
     TITLE_INERTIA_SPRING,
     TITLE_SNAP_TRANSITION,
     TITLE_SPRING,
-    TITLE_START_DELAY_MS,
 } from '../components/projects/config'
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
@@ -40,8 +39,6 @@ export const useCarouselDrag = ({
     const lastMoveX = useRef<number>(0)
     const velocityX = useRef<number>(0)
 
-    const titleDelayTimer = useRef<number | null>(null)
-
     const onPointerDown = (e: React.PointerEvent) => {
         setIsDragging(true)
         dragStartX.current = e.clientX
@@ -53,11 +50,6 @@ export const useCarouselDrag = ({
         lastMoveTime.current = Date.now()
         lastMoveX.current = currentX
         velocityX.current = 0
-
-        if (titleDelayTimer.current) {
-            window.clearTimeout(titleDelayTimer.current)
-            titleDelayTimer.current = null
-        }
     }
 
     const onPointerMove = (e: React.PointerEvent) => {
@@ -87,17 +79,11 @@ export const useCarouselDrag = ({
             transition: IMAGE_SPRING,
         })
 
-        if (titleDelayTimer.current) {
-            window.clearTimeout(titleDelayTimer.current)
-        }
-
-        titleDelayTimer.current = window.setTimeout(() => {
-            titlesCtrl.start({
-                x: clamped,
-                transition: TITLE_SPRING,
-            })
-            titleDelayTimer.current = null
-        }, TITLE_START_DELAY_MS)
+        // Mise à jour des titres à chaque mouvement avec une transition plus lente
+        titlesCtrl.start({
+            x: clamped,
+            transition: TITLE_SPRING,
+        })
     }
 
     const onPointerUp = () => {
@@ -105,11 +91,6 @@ export const useCarouselDrag = ({
 
         setIsDragging(false)
         const currentX = xImages.get()
-
-        if (titleDelayTimer.current) {
-            window.clearTimeout(titleDelayTimer.current)
-            titleDelayTimer.current = null
-        }
 
         const velocity = velocityX.current
         const targetX = currentX + velocity * INERTIA_DURATION_MS * INERTIA_FACTOR

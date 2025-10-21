@@ -20,9 +20,9 @@ export const IMAGE_SPRING = {
 
 export const TITLE_SPRING = {
     type: 'spring',
-    stiffness: 200,
-    damping: 40,
-    mass: 1.2,
+    stiffness: 250,
+    damping: 30,
+    mass: 1.5,
 } as const
 
 export const IMAGE_SNAP_MS = 250

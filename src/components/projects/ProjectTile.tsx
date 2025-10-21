@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
+import testImage from '@/assets/images/hero-placeholder.png'
 
 interface AnimeInstance {
     (params: Record<string, unknown>): void
@@ -248,16 +249,16 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
                     className="relative flex justify-center items-center overflow-hidden w-full h-full cursor-pointer origin-bottom"
                     style={{ backgroundColor: color }}
                 >
+                    {/* Tenter avec images 560*314 */}
                     <Image
                         draggable={false}
                         onDragStart={(e) => e.preventDefault()}
                         ref={imgRef}
                         className="relative block flex-none max-w-none w-auto h-auto select-none pointer-events-none"
-                        src={imageUrl}
+                        src={testImage}
                         alt="Image"
-                        width={504}
-                        height={283}
-                        style={{ width: '100%', height: '100%' }}
+                        width={1920}
+                        height={1080}
                     />
                 </div>
             </div>
