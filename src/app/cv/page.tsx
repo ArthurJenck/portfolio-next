@@ -10,11 +10,11 @@ const CV = () => {
     return (
         // Le zoom n'a pas besoin d'être au-dessus de 25%
         <iframe
-            src="/CV Arthur Jenck.pdf#zoom=25"
+            src="https://3jrx06emyedlbjzt.public.blob.vercel-storage.com/CV_Arthur-Jenck"
             width={'100%'}
             height={'100%'}
             style={{ width: '100%', height: '100dvh', border: 'none' }}
-        ></iframe>
+        />
     )
 }
 

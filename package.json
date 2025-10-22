@@ -3,11 +3,10 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "dev": "next dev --turbopack",
+        "dev": "next dev --turbopack -p 3001",
         "build": "next build --turbopack",
         "start": "next start",
-        "lint": "eslint",
-        "create-admin": "tsx scripts/create-admin.ts"
+        "lint": "eslint"
     },
     "dependencies": {
         "@tanstack/react-query": "^5.90.5",

@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import { Sora } from 'next/font/google'
-import './globals.css'
+import '@/app/globals.css'
 import { QueryProvider } from '@/providers/QueryProvider'
 import { PrefetchProvider } from '@/providers/PrefetchProvider'
 import { cn } from '@/lib/utils'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Analytics } from '@vercel/analytics/next'
+import NavBar from '@/components/NavBar'
+import Footer from '@/components/Footer'
 
 const sora = Sora({
     subsets: ['latin'],
@@ -69,7 +71,11 @@ export default function RootLayout({
             <body className={cn('overflow-x-hidden', sora.className)}>
                 <QueryProvider>
                     <PrefetchProvider>
-                        {children}
+                        <div className="min-h-screen flex flex-col">
+                            <NavBar />
+                            {children}
+                            <Footer />
+                        </div>
                         <Analytics />
                         <SpeedInsights />
                     </PrefetchProvider>

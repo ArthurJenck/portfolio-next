@@ -11,7 +11,7 @@ const ProjectPage = () => {
     console.log(project)
 
     return (
-        <div>
+        <div className="flex flex-col justify-center items-center">
             <h1>{project?.name}</h1>
             <p>{project?.description}</p>
             {project?.image && <Image src={project?.image} alt={project?.name} width={100} height={100} />}

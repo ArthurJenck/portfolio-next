@@ -1,4 +1,5 @@
 import { useScroll } from '@/hooks/useScroll'
+import { usePathname } from 'next/navigation'
 
 interface BurgerLinkProps {
     href?: string
@@ -7,15 +8,17 @@ interface BurgerLinkProps {
 
 const BurgerLink = ({ href, title }: BurgerLinkProps) => {
     const scrollTo = useScroll()
+    const pathname = usePathname()
+    const isHomePage = pathname === '/'
 
     return (
         <li>
             {/* Le preventDefault sert à éviter le rechargement de la page en cliquant sur le lien. On utilise alors la fonction scrollTo pour remonter en haut de la page et nettoyer l'url */}
             <a
-                className="burger-link font-bold text-2xl tracking-[1px] relative select-none"
-                href={href}
+                className="burger-link font-bold text-2xl tracking-[1px] relative select-none cursor-pointer"
+                href={isHomePage ? href : `/${href}`}
                 onClick={(e) => {
-                    if (!href) {
+                    if (!href && isHomePage) {
                         e.preventDefault()
                         scrollTo(0)
                     }
