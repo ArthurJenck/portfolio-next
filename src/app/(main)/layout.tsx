@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Sora, Montserrat } from 'next/font/google'
+import { Sora } from 'next/font/google'
 import '@/app/globals.css'
 import { QueryProvider } from '@/providers/QueryProvider'
 import { PrefetchProvider } from '@/providers/PrefetchProvider'
@@ -10,12 +10,6 @@ import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
 
 const sora = Sora({
-    subsets: ['latin'],
-    weight: ['100', '200', '300', '400', '500', '600', '700', '800'],
-    display: 'swap',
-})
-
-const montserrat = Montserrat({
     subsets: ['latin'],
     weight: ['100', '200', '300', '400', '500', '600', '700', '800'],
     display: 'swap',
@@ -74,7 +68,7 @@ export default function RootLayout({
                     }}
                 />
             </head>
-            <body className={cn('overflow-x-hidden', sora.className, montserrat.className)}>
+            <body className={cn('overflow-x-hidden', sora.className)}>
                 <QueryProvider>
                     <PrefetchProvider>
                         <div className="min-h-screen flex flex-col">
