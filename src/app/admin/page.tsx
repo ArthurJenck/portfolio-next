@@ -13,7 +13,8 @@ import { ProjectList, ProjectEdit, ProjectCreate } from './resources/projects'
 import { SkillList, SkillEdit, SkillCreate } from './resources/skills'
 import { SkillCategoryList, SkillCategoryEdit, SkillCategoryCreate } from './resources/skill-categories'
 import { UserList, UserEdit, UserCreate } from './resources/users'
-import { ProjectIcon, SkillIcon, SkillCategoryIcon, UserIcon } from './components/CustomIcons'
+import { CVList, CVEdit, CVCreate } from './resources/cv'
+import { ProjectIcon, SkillIcon, SkillCategoryIcon, UserIcon, CVIcon } from './components/CustomIcons'
 
 export default function AdminPage() {
     const [mounted, setMounted] = useState(false)
@@ -78,6 +79,14 @@ export default function AdminPage() {
                     create={UserCreate}
                     icon={UserIcon}
                     options={{ label: 'Utilisateurs' }}
+                />
+                <Resource
+                    name="cv"
+                    list={CVList}
+                    edit={CVEdit}
+                    create={CVCreate}
+                    icon={CVIcon}
+                    options={{ label: 'CV' }}
                 />
             </Admin>
         </SessionProvider>

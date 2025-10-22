@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Sora } from 'next/font/google'
-import '../globals.css'
-import { QueryProvider } from '@/providers/QueryProvider'
+import '@/app/globals.css'
+import './admin.css'
 
 const sora = Sora({
     subsets: ['latin'],
@@ -10,21 +10,19 @@ const sora = Sora({
 })
 
 export const metadata: Metadata = {
-    title: 'Arthur Jenck – CV',
-    description: "CV d'Arthur Jenck, développeur web front-end",
-    robots: 'index',
+    title: 'Admin – Arthur Jenck',
+    description: "Interface d'administration du portfolio",
+    robots: 'noindex, nofollow',
 }
 
-export default function CVLayout({
+export default function AdminLayout({
     children,
 }: Readonly<{
     children: React.ReactNode
 }>) {
     return (
         <html lang="fr">
-            <body className={sora.className}>
-                <QueryProvider>{children}</QueryProvider>
-            </body>
+            <body className={sora.className}>{children}</body>
         </html>
     )
 }

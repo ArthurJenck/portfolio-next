@@ -5,6 +5,7 @@ import connectDB from '@/lib/mongodb'
 import Project from '@/models/Project'
 import { Types } from 'mongoose'
 import { generateSlug } from '@/lib/utils'
+import { del } from '@vercel/blob'
 
 interface PopulatedSkill {
     _id: Types.ObjectId
@@ -55,17 +56,27 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         await connectDB()
         const body = await request.json()
 
+        // Récupérer le projet actuel
+        const currentProject = await Project.findById(id)
+        if (!currentProject) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
         // Si le nom change, regénérer le slug
-        if (body.name) {
-            const currentProject = await Project.findById(id)
-            if (currentProject && body.name !== currentProject.name) {
-                body.slug = generateSlug(body.name)
+        if (body.name && body.name !== currentProject.name) {
+            body.slug = generateSlug(body.name)
+        }
+
+        // Si l'image change, supprimer l'ancienne de Vercel Blob
+        if (body.image && body.image !== currentProject.image) {
+            try {
+                await del(currentProject.image)
+            } catch (error) {
+                console.error('Error deleting old project image from Vercel Blob:', error)
+                // Continue même si la suppression échoue
             }
         }
 
         const project = await Project.findByIdAndUpdate(id, body, { new: true })
 
-        if (!project) return NextResponse.json({ error: 'Not found' }, { status: 404 })
         return NextResponse.json(project)
     } catch (error) {
         console.error('Error updating project:', error)
@@ -80,9 +91,23 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     const { id } = await params
     try {
         await connectDB()
-        const project = await Project.findByIdAndDelete(id)
+        const project = await Project.findById(id)
 
         if (!project) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+        // Supprimer l'image de Vercel Blob
+        if (project.image) {
+            try {
+                await del(project.image)
+            } catch (error) {
+                console.error('Error deleting project image from Vercel Blob:', error)
+                // Continue même si la suppression échoue
+            }
+        }
+
+        // Supprimer le projet de MongoDB
+        await Project.findByIdAndDelete(id)
+
         return NextResponse.json({ success: true })
     } catch (error) {
         console.error('Error deleting project:', error)
