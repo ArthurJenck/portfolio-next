@@ -2,7 +2,7 @@ import Header from '@/sections/Header'
 import Skills from '@/sections/Skills'
 import About from '@/sections/About'
 import Contact from '@/sections/Contact'
-import Projets from '@/sections/Projets'
+import Projets from '@/sections/Projects'
 import FastTravel from '@/components/FastTravel/FastTravel'
 
 const Home = () => {

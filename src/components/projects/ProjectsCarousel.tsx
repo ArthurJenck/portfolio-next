@@ -8,7 +8,6 @@ import {
     useTransform,
     useMotionValueEvent,
 } from 'framer-motion'
-import { useProjects } from '@/hooks/useProjects'
 import ProjectTile from './ProjectTile'
 import { ProjectDescription } from './ProjectDescription'
 import {
@@ -25,9 +24,13 @@ import {
 } from './config'
 import { useCarouselBounds } from '@/hooks/useCarouselBounds'
 import { useCarouselDrag } from '@/hooks/useCarouselDrag'
+import { MinimalProjectType } from '@/types/ProjectTypes'
 
-export const ProjectsCarousel: React.FC = () => {
-    const { data: projects, isLoading, error } = useProjects()
+interface ProjecsCarouselProps {
+    projects: MinimalProjectType[]
+}
+
+const ProjectsCarousel = ({ projects }: ProjecsCarouselProps) => {
     const viewportRef = useRef<HTMLDivElement | null>(null)
     const sectionRef = useRef<HTMLElement | null>(null)
 
@@ -193,22 +196,6 @@ export const ProjectsCarousel: React.FC = () => {
         }
     }, [])
 
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center w-full h-full">
-                <div className="text-gray-500">Chargement des projets...</div>
-            </div>
-        )
-    }
-
-    if (error || !projects) {
-        return (
-            <div className="flex items-center justify-center w-full h-full">
-                <div className="text-red-500">Erreur lors du chargement des projets</div>
-            </div>
-        )
-    }
-
     return (
         <div
             className="relative w-full my-[8vh]"
@@ -298,3 +285,5 @@ export const ProjectsCarousel: React.FC = () => {
         </div>
     )
 }
+
+export default ProjectsCarousel
