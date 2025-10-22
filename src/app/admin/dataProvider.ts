@@ -20,7 +20,7 @@ export default {
 
     getOne: (resource, params) =>
         httpClient(`${apiUrl}/${resource}/${params.id}`).then(({ json }) => ({
-            data: { ...json, id: json._id },
+            data: { ...json, id: json._id || json.id },
         })),
 
     getMany: (resource, params) => {

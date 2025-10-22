@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Project from '@/models/Project'
+import Skill from '@/models/Skill'
 import { Types } from 'mongoose'
 
 interface PopulatedSkill {
@@ -15,6 +16,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
     const { slug } = await params
     try {
         await connectDB()
+        // Force Skill model registration
+        Skill.modelName
         const project = await Project.findOne({ slug }).populate('stack')
 
         if (!project) return NextResponse.json({ error: 'Not found' }, { status: 404 })
@@ -23,8 +26,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
         const response = {
             id: project._id.toString(),
             name: project.name,
+            subtitle: project.subtitle,
+            date: project.date.toISOString(),
             slug: project.slug,
             image: project.image,
+            summary: project.summary,
             description: project.description,
             stack: (project.stack as unknown as PopulatedSkill[]).map((skill) => ({
                 id: skill._id.toString(),
@@ -32,8 +38,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
                 icon: skill.icon || '',
                 description: skill.description || '',
             })),
-            github_url: project.githubLink,
-            project_url: project.webLink,
+            githubLink: project.githubLink,
+            webLink: project.webLink,
+            order: project.order,
         }
 
         return NextResponse.json(response)

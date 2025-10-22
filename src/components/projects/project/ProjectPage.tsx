@@ -15,10 +15,10 @@ const ProjectPage = () => {
             <h1>{project?.name}</h1>
             <p>{project?.description}</p>
             {project?.image && <Image src={project?.image} alt={project?.name} width={100} height={100} />}
-            <a href={project?.project_url} target="_blank" rel="noopener noreferrer">
+            <a href={project?.webLink} target="_blank" rel="noopener noreferrer">
                 Site web
             </a>
-            <a href={project?.github_url} target="_blank" rel="noopener noreferrer">
+            <a href={project?.githubLink} target="_blank" rel="noopener noreferrer">
                 GitHub
             </a>
         </div>

@@ -271,7 +271,7 @@ const ProjectsCarousel = ({ projects }: ProjecsCarouselProps) => {
                             <ProjectDescription
                                 key={`titles-${p.id}`}
                                 title={p.name}
-                                subtitle={p.name}
+                                subtitle={p.subtitle || p.name}
                                 description={p.summary}
                                 tags={stackNames}
                                 isHovered={hovered === i}

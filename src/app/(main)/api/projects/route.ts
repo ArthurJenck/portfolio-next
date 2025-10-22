@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import Project from '@/models/Project'
+import Skill from '@/models/Skill'
 import { Types } from 'mongoose'
 import { generateSlug } from '@/lib/utils'
 
@@ -16,12 +17,16 @@ interface PopulatedSkill {
 export async function GET() {
     try {
         await connectDB()
+        // Force Skill model registration
+        Skill.modelName
         const projects = await Project.find().populate('stack').sort({ order: 1 })
 
         // Renvoyer MinimalProjectType
         const response = projects.map((project) => ({
             id: project._id.toString(),
             name: project.name,
+            subtitle: project.subtitle,
+            date: project.date.toISOString(),
             slug: project.slug,
             image: project.image,
             summary: project.summary,

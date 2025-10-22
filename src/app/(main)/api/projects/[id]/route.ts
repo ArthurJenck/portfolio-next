@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import Project from '@/models/Project'
+import Skill from '@/models/Skill'
 import { Types } from 'mongoose'
 import { generateSlug } from '@/lib/utils'
 import { del } from '@vercel/blob'
@@ -19,16 +20,22 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const { id } = await params
     try {
         await connectDB()
+        // Force Skill model registration
+        Skill.modelName
         const project = await Project.findById(id).populate('stack')
 
         if (!project) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-        // Renvoyer DetailedProjectType
+        // Renvoyer les données complètes pour l'admin
         const response = {
             id: project._id.toString(),
+            _id: project._id.toString(),
             name: project.name,
+            subtitle: project.subtitle,
+            date: project.date.toISOString(),
             slug: project.slug,
             image: project.image,
+            summary: project.summary,
             description: project.description,
             stack: (project.stack as unknown as PopulatedSkill[]).map((skill) => ({
                 id: skill._id.toString(),
@@ -36,8 +43,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                 icon: skill.icon || '',
                 description: skill.description || '',
             })),
-            github_url: project.githubLink,
-            project_url: project.webLink,
+            githubLink: project.githubLink,
+            webLink: project.webLink,
+            order: project.order,
         }
 
         return NextResponse.json(response)
@@ -60,13 +68,39 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         const currentProject = await Project.findById(id)
         if (!currentProject) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
+        // Nettoyer les données : ne garder que les champs MongoDB valides
+        const updateData: Record<string, unknown> = {}
+        const allowedFields = [
+            'name',
+            'subtitle',
+            'date',
+            'summary',
+            'description',
+            'stack',
+            'githubLink',
+            'webLink',
+            'image',
+            'order',
+        ]
+
+        for (const field of allowedFields) {
+            if (body[field] !== undefined) {
+                // Traitement spécial pour stack : extraire seulement les IDs
+                if (field === 'stack' && Array.isArray(body[field])) {
+                    updateData[field] = body[field].map((skill: { id?: string; _id?: string }) => skill.id || skill._id)
+                } else {
+                    updateData[field] = body[field]
+                }
+            }
+        }
+
         // Si le nom change, regénérer le slug
-        if (body.name && body.name !== currentProject.name) {
-            body.slug = generateSlug(body.name)
+        if (updateData.name && updateData.name !== currentProject.name) {
+            updateData.slug = generateSlug(updateData.name as string)
         }
 
         // Si l'image change, supprimer l'ancienne de Vercel Blob
-        if (body.image && body.image !== currentProject.image) {
+        if (updateData.image && updateData.image !== currentProject.image) {
             try {
                 await del(currentProject.image)
             } catch (error) {
@@ -75,7 +109,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
             }
         }
 
-        const project = await Project.findByIdAndUpdate(id, body, { new: true })
+        const project = await Project.findByIdAndUpdate(id, updateData, { new: true })
 
         return NextResponse.json(project)
     } catch (error) {
