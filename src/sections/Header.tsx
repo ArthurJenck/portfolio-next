@@ -21,7 +21,7 @@ const Header = () => {
             onClick={() => scrollTo(window.innerHeight)}
             onMouseMove={(e) => handleH1Wght(e)}
             onMouseOver={(e) => handleH1Wght(e)}
-            className="flex flex-col items-center justify-center scroll-smooth h-svh"
+            className="flex flex-col items-center justify-center scroll-smooth h-svh relative"
         >
             <h1 className="md:max-w-[50vw] text-center text-[clamp(1rem,23vw,100px)] lg:text-[11.5vw] leading-[90%]">
                 Arthur

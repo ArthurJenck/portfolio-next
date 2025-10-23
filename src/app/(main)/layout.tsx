@@ -75,6 +75,15 @@ export default function RootLayout({
                 />
             </head>
             <body className={cn('overflow-x-hidden', sora.className, montserrat.className)}>
+                <div
+                    className="fixed inset-0 h-svh -z-10 top-svh"
+                    style={{
+                        background: 'var(--primary)',
+                        backgroundImage: `radial-gradient(circle, rgba(120, 120, 120, 0.2) 1px, transparent 1px)`,
+                        backgroundSize: '30px 30px',
+                        backgroundPosition: '0 0',
+                    }}
+                />
                 <QueryProvider>
                     <PrefetchProvider>
                         <div className="min-h-screen flex flex-col">
