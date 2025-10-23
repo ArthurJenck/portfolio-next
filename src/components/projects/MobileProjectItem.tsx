@@ -10,9 +10,11 @@ interface MobileProjectItemProps {
 
 const MobileProjectItem = ({ project }: MobileProjectItemProps) => {
     return (
-        <Link href={`/projects/${project.slug}`}>
+        <Link href={`/project/${project.slug}`} className="flex flex-col gap-1">
             <Image src={testImage} alt={project.name} width={300} height={100} className="w-full h-auto" />
-            <h3 className="text-xl font-extralight">Odace+ – SaaS complet</h3>
+            <h3 className="text-xl font-extralight">
+                {project.name} – {project.subtitle}
+            </h3>
         </Link>
     )
 }

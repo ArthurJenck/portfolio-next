@@ -9,9 +9,16 @@ interface FileUploadInputProps {
     label: string
     required?: boolean
     accept?: string
+    helperText?: string
 }
 
-export const FileUploadInput = ({ source, label, required = false, accept = 'image/*' }: FileUploadInputProps) => {
+export const FileUploadInput = ({
+    source,
+    label,
+    required = false,
+    accept = 'image/*',
+    helperText,
+}: FileUploadInputProps) => {
     const { field } = useInput({ source })
     const [uploading, setUploading] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -161,6 +168,8 @@ export const FileUploadInput = ({ source, label, required = false, accept = 'ima
             )}
 
             {error && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>}
+
+            {helperText && <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">{helperText}</p>}
 
             <input type="hidden" {...field} />
         </div>

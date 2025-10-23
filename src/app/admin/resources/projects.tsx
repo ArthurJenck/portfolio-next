@@ -61,7 +61,12 @@ export const ProjectEdit = () => (
                 validate={required()}
                 helperText="Description détaillée pour la page du projet"
             />
-            <FileUploadInput source="image" label="Image du projet" required />
+            <FileUploadInput
+                source="image"
+                label="Image du projet"
+                required
+                helperText="Taille recommandée : 1440x810 pixels"
+            />
             <ReferenceArrayInput source="stack" reference="skills" label="Stack">
                 <SelectArrayInput optionText="name" />
             </ReferenceArrayInput>
@@ -93,7 +98,12 @@ export const ProjectCreate = () => (
                 validate={required()}
                 helperText="Description détaillée pour la page du projet"
             />
-            <FileUploadInput source="image" label="Image du projet" required />
+            <FileUploadInput
+                source="image"
+                label="Image du projet"
+                required
+                helperText="Taille recommandée : 1440x810 pixels"
+            />
             <ReferenceArrayInput source="stack" reference="skills" label="Stack">
                 <SelectArrayInput optionText="name" />
             </ReferenceArrayInput>
