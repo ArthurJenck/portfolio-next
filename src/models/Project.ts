@@ -1,5 +1,10 @@
 import mongoose, { Schema, Document, Types } from 'mongoose'
 
+export interface IProjectMedia {
+    url: string
+    type: 'image' | 'video'
+}
+
 export interface IProject extends Document {
     name: string
     subtitle?: string
@@ -10,7 +15,8 @@ export interface IProject extends Document {
     stack: Types.ObjectId[]
     githubLink?: string
     webLink?: string
-    image: string
+    cover_image: string
+    medias: IProjectMedia[]
     order: number
     createdAt: Date
     updatedAt: Date
@@ -27,7 +33,13 @@ const ProjectSchema = new Schema<IProject>(
         stack: [{ type: Schema.Types.ObjectId, ref: 'Skill' }],
         githubLink: String,
         webLink: String,
-        image: { type: String, required: true },
+        cover_image: { type: String, required: true },
+        medias: [
+            {
+                url: { type: String, required: true },
+                type: { type: String, enum: ['image', 'video'], required: true },
+            },
+        ],
         order: { type: Number, required: true, default: 0 },
     },
     { timestamps: true },

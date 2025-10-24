@@ -29,7 +29,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
             subtitle: project.subtitle,
             date: project.date.toISOString(),
             slug: project.slug,
-            image: project.image,
+            cover_image: project.cover_image,
+            medias:
+                project.medias && project.medias.length > 0
+                    ? project.medias
+                    : [{ url: project.cover_image, type: 'image' as const }],
             summary: project.summary,
             description: project.description,
             stack: (project.stack as unknown as PopulatedSkill[]).map((skill) => ({

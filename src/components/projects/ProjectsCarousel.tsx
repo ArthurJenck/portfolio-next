@@ -234,7 +234,7 @@ const ProjectsCarousel = ({ projects }: ProjecsCarouselProps) => {
                             <ProjectTile
                                 key={p.id}
                                 projectSlug={p.slug}
-                                imageUrl={p.image}
+                                imageUrl={p.cover_image}
                                 width={ITEM_WIDTH}
                                 height={TILE_HEIGHT}
                                 color={'#f0f0f0'}

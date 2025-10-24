@@ -28,7 +28,7 @@ export async function GET() {
             subtitle: project.subtitle,
             date: project.date.toISOString(),
             slug: project.slug,
-            image: project.image,
+            cover_image: project.cover_image,
             summary: project.summary,
             stack: (project.stack as unknown as PopulatedSkill[]).map((skill) => ({
                 id: skill._id.toString(),
@@ -62,6 +62,16 @@ export async function POST(request: Request) {
         if (body.order === undefined) {
             const maxProject = await Project.findOne().sort({ order: -1 })
             body.order = maxProject ? maxProject.order + 1 : 0
+        }
+
+        // Si medias n'est pas fourni ou est vide, initialiser avec cover_image
+        if ((!body.medias || body.medias.length === 0) && body.cover_image) {
+            body.medias = [
+                {
+                    url: body.cover_image,
+                    type: 'image',
+                },
+            ]
         }
 
         const project = await Project.create(body)

@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import { Sora, Montserrat } from 'next/font/google'
 import '@/app/globals.css'
 import { QueryProvider } from '@/providers/QueryProvider'
 import { PrefetchProvider } from '@/providers/PrefetchProvider'
@@ -8,17 +7,20 @@ import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Analytics } from '@vercel/analytics/next'
 import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
+import { Sora, Montserrat } from 'next/font/google'
 
 const sora = Sora({
     subsets: ['latin'],
     weight: ['100', '200', '300', '400', '500', '600', '700', '800'],
     display: 'swap',
+    variable: '--font-sora',
 })
 
 const montserrat = Montserrat({
     subsets: ['latin'],
     weight: ['100', '200', '300', '400', '500', '600', '700', '800'],
     display: 'swap',
+    variable: '--font-montserrat',
 })
 
 export const metadata: Metadata = {
@@ -74,7 +76,7 @@ export default function RootLayout({
                     }}
                 />
             </head>
-            <body className={cn('overflow-x-hidden', sora.className, montserrat.className)}>
+            <body className={cn('overflow-x-hidden', sora.className, sora.variable, montserrat.variable)}>
                 <div
                     className="fixed inset-0 h-svh -z-10 top-svh"
                     style={{
@@ -91,8 +93,9 @@ export default function RootLayout({
                             {children}
                             <Footer />
                         </div>
-                        <Analytics />
-                        <SpeedInsights />
+                        {/* TODO: remettre le debug */}
+                        <Analytics debug={false} />
+                        <SpeedInsights debug={false} />
                     </PrefetchProvider>
                 </QueryProvider>
             </body>

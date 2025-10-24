@@ -2,7 +2,6 @@ import { MinimalProjectType } from '@/types/ProjectTypes'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
-import testImage from '@/assets/images/hero-placeholder.png'
 
 interface MobileProjectItemProps {
     project: MinimalProjectType
@@ -11,7 +10,7 @@ interface MobileProjectItemProps {
 const MobileProjectItem = ({ project }: MobileProjectItemProps) => {
     return (
         <Link href={`/project/${project.slug}`} className="flex flex-col gap-1">
-            <Image src={testImage} alt={project.name} width={300} height={100} className="w-full h-auto" />
+            <Image src={project.cover_image} alt={project.name} width={300} height={100} className="w-full h-auto" />
             <h3 className="text-xl font-extralight">
                 {project.name} – {project.subtitle}
             </h3>

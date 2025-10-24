@@ -11,13 +11,13 @@ import {
     SimpleForm,
     TextInput,
     DateInput,
-    ReferenceArrayInput,
-    SelectArrayInput,
     required,
     FunctionField,
 } from 'react-admin'
 import { ReorderButtons } from '../components/ReorderButtons'
 import { FileUploadInput } from '../components/FileUploadInput'
+import { MediasUploadInput } from '../components/MediasUploadInput'
+import { ProjectSkillsInput } from '../components/ProjectSkillsInput'
 
 export const ProjectList = () => (
     <List>
@@ -62,14 +62,18 @@ export const ProjectEdit = () => (
                 helperText="Description détaillée pour la page du projet"
             />
             <FileUploadInput
-                source="image"
-                label="Image du projet"
+                source="cover_image"
+                label="Image de couverture"
                 required
-                helperText="Taille recommandée : 1440x810 pixels"
+                helperText="Taille recommandée : 1440x810 pixels - Utilisée dans la liste des projets"
             />
-            <ReferenceArrayInput source="stack" reference="skills" label="Stack">
-                <SelectArrayInput optionText="name" />
-            </ReferenceArrayInput>
+            <MediasUploadInput
+                source="medias"
+                label="Médias du projet"
+                accept="image/*,video/*"
+                helperText="Images et vidéos affichées sur la page du projet (réordonnables par glisser-déposer)"
+            />
+            <ProjectSkillsInput source="stack" label="Stack technique" />
             <TextInput source="githubLink" label="Lien GitHub" />
             <TextInput source="webLink" label="Lien du site web" />
         </SimpleForm>
@@ -99,14 +103,18 @@ export const ProjectCreate = () => (
                 helperText="Description détaillée pour la page du projet"
             />
             <FileUploadInput
-                source="image"
-                label="Image du projet"
+                source="cover_image"
+                label="Image de couverture"
                 required
-                helperText="Taille recommandée : 1440x810 pixels"
+                helperText="Taille recommandée : 1440x810 pixels - Utilisée dans la liste des projets"
             />
-            <ReferenceArrayInput source="stack" reference="skills" label="Stack">
-                <SelectArrayInput optionText="name" />
-            </ReferenceArrayInput>
+            <MediasUploadInput
+                source="medias"
+                label="Médias du projet"
+                accept="image/*,video/*"
+                helperText="Images et vidéos affichées sur la page du projet (réordonnables par glisser-déposer)"
+            />
+            <ProjectSkillsInput source="stack" label="Stack technique" />
             <TextInput source="githubLink" label="Lien GitHub" />
             <TextInput source="webLink" label="Lien du site web" />
         </SimpleForm>
