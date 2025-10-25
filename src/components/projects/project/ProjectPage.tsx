@@ -7,19 +7,14 @@ import { useParams } from 'next/navigation'
 import Markdown from 'react-markdown'
 import remarkBreaks from 'remark-breaks'
 import ProjectStackTag from './ProjectStackTag'
+import ProjectPageSkeleton from './ProjectPageSkeleton'
 
 const ProjectPage = () => {
     const { slug } = useParams<{ slug: string }>()
     const { data: project, isLoading, isError } = useProject(slug)
 
-    console.log(project)
-
     if (isLoading) {
-        return (
-            <div className="flex flex-col justify-center items-center gap-4 min-h-[50vh]">
-                <p className="text-lg">Chargement du projet...</p>
-            </div>
-        )
+        return <ProjectPageSkeleton />
     }
 
     if (isError || !project) {

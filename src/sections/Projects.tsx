@@ -1,6 +1,7 @@
 'use client'
 
 import MobileProjectsList from '@/components/projects/MobileProjectsList'
+import MobileProjectsListSkeleton from '@/components/projects/MobileProjectsListSkeleton'
 import ProjectsCarousel from '@/components/projects/ProjectsCarousel'
 import SectionTitle from '@/components/SectionTitle'
 import { useProjects } from '@/hooks/useProjects'
@@ -17,25 +18,27 @@ const Projets = () => {
                     <SectionTitle title="Projets" />
                 </div>
 
-                {isLoading ? (
-                    <div className="flex items-center justify-center w-full h-full">
-                        <div className="text-gray-500">Chargement des projets...</div>
-                    </div>
-                ) : error || !projects ? (
-                    <div className="flex items-center justify-center w-full h-full">
-                        <div className="text-red-500">Erreur lors du chargement des projets</div>
-                    </div>
-                ) : (
-                    <>
-                        <div className="hidden md:flex items-center flex-1">
-                            <ProjectsCarousel projects={projects} />
+                <div className="hidden md:flex items-center flex-1">
+                    {(error || !projects) && !isLoading ? (
+                        <div className="flex items-center justify-center w-full h-full">
+                            <div className="text-red-500">Erreur lors du chargement des projets</div>
                         </div>
+                    ) : (
+                        <ProjectsCarousel projects={projects || []} isLoading={isLoading} />
+                    )}
+                </div>
 
-                        <div className="md:hidden flex-1">
-                            <MobileProjectsList projects={projects} />
+                <div className="md:hidden flex-1">
+                    {isLoading ? (
+                        <MobileProjectsListSkeleton />
+                    ) : error || !projects ? (
+                        <div className="flex items-center justify-center w-full h-full">
+                            <div className="text-red-500">Erreur lors du chargement des projets</div>
                         </div>
-                    </>
-                )}
+                    ) : (
+                        <MobileProjectsList projects={projects} />
+                    )}
+                </div>
             </div>
         </section>
     )

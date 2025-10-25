@@ -25,12 +25,14 @@ import {
 import { useCarouselBounds } from '@/hooks/useCarouselBounds'
 import { useCarouselDrag } from '@/hooks/useCarouselDrag'
 import { MinimalProjectType } from '@/types/ProjectTypes'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface ProjecsCarouselProps {
     projects: MinimalProjectType[]
+    isLoading?: boolean
 }
 
-const ProjectsCarousel = ({ projects }: ProjecsCarouselProps) => {
+const ProjectsCarousel = ({ projects, isLoading = false }: ProjecsCarouselProps) => {
     const viewportRef = useRef<HTMLDivElement | null>(null)
     const sectionRef = useRef<HTMLElement | null>(null)
 
@@ -43,9 +45,14 @@ const ProjectsCarousel = ({ projects }: ProjecsCarouselProps) => {
     const isMountedRef = useRef(false)
     const dragEndTimeout = useRef<number | null>(null)
 
+    // Créer un tableau factice pour les skeletons
+    const skeletonItems = useMemo(() => Array.from({ length: 10 }, (_, i) => ({ id: `skeleton-${i}` })), [])
+    const displayItems = isLoading ? skeletonItems : projects
+
     const contentWidth = useMemo(
-        () => (projects?.length || 0) * ITEM_WIDTH + ((projects?.length || 0) - 1) * ITEM_GAP + VIEW_PADDING * 2,
-        [projects],
+        () =>
+            (displayItems?.length || 0) * ITEM_WIDTH + ((displayItems?.length || 0) - 1) * ITEM_GAP + VIEW_PADDING * 2,
+        [displayItems],
     )
 
     const { dragBounds } = useCarouselBounds(viewportRef, contentWidth)
@@ -229,20 +236,31 @@ const ProjectsCarousel = ({ projects }: ProjecsCarouselProps) => {
                     onPointerUp={handlers.onPointerUp}
                     onPointerLeave={handlers.onPointerUp}
                 >
-                    {projects.map((p, i) => {
-                        return (
-                            <ProjectTile
-                                key={p.id}
-                                projectSlug={p.slug}
-                                imageUrl={p.cover_image}
-                                width={ITEM_WIDTH}
-                                height={TILE_HEIGHT}
-                                color={'#f0f0f0'}
-                                onHoverStart={() => setHovered(i)}
-                                onHoverEnd={() => setHovered((s) => (s === i ? null : s))}
-                            />
-                        )
-                    })}
+                    {isLoading
+                        ? skeletonItems.map((item) => (
+                              <Skeleton
+                                  key={item.id}
+                                  style={{
+                                      width: ITEM_WIDTH,
+                                      height: TILE_HEIGHT,
+                                  }}
+                                  className="rounded-lg flex-shrink-0"
+                              />
+                          ))
+                        : projects.map((p, i) => {
+                              return (
+                                  <ProjectTile
+                                      key={p.id}
+                                      projectSlug={p.slug}
+                                      imageUrl={p.cover_image}
+                                      width={ITEM_WIDTH}
+                                      height={TILE_HEIGHT}
+                                      color={'#f0f0f0'}
+                                      onHoverStart={() => setHovered(i)}
+                                      onHoverEnd={() => setHovered((s) => (s === i ? null : s))}
+                                  />
+                              )
+                          })}
                 </motion.div>
             </motion.div>
 
@@ -263,23 +281,35 @@ const ProjectsCarousel = ({ projects }: ProjecsCarouselProps) => {
                     animate={titlesCtrl}
                     initial={{ x: 0 }}
                 >
-                    {projects.map((p, i) => {
-                        // Récupérer les noms des compétences de la stack
-                        const stackNames = p.stack?.map((skill) => skill.name).join(', ') || ''
+                    {isLoading
+                        ? skeletonItems.map((item) => (
+                              <div key={item.id} style={{ width: ITEM_WIDTH }}>
+                                  <div className="flex flex-col gap-2">
+                                      <Skeleton className="h-7 w-48" />
+                                      <Skeleton className="h-6 w-36" />
+                                      <div className="mt-4">
+                                          <Skeleton className="h-2 w-1/7" />
+                                      </div>
+                                  </div>
+                              </div>
+                          ))
+                        : projects.map((p, i) => {
+                              // Récupérer les noms des compétences de la stack
+                              const stackNames = p.stack?.map((skill) => skill.name).join(', ') || ''
 
-                        return (
-                            <ProjectDescription
-                                key={`titles-${p.id}`}
-                                title={p.name}
-                                subtitle={p.subtitle || p.name}
-                                description={p.summary}
-                                tags={stackNames}
-                                isHovered={hovered === i}
-                                isDragging={isDragging}
-                                width={ITEM_WIDTH}
-                            />
-                        )
-                    })}
+                              return (
+                                  <ProjectDescription
+                                      key={`titles-${p.id}`}
+                                      title={p.name}
+                                      subtitle={p.subtitle || p.name}
+                                      description={p.summary}
+                                      tags={stackNames}
+                                      isHovered={hovered === i}
+                                      isDragging={isDragging}
+                                      width={ITEM_WIDTH}
+                                  />
+                              )
+                          })}
                 </motion.div>
             </motion.div>
         </div>
