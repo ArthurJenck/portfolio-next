@@ -39,6 +39,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
     const pointerDownPos = useRef({ x: 0, y: 0 })
     const pointerDownTime = useRef(0)
     const longPressTimer = useRef<number | null>(null)
+    const hasPrefetched = useRef(false)
 
     useEffect(() => {
         const stackEl = stackRef.current
@@ -159,7 +160,13 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
             })
         }
 
-        const onMouseEnter = () => animateIn()
+        const onMouseEnter = () => {
+            animateIn()
+            if (!hasPrefetched.current) {
+                router.prefetch(`/project/${projectSlug}`)
+                hasPrefetched.current = true
+            }
+        }
         const onMouseLeave = () => animateOut()
 
         stackEl.addEventListener('mouseenter', onMouseEnter)
@@ -170,7 +177,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
             stackEl.removeEventListener('mouseleave', onMouseLeave)
             removeAnimeTargets()
         }
-    }, [])
+    }, [projectSlug, router])
 
     const handlePointerDown = (e: React.PointerEvent) => {
         pointerDownPos.current = { x: e.clientX, y: e.clientY }
@@ -198,7 +205,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
         const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
         const holdDuration = Date.now() - pointerDownTime.current
 
-        if (totalMovement < 5 && holdDuration < 100) {
+        if (totalMovement < 10 && holdDuration < 300) {
             router.push(`/project/${projectSlug}`)
         }
     }

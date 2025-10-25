@@ -198,7 +198,7 @@ const ProjectsCarousel = ({ projects }: ProjecsCarouselProps) => {
 
     return (
         <div
-            className="relative w-full my-[8vh]"
+            className="relative w-full my-[6vh]"
             style={{
                 height: TILE_HEIGHT + TITLE_TOP_OFFSET + DESCRIPTION_HEIGHT,
             }}

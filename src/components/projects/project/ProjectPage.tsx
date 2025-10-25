@@ -10,11 +10,26 @@ import ProjectStackTag from './ProjectStackTag'
 
 const ProjectPage = () => {
     const { slug } = useParams<{ slug: string }>()
-    const { data: project } = useProject(slug)
+    const { data: project, isLoading, isError } = useProject(slug)
 
     console.log(project)
 
-    if (!project) return <div>Projet non trouvé</div>
+    if (isLoading) {
+        return (
+            <div className="flex flex-col justify-center items-center gap-4 min-h-[50vh]">
+                <p className="text-lg">Chargement du projet...</p>
+            </div>
+        )
+    }
+
+    if (isError || !project) {
+        return (
+            <div className="flex flex-col justify-center items-center gap-4 min-h-[50vh]">
+                <p className="text-2xl font-bold">Projet non trouvé</p>
+                <p className="text-lg">Le projet que vous recherchez n'existe pas ou n'est plus disponible.</p>
+            </div>
+        )
+    }
 
     const medias =
         project.medias && project.medias.length > 0
@@ -22,20 +37,24 @@ const ProjectPage = () => {
             : [{ url: project.cover_image, type: 'image' as const }]
 
     return (
-        <div className="flex flex-col justify-start items-center gap-24 max-w-[80vw]">
+        <div className="flex flex-col justify-start items-center gap-8 md:gap-24 max-w-[80vw] mb-12 md:mb-[10vh]">
             <div className="flex flex-col items-center gap-0.5">
                 <h1 className="text-5xl font-bold">{project?.name}</h1>
                 <h2 className="text-2xl italic">{project?.subtitle}</h2>
             </div>
-            <div className="flex gap-28 flex-1">
-                <div className="flex-1/2">
+            <div className="flex flex-col-reverse md:flex-row gap-4 md:gap-28 flex-1">
+                <div className="flex-1/2 flex flex-col gap-4">
                     <div className="text-md tracking-wider markdown">
                         <Markdown remarkPlugins={[remarkBreaks]}>{project?.description}</Markdown>
                     </div>
-                    {project?.webLink && <ImgLink type="projet" link={project?.webLink} className="size-10" />}
-                    {project?.githubLink && <ImgLink type="github" link={project?.githubLink} className="size-10" />}
+                    <div className="flex items-center gap-4">
+                        {project?.webLink && <ImgLink type="projet" link={project?.webLink} className="size-11" />}
+                        {project?.githubLink && (
+                            <ImgLink type="github" link={project?.githubLink} className="size-11" />
+                        )}
+                    </div>
                 </div>
-                <div className="flex flex-col gap-4 flex-1/2">
+                <div className="flex flex-col gap-16 md:gap-4 flex-1/2">
                     {medias.map((media, index) => (
                         <div key={index}>
                             {media.type === 'image' ? (

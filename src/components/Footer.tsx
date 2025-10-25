@@ -2,7 +2,7 @@ import ImgLink from './ImgLink'
 
 const Footer = () => {
     return (
-        <footer className="relative bg-[var(--secondary)] flex flex-col md:flex-row justify-between items-center py-4 md:py-[2vw] px-0 md:px-[4vw] gap-4 md:gap-0">
+        <footer className="relative bg-[var(--secondary)] flex flex-col md:flex-row justify-between items-center py-4 md:py-4 px-0 md:px-8 gap-4 md:gap-0">
             <div className="flex flex-col md:flex-row items-center gap-[1.5vw]">
                 <ImgLink type="logo" className="size-16" />
                 <p className="font-bold tracking-[1px] text-center md:text-left">
