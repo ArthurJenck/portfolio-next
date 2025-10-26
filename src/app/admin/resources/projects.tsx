@@ -11,18 +11,20 @@ import {
     SimpleForm,
     TextInput,
     DateInput,
-    ReferenceArrayInput,
-    SelectArrayInput,
     required,
     FunctionField,
 } from 'react-admin'
 import { ReorderButtons } from '../components/ReorderButtons'
 import { FileUploadInput } from '../components/FileUploadInput'
+import { MediasUploadInput } from '../components/MediasUploadInput'
+import { ProjectSkillsInput } from '../components/ProjectSkillsInput'
 
 export const ProjectList = () => (
     <List>
         <Datagrid rowClick="edit">
             <TextField source="name" label="Nom" />
+            <TextField source="subtitle" label="Sous-titre" />
+            <TextField source="slug" label="Slug" />
             <DateField source="date" label="Date" />
             <ReferenceArrayField source="stack" reference="skills" label="Stack">
                 <SingleFieldList>
@@ -40,6 +42,8 @@ export const ProjectEdit = () => (
     <Edit>
         <SimpleForm>
             <TextInput source="name" label="Nom du projet" validate={required()} />
+            <TextInput source="subtitle" label="Sous-titre" />
+            <TextInput source="slug" label="Slug" disabled helperText="Généré automatiquement à partir du nom" />
             <DateInput source="date" label="Date" validate={required()} />
             <TextInput
                 source="summary"
@@ -57,10 +61,19 @@ export const ProjectEdit = () => (
                 validate={required()}
                 helperText="Description détaillée pour la page du projet"
             />
-            <FileUploadInput source="image" label="Image du projet" required />
-            <ReferenceArrayInput source="stack" reference="skills" label="Stack">
-                <SelectArrayInput optionText="name" />
-            </ReferenceArrayInput>
+            <FileUploadInput
+                source="cover_image"
+                label="Image de couverture"
+                required
+                helperText="Taille recommandée : 1440x810 pixels - Utilisée dans la liste des projets"
+            />
+            <MediasUploadInput
+                source="medias"
+                label="Médias du projet"
+                accept="image/*,video/*"
+                helperText="Images et vidéos affichées sur la page du projet (réordonnables par glisser-déposer)"
+            />
+            <ProjectSkillsInput source="stack" label="Stack technique" />
             <TextInput source="githubLink" label="Lien GitHub" />
             <TextInput source="webLink" label="Lien du site web" />
         </SimpleForm>
@@ -71,6 +84,7 @@ export const ProjectCreate = () => (
     <Create>
         <SimpleForm>
             <TextInput source="name" label="Nom du projet" validate={required()} />
+            <TextInput source="subtitle" label="Sous-titre" />
             <DateInput source="date" label="Date" validate={required()} />
             <TextInput
                 source="summary"
@@ -88,10 +102,19 @@ export const ProjectCreate = () => (
                 validate={required()}
                 helperText="Description détaillée pour la page du projet"
             />
-            <FileUploadInput source="image" label="Image du projet" required />
-            <ReferenceArrayInput source="stack" reference="skills" label="Stack">
-                <SelectArrayInput optionText="name" />
-            </ReferenceArrayInput>
+            <FileUploadInput
+                source="cover_image"
+                label="Image de couverture"
+                required
+                helperText="Taille recommandée : 1440x810 pixels - Utilisée dans la liste des projets"
+            />
+            <MediasUploadInput
+                source="medias"
+                label="Médias du projet"
+                accept="image/*,video/*"
+                helperText="Images et vidéos affichées sur la page du projet (réordonnables par glisser-déposer)"
+            />
+            <ProjectSkillsInput source="stack" label="Stack technique" />
             <TextInput source="githubLink" label="Lien GitHub" />
             <TextInput source="webLink" label="Lien du site web" />
         </SimpleForm>

@@ -8,7 +8,6 @@ import {
     useTransform,
     useMotionValueEvent,
 } from 'framer-motion'
-import { useProjects } from '@/hooks/useProjects'
 import ProjectTile from './ProjectTile'
 import { ProjectDescription } from './ProjectDescription'
 import {
@@ -19,14 +18,21 @@ import {
     ITEM_WIDTH,
     TILE_HEIGHT,
     TITLE_SCALE_TRANSITION,
+    TITLE_SPRING,
     TITLE_TOP_OFFSET,
     VIEW_PADDING,
 } from './config'
 import { useCarouselBounds } from '@/hooks/useCarouselBounds'
 import { useCarouselDrag } from '@/hooks/useCarouselDrag'
+import { MinimalProjectType } from '@/types/ProjectTypes'
+import { Skeleton } from '@/components/ui/skeleton'
 
-export const ProjectsCarousel: React.FC = () => {
-    const { data: projects, isLoading, error } = useProjects()
+interface ProjecsCarouselProps {
+    projects: MinimalProjectType[]
+    isLoading?: boolean
+}
+
+const ProjectsCarousel = ({ projects, isLoading = false }: ProjecsCarouselProps) => {
     const viewportRef = useRef<HTMLDivElement | null>(null)
     const sectionRef = useRef<HTMLElement | null>(null)
 
@@ -36,14 +42,27 @@ export const ProjectsCarousel: React.FC = () => {
 
     const [hovered, setHovered] = useState<number | null>(null)
     const [isDraggingOrRecentlyDragged, setIsDraggingOrRecentlyDragged] = useState(false)
+    const isMountedRef = useRef(false)
     const dragEndTimeout = useRef<number | null>(null)
 
+    // Créer un tableau factice pour les skeletons
+    const skeletonItems = useMemo(() => Array.from({ length: 10 }, (_, i) => ({ id: `skeleton-${i}` })), [])
+    const displayItems = isLoading ? skeletonItems : projects
+
     const contentWidth = useMemo(
-        () => (projects?.length || 0) * ITEM_WIDTH + ((projects?.length || 0) - 1) * ITEM_GAP + VIEW_PADDING * 2,
-        [projects],
+        () =>
+            (displayItems?.length || 0) * ITEM_WIDTH + ((displayItems?.length || 0) - 1) * ITEM_GAP + VIEW_PADDING * 2,
+        [displayItems],
     )
 
     const { dragBounds } = useCarouselBounds(viewportRef, contentWidth)
+
+    useEffect(() => {
+        isMountedRef.current = true
+        return () => {
+            isMountedRef.current = false
+        }
+    }, [])
 
     // Scroll-based animation : écouter le scroll de la section
     useEffect(() => {
@@ -88,13 +107,37 @@ export const ProjectsCarousel: React.FC = () => {
         [dragBounds.left],
     )
 
-    // Synchroniser la position avec le scroll (sauf si on drag)
+    const lastScrollX = useRef<number>(0)
     useMotionValueEvent(scrollX, 'change', (latest) => {
-        if (!isDraggingOrRecentlyDragged) {
-            // Utiliser .set() pour une mise à jour instantanée sans animation
+        if (isDragging) {
+            lastScrollX.current = latest
+            return
+        }
+
+        if (!isDraggingOrRecentlyDragged && isMountedRef.current) {
             xImages.set(latest)
             imagesCtrl.set({ x: latest })
-            titlesCtrl.set({ x: latest })
+            titlesCtrl.start({
+                x: latest,
+                transition: TITLE_SPRING,
+            })
+            lastScrollX.current = latest
+        } else if (isDraggingOrRecentlyDragged && isMountedRef.current) {
+            const scrollDelta = Math.abs(latest - lastScrollX.current)
+            if (scrollDelta > 5) {
+                setIsDraggingOrRecentlyDragged(false)
+                if (dragEndTimeout.current) {
+                    window.clearTimeout(dragEndTimeout.current)
+                    dragEndTimeout.current = null
+                }
+                xImages.set(latest)
+                imagesCtrl.set({ x: latest })
+                titlesCtrl.start({
+                    x: latest,
+                    transition: TITLE_SPRING,
+                })
+                lastScrollX.current = latest
+            }
         }
     })
 
@@ -122,6 +165,7 @@ export const ProjectsCarousel: React.FC = () => {
     useEffect(() => {
         if (isDragging) {
             setIsDraggingOrRecentlyDragged(true)
+            lastScrollX.current = scrollX.get()
             if (dragEndTimeout.current) {
                 window.clearTimeout(dragEndTimeout.current)
             }
@@ -132,10 +176,16 @@ export const ProjectsCarousel: React.FC = () => {
                 setIsDraggingOrRecentlyDragged(false)
 
                 // Forcer une dernière synchronisation pour être sûr que tout est aligné
-                const currentScrollX = scrollX.get()
-                xImages.set(currentScrollX)
-                imagesCtrl.set({ x: currentScrollX })
-                titlesCtrl.set({ x: currentScrollX })
+                if (isMountedRef.current) {
+                    const currentScrollX = scrollX.get()
+                    xImages.set(currentScrollX)
+                    imagesCtrl.set({ x: currentScrollX })
+                    titlesCtrl.start({
+                        x: currentScrollX,
+                        transition: TITLE_SPRING,
+                    })
+                    lastScrollX.current = currentScrollX
+                }
             }, 300)
         }
     }, [isDragging, isDraggingOrRecentlyDragged, scrollX, xImages, imagesCtrl, titlesCtrl])
@@ -153,25 +203,9 @@ export const ProjectsCarousel: React.FC = () => {
         }
     }, [])
 
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center w-full h-full">
-                <div className="text-gray-500">Chargement des projets...</div>
-            </div>
-        )
-    }
-
-    if (error || !projects) {
-        return (
-            <div className="flex items-center justify-center w-full h-full">
-                <div className="text-red-500">Erreur lors du chargement des projets</div>
-            </div>
-        )
-    }
-
     return (
         <div
-            className="relative w-full my-[8vh]"
+            className="relative w-full my-[6vh]"
             style={{
                 height: TILE_HEIGHT + TITLE_TOP_OFFSET + DESCRIPTION_HEIGHT,
             }}
@@ -202,20 +236,31 @@ export const ProjectsCarousel: React.FC = () => {
                     onPointerUp={handlers.onPointerUp}
                     onPointerLeave={handlers.onPointerUp}
                 >
-                    {projects.map((p, i) => {
-                        return (
-                            <ProjectTile
-                                key={p.id}
-                                projectId={p.id}
-                                imageUrl={p.image}
-                                width={ITEM_WIDTH}
-                                height={TILE_HEIGHT}
-                                color={'#f0f0f0'}
-                                onHoverStart={() => setHovered(i)}
-                                onHoverEnd={() => setHovered((s) => (s === i ? null : s))}
-                            />
-                        )
-                    })}
+                    {isLoading
+                        ? skeletonItems.map((item) => (
+                              <Skeleton
+                                  key={item.id}
+                                  style={{
+                                      width: ITEM_WIDTH,
+                                      height: TILE_HEIGHT,
+                                  }}
+                                  className="rounded-lg flex-shrink-0"
+                              />
+                          ))
+                        : projects.map((p, i) => {
+                              return (
+                                  <ProjectTile
+                                      key={p.id}
+                                      projectSlug={p.slug}
+                                      imageUrl={p.cover_image}
+                                      width={ITEM_WIDTH}
+                                      height={TILE_HEIGHT}
+                                      color={'#f0f0f0'}
+                                      onHoverStart={() => setHovered(i)}
+                                      onHoverEnd={() => setHovered((s) => (s === i ? null : s))}
+                                  />
+                              )
+                          })}
                 </motion.div>
             </motion.div>
 
@@ -236,25 +281,39 @@ export const ProjectsCarousel: React.FC = () => {
                     animate={titlesCtrl}
                     initial={{ x: 0 }}
                 >
-                    {projects.map((p, i) => {
-                        // Récupérer les noms des compétences de la stack
-                        const stackNames = p.stack?.map((skill) => skill.name).join(', ') || ''
+                    {isLoading
+                        ? skeletonItems.map((item) => (
+                              <div key={item.id} style={{ width: ITEM_WIDTH }}>
+                                  <div className="flex flex-col gap-2">
+                                      <Skeleton className="h-7 w-48" />
+                                      <Skeleton className="h-6 w-36" />
+                                      <div className="mt-4">
+                                          <Skeleton className="h-2 w-1/7" />
+                                      </div>
+                                  </div>
+                              </div>
+                          ))
+                        : projects.map((p, i) => {
+                              // Récupérer les noms des compétences de la stack
+                              const stackNames = p.stack?.map((skill) => skill.name).join(', ') || ''
 
-                        return (
-                            <ProjectDescription
-                                key={`titles-${p.id}`}
-                                title={p.name}
-                                subtitle={p.name}
-                                description={p.summary}
-                                tags={stackNames}
-                                isHovered={hovered === i}
-                                isDragging={isDragging}
-                                width={ITEM_WIDTH}
-                            />
-                        )
-                    })}
+                              return (
+                                  <ProjectDescription
+                                      key={`titles-${p.id}`}
+                                      title={p.name}
+                                      subtitle={p.subtitle || p.name}
+                                      description={p.summary}
+                                      tags={stackNames}
+                                      isHovered={hovered === i}
+                                      isDragging={isDragging}
+                                      width={ITEM_WIDTH}
+                                  />
+                              )
+                          })}
                 </motion.div>
             </motion.div>
         </div>
     )
 }
+
+export default ProjectsCarousel

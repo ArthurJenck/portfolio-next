@@ -6,6 +6,7 @@ import {
     Star,
     List,
     User,
+    FileText,
     Plus,
     Edit,
     Trash2,
@@ -32,6 +33,7 @@ export const ProjectIcon = createLucideIcon(FolderOpen)
 export const SkillIcon = createLucideIcon(Star)
 export const SkillCategoryIcon = createLucideIcon(List)
 export const UserIcon = createLucideIcon(User)
+export const CVIcon = createLucideIcon(FileText)
 
 // Icônes d'actions
 export const AddIcon = createLucideIcon(Plus)

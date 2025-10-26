@@ -36,8 +36,8 @@ export const ProjectDescription: React.FC<ProjectDescriptionProps> = ({
                 transition={TITLE_SCALE_TRANSITION}
                 style={{ transformOrigin: 'left top' }}
             >
-                <div className="uppercase font-serif text-2xl">{title}</div>
-                <div className="italic font-serif -ml-[5px] px-[5px] relative text-xl">
+                <div className="uppercase text-2xl font-montserrat">{title}</div>
+                <div className="italic -ml-[5px] px-[5px] relative text-xl font-montserrat">
                     {subtitle}
                     <span
                         className="absolute block"

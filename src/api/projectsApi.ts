@@ -12,7 +12,19 @@ export async function getProjects(): Promise<ProjectResponse> {
     return res.json()
 }
 
-export async function getProject(id: string): Promise<DetailedProjectType> {
+// Pour le front - récupération par slug (URLs propres)
+export async function getProject(slug: string): Promise<DetailedProjectType> {
+    const res = await fetch(`${API_URL}/api/projects/slug/${slug}`)
+
+    if (!res.ok) {
+        throw new Error('Failed to fetch project')
+    }
+
+    return res.json()
+}
+
+// Pour l'admin - récupération par ID MongoDB
+export async function getProjectById(id: string): Promise<DetailedProjectType> {
     const res = await fetch(`${API_URL}/api/projects/${id}`)
 
     if (!res.ok) {

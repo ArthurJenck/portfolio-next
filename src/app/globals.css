@@ -1,5 +1,11 @@
 @import 'tailwindcss';
 
+@layer base {
+    .font-montserrat {
+        font-family: var(--font-montserrat);
+    }
+}
+
 :root {
     --primary: #110f1e;
     --secondary: #2c253e;
@@ -27,4 +33,8 @@ body {
         background-color: var(--white);
         border-radius: 5px;
     }
+}
+
+.markdown p:not(:last-child, :has(+ ul, + ol)) {
+    margin-bottom: 1rem;
 }

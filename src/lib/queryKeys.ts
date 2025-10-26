@@ -4,4 +4,5 @@ export const queryKeys = {
 
     skills: ['skills'] as const,
     techs: ['techs'] as const,
+    cv: ['cv'] as const,
 }

@@ -7,16 +7,20 @@ export default {
     getList: (resource) => {
         // Router skills vers /api/skills/all pour avoir une liste plate dans l'admin
         const endpoint = resource === 'skills' ? `${apiUrl}/skills/all` : `${apiUrl}/${resource}`
-        return httpClient(endpoint).then(({ json }) => ({
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            data: json.map((item: any) => ({ ...item, id: item._id || item.id })),
-            total: json.length,
-        }))
+        return httpClient(endpoint).then(({ json }) => {
+            // Pour CV, on retourne un tableau avec un seul élément si json n'est pas un tableau
+            const data = Array.isArray(json) ? json : [json]
+            return {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                data: data.map((item: any) => ({ ...item, id: item._id || item.id })),
+                total: data.length,
+            }
+        })
     },
 
     getOne: (resource, params) =>
         httpClient(`${apiUrl}/${resource}/${params.id}`).then(({ json }) => ({
-            data: { ...json, id: json._id },
+            data: { ...json, id: json._id || json.id },
         })),
 
     getMany: (resource, params) => {

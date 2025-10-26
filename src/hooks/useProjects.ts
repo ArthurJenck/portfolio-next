@@ -12,11 +12,11 @@ export function useProjects() {
     })
 }
 
-export function useProject(id: string) {
+export function useProject(slug: string) {
     return useQuery({
-        queryKey: queryKeys.project(id),
-        queryFn: () => getProject(id),
+        queryKey: queryKeys.project(slug),
+        queryFn: () => getProject(slug),
         staleTime: 1000 * 60 * 5, // 5 minutes
-        enabled: !!id,
+        enabled: !!slug,
     })
 }

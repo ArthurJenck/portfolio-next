@@ -10,6 +10,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { useScroll } from '../hooks/useScroll'
+import { usePathname } from 'next/navigation'
 
 interface ImgLinkProps {
     type: 'logo' | 'linkedin' | 'github' | 'cv' | 'projet'
@@ -20,6 +21,8 @@ interface ImgLinkProps {
 
 const ImgLink = ({ type, link: customLink, alt: customAlt, className }: ImgLinkProps) => {
     const scrollTo = useScroll()
+    const pathname = usePathname()
+    const isHomePage = pathname === '/'
 
     // Configuration des liens et icônes selon le type
     const getLinkConfig = () => {
@@ -137,7 +140,7 @@ const ImgLink = ({ type, link: customLink, alt: customAlt, className }: ImgLinkP
             <Link
                 href={link}
                 onClick={
-                    isLogoWithoutLink
+                    isLogoWithoutLink && isHomePage
                         ? (e) => {
                               e.preventDefault()
                               scrollTo(0)
@@ -161,7 +164,7 @@ const ImgLink = ({ type, link: customLink, alt: customAlt, className }: ImgLinkP
                 href={link}
                 className={cn('select-none hidden md:block', className)}
                 onClick={
-                    isLogoWithoutLink
+                    isLogoWithoutLink && isHomePage
                         ? (e) => {
                               e.preventDefault()
                               scrollTo(0)
