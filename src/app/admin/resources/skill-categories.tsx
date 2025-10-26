@@ -1,17 +1,6 @@
-import {
-    List,
-    Datagrid,
-    TextField,
-    Edit,
-    Create,
-    SimpleForm,
-    TextInput,
-    ReferenceArrayInput,
-    SelectArrayInput,
-    required,
-    FunctionField,
-} from 'react-admin'
+import { List, Datagrid, TextField, Edit, Create, SimpleForm, TextInput, required, FunctionField } from 'react-admin'
 import { ReorderButtons } from '../components/ReorderButtons'
+import { SkillCategorySkillsInput } from '../components/SkillCategorySkillsInput'
 
 export const SkillCategoryList = () => (
     <List>
@@ -33,9 +22,7 @@ export const SkillCategoryEdit = () => (
                 validate={required()}
                 helperText="Version courte pour mobile (ex: 'Front' pour 'Front-end')"
             />
-            <ReferenceArrayInput source="skills" reference="skills" label="Compétences">
-                <SelectArrayInput optionText="name" />
-            </ReferenceArrayInput>
+            <SkillCategorySkillsInput source="skills" label="Compétences" />
         </SimpleForm>
     </Edit>
 )
@@ -50,9 +37,7 @@ export const SkillCategoryCreate = () => (
                 validate={required()}
                 helperText="Version courte pour mobile (ex: 'Front' pour 'Front-end')"
             />
-            <ReferenceArrayInput source="skills" reference="skills" label="Compétences">
-                <SelectArrayInput optionText="name" />
-            </ReferenceArrayInput>
+            <SkillCategorySkillsInput source="skills" label="Compétences" />
         </SimpleForm>
     </Create>
 )

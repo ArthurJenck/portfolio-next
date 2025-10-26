@@ -14,7 +14,8 @@ import { SkillList, SkillEdit, SkillCreate } from './resources/skills'
 import { SkillCategoryList, SkillCategoryEdit, SkillCategoryCreate } from './resources/skill-categories'
 import { UserList, UserEdit, UserCreate } from './resources/users'
 import { CVList, CVEdit, CVCreate } from './resources/cv'
-import { ProjectIcon, SkillIcon, SkillCategoryIcon, UserIcon, CVIcon } from './components/CustomIcons'
+import { ContactLinkList, ContactLinkEdit, ContactLinkCreate } from './resources/contact-links'
+import { ProjectIcon, SkillIcon, SkillCategoryIcon, UserIcon, CVIcon, ContactLinkIcon } from './components/CustomIcons'
 
 export default function AdminPage() {
     const [mounted, setMounted] = useState(false)
@@ -87,6 +88,14 @@ export default function AdminPage() {
                     create={CVCreate}
                     icon={CVIcon}
                     options={{ label: 'CV' }}
+                />
+                <Resource
+                    name="contact-links"
+                    list={ContactLinkList}
+                    edit={ContactLinkEdit}
+                    create={ContactLinkCreate}
+                    icon={ContactLinkIcon}
+                    options={{ label: 'Liens de contact' }}
                 />
             </Admin>
         </SessionProvider>

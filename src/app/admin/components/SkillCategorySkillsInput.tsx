@@ -16,7 +16,7 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSo
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
-interface ProjectSkillsInputProps {
+interface SkillCategorySkillsInputProps {
     source: string
     label: string
 }
@@ -73,7 +73,7 @@ const SortableSkillItem = ({ skill, onRemove }: SortableSkillItemProps) => {
     )
 }
 
-export const ProjectSkillsInput = ({ source, label }: ProjectSkillsInputProps) => {
+export const SkillCategorySkillsInput = ({ source, label }: SkillCategorySkillsInputProps) => {
     const { field } = useInput({ source })
     const [allSkills, setAllSkills] = useState<Skill[]>([])
     const [selectedSkillIds, setSelectedSkillIds] = useState<string[]>([])
@@ -173,11 +173,11 @@ export const ProjectSkillsInput = ({ source, label }: ProjectSkillsInputProps) =
         <div className="my-4">
             <label className="block text-sm font-medium mb-2">{label}</label>
 
-            {/* Section des compétences sélectionnées (drag and drop) */}
+            {/* Section des compétences assignées (drag and drop) */}
             {selectedSkills.length > 0 && (
                 <div className="mb-4">
                     <h4 className="text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                        Compétences sélectionnées ({selectedSkills.length})
+                        Compétences assignées ({selectedSkills.length})
                     </h4>
                     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                         <SortableContext items={selectedSkillIds} strategy={verticalListSortingStrategy}>
@@ -189,7 +189,7 @@ export const ProjectSkillsInput = ({ source, label }: ProjectSkillsInputProps) =
                         </SortableContext>
                     </DndContext>
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                        Glissez-déposez pour réorganiser l'ordre d'affichage
+                        Glissez-déposez pour réorganiser l'ordre d'affichage dans la catégorie
                     </p>
                 </div>
             )}

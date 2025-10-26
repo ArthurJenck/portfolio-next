@@ -27,6 +27,8 @@ export const ReorderButtons = ({ resourceName, idField = 'id' }: ReorderButtonsP
                 bodyField = 'skillId'
             } else if (resourceName === 'skill-categories') {
                 bodyField = 'categoryId'
+            } else if (resourceName === 'contact-links') {
+                bodyField = 'contactLinkId'
             }
 
             const response = await fetch(`/api/${resourceName}/reorder`, {

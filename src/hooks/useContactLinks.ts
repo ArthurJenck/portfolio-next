@@ -1,13 +1,13 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { getCV } from '@/api/cvApi'
+import { getContactLinks } from '@/api/contactLinksApi'
 import { queryKeys } from '@/lib/queryKeys'
 
-export function useCV() {
+export function useContactLinks() {
     return useQuery({
-        queryKey: queryKeys.cv,
-        queryFn: getCV,
+        queryKey: queryKeys.contactLinks,
+        queryFn: getContactLinks,
         staleTime: 1000 * 60 * 60 * 24, // 1 journée
     })
 }
