@@ -7,7 +7,7 @@ const About = () => {
     return (
         <section id="about">
             <SectionTitle title="Qui suis-je ?" />
-            <div className="flex flex-col xl:flex-row justify-center items-center max-w-[70vw] lg:max-w-[60vw] gap-10 md:gap-20 py-[5svh] md:py-[8vh] mx-auto">
+            <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start max-w-[70vw] lg:max-w-[60vw] gap-10 md:gap-20 py-[5svh] md:py-[12 vh] mx-auto lg:relative">
                 <AsciiPortrait />
                 <div>
                     <h3 className="text-2xl lg:text-3xl font-bold mb-5">Je sais centrer une div</h3>
