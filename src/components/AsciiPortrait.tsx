@@ -1,6 +1,6 @@
 const AsciiPortrait = () => {
     return (
-        <div className="relative lg:sticky top-30 left-0 w-[min(380px,100%)] md:w-[380px] @container md:@container-normal">
+        <div className="relative lg:sticky lg:top-30 w-[min(380px,100%)] md:w-[380px] @container md:@container-normal">
             <pre className="whitespace-pre-wrap size-full md:size-auto text-[1.32cqw] md:text-[5px] bg-white text-black leading-[1.1] md:leading-none overflow-hidden flex justify-center items-center">
                 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
