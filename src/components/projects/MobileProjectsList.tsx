@@ -6,8 +6,6 @@ interface MobileProjectsListProps {
 }
 
 const MobileProjectsList = ({ projects }: MobileProjectsListProps) => {
-    console.log(projects)
-
     return (
         <div className="flex flex-col gap-8 p-[5.5vw]">
             {projects.map((project) => (

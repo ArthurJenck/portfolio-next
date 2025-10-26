@@ -163,7 +163,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
         const onMouseEnter = () => {
             animateIn()
             if (!hasPrefetched.current) {
-                router.prefetch(`/project/${projectSlug}`)
+                router.prefetch(`/${projectSlug}`)
                 hasPrefetched.current = true
             }
         }
@@ -206,7 +206,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
         const holdDuration = Date.now() - pointerDownTime.current
 
         if (totalMovement < 10 && holdDuration < 300) {
-            router.push(`/project/${projectSlug}`)
+            router.push(`/${projectSlug}`)
         }
     }
 
