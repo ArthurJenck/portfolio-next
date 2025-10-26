@@ -42,7 +42,7 @@ const ImgLink = ({ type, link: customLink, alt: customAlt, className }: ImgLinkP
             case 'cv':
                 return {
                     link: '/cv',
-                    linkMobile: '/CV Arthur Jenck.pdf',
+                    linkMobile: '/api/cv/download',
                     icon: cvIcon,
                     alt: 'Lien vers mon CV',
                 }
@@ -105,13 +105,8 @@ const ImgLink = ({ type, link: customLink, alt: customAlt, className }: ImgLinkP
     if (type === 'cv') {
         return (
             <>
-                {/* Version mobile : lien direct vers le PDF */}
-                <motion.a
-                    href={linkMobile}
-                    className={cn('select-none block md:hidden', className)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
+                {/* Version mobile : téléchargement direct du PDF */}
+                <motion.a href={linkMobile} className={cn('select-none block md:hidden', className)} download>
                     <Image src={icon} alt={alt} width={100} height={100} style={{ width: '100%', height: '100%' }} />
                 </motion.a>
 

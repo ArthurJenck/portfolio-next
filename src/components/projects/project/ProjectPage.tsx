@@ -32,15 +32,18 @@ const ProjectPage = () => {
             : [{ url: project.cover_image, type: 'image' as const }]
 
     return (
-        <div className="flex flex-col justify-start items-center gap-8 md:gap-24 max-w-[80vw] mb-12 md:mb-[10vh]">
-            <div className="flex flex-col items-center gap-0.5">
-                <h1 className="text-5xl font-bold">{project?.name}</h1>
+        <div className="flex flex-col justify-start md:items-center gap-8 pl-[4vw] pr-[calc(8vw+28px)] md:pr-0 md:gap-24 md:max-w-[80vw] mb-12 md:mb-[10vh]">
+            <div className="flex flex-col items-start md:items-center gap-0.5 w-full">
+                <h1 className="text-4xl md:text-5xl font-bol    d">{project?.name}</h1>
                 <h2 className="text-2xl italic">{project?.subtitle}</h2>
             </div>
             <div className="flex flex-col-reverse md:flex-row gap-4 md:gap-28 flex-1">
                 <div className="flex-1/2 flex flex-col gap-4">
                     <div className="text-md tracking-wider markdown">
-                        <Markdown remarkPlugins={[remarkBreaks]}>{project?.description}</Markdown>
+                        <Markdown remarkPlugins={[remarkBreaks]}>
+                            {project?.description &&
+                                'lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.  exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?'}
+                        </Markdown>
                     </div>
                     <div className="flex items-center gap-4">
                         {project?.webLink && <ImgLink type="projet" link={project?.webLink} className="size-11" />}

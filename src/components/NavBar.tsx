@@ -4,8 +4,13 @@ import ImgLink from './ImgLink'
 import Burger from './Burger'
 import { useScroll, useMotionValue, useSpring, motion } from 'framer-motion'
 import { useEffect } from 'react'
+import { usePathname } from 'next/navigation'
+import { cn } from '@/lib/utils'
 
 const NavBar = () => {
+    const pathname = usePathname()
+    const isLanding = pathname === '/'
+
     // Utilisation de useScroll de Framer Motion (optimisé avec requestAnimationFrame)
     const { scrollY } = useScroll()
 
@@ -28,14 +33,21 @@ const NavBar = () => {
     return (
         <>
             {/* Version mobile : logo qui disparaît au scroll */}
-            <nav className="md:hidden fixed top-8 left-[4vw] right-[4vw] z-50 h-16 flex justify-between items-center pointer-events-none">
-                <motion.div
-                    style={{ opacity: logoOpacity }}
-                    transition={{ duration: 0.3, ease: 'easeOut' }}
-                    className="pointer-events-auto"
-                >
-                    <ImgLink type="logo" className="size-[4rem]" />
-                </motion.div>
+            <nav
+                className={cn(
+                    'md:hidden fixed top-8 left-[4vw] right-[4vw] z-50 h-16 flex items-center pointer-events-none',
+                    isLanding ? 'justify-between' : 'justify-end',
+                )}
+            >
+                {isLanding && (
+                    <motion.div
+                        style={{ opacity: logoOpacity }}
+                        transition={{ duration: 0.3, ease: 'easeOut' }}
+                        className="pointer-events-auto"
+                    >
+                        <ImgLink type="logo" className="size-[4rem]" />
+                    </motion.div>
+                )}
                 <div className="pointer-events-auto">
                     <Burger />
                 </div>

@@ -10,7 +10,7 @@ const sora = Sora({
 })
 
 export const metadata: Metadata = {
-    title: 'Arthur Jenck – CV',
+    title: 'Arthur Jenck • CV',
     description: "CV d'Arthur Jenck, développeur web front-end",
     robots: 'index',
 }
