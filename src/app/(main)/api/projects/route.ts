@@ -30,12 +30,14 @@ export async function GET() {
             slug: project.slug,
             cover_image: project.cover_image,
             summary: project.summary,
-            stack: (project.stack as unknown as PopulatedSkill[]).map((skill) => ({
-                id: skill._id.toString(),
-                name: skill.name,
-                icon: skill.icon || '',
-                description: skill.description || '',
-            })),
+            stack: project.stack
+                ? (project.stack as unknown as PopulatedSkill[]).map((skill) => ({
+                      id: skill._id.toString(),
+                      name: skill.name,
+                      icon: skill.icon || '',
+                      description: skill.description || '',
+                  }))
+                : [],
         }))
 
         return NextResponse.json(response)

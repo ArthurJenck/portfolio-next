@@ -36,12 +36,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
                     : [{ url: project.cover_image, type: 'image' as const }],
             summary: project.summary,
             description: project.description,
-            stack: (project.stack as unknown as PopulatedSkill[]).map((skill) => ({
-                id: skill._id.toString(),
-                name: skill.name,
-                icon: skill.icon || '',
-                description: skill.description || '',
-            })),
+            stack: project.stack
+                ? (project.stack as unknown as PopulatedSkill[]).map((skill) => ({
+                      id: skill._id.toString(),
+                      name: skill.name,
+                      icon: skill.icon || '',
+                      description: skill.description || '',
+                  }))
+                : [],
             githubLink: project.githubLink,
             webLink: project.webLink,
             order: project.order,

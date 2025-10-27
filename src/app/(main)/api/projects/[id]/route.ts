@@ -38,7 +38,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
             medias: project.medias || [],
             summary: project.summary,
             description: project.description,
-            stack: (project.stack as unknown as PopulatedSkill[]).map((skill) => skill._id.toString()),
+            stack: project.stack
+                ? (project.stack as unknown as PopulatedSkill[]).map((skill) => skill._id.toString())
+                : [],
             githubLink: project.githubLink,
             webLink: project.webLink,
             order: project.order,
