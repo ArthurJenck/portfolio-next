@@ -11,10 +11,11 @@ const MobileProjectItem = ({ project }: MobileProjectItemProps) => {
     return (
         <Link href={`/${project.slug}`} className="flex flex-col gap-1">
             <Image src={project.cover_image} alt={project.name} width={300} height={100} className="w-full h-auto" />
-            <h3 className="text-xl font-extralight">
-                <span className="font-semibold">{project.name}</span> –{' '}
-                <span className="italic">{project.subtitle}</span>
-            </h3>
+            <div className="text-xl">
+                <h3 className="font-semibold">{project.name}</h3>
+                <p className="font-extralight italic">{project.subtitle}</p>
+                <span className="ml-0.5">—</span>
+            </div>
         </Link>
     )
 }

@@ -3,9 +3,6 @@ import {
     Datagrid,
     TextField,
     DateField,
-    ReferenceArrayField,
-    SingleFieldList,
-    ChipField,
     Edit,
     Create,
     SimpleForm,
@@ -24,13 +21,6 @@ export const ProjectList = () => (
             <TextField source="subtitle" label="Sous-titre" />
             <TextField source="slug" label="Slug" />
             <DateField source="date" label="Date" />
-            <ReferenceArrayField source="stack" reference="skills" label="Stack">
-                <SingleFieldList>
-                    <ChipField source="name" />
-                </SingleFieldList>
-            </ReferenceArrayField>
-            <TextField source="githubLink" label="GitHub" />
-            <TextField source="webLink" label="Site Web" />
         </Datagrid>
     </List>
 )

@@ -32,12 +32,12 @@ const ProjectPage = () => {
             : [{ url: project.cover_image, type: 'image' as const }]
 
     return (
-        <div className="flex flex-col justify-start md:items-center gap-8 pl-[4vw] pr-[calc(8vw+28px)] md:pr-0 md:gap-24 md:max-w-[80vw] mb-12 md:mb-[10vh]">
-            <div className="flex flex-col items-start md:items-center gap-0.5 w-full">
+        <div className="flex flex-col justify-start md:items-center gap-8 px-[4vw] md:gap-24 md:max-w-[80vw] mb-12 md:mb-[10vh]">
+            <div className="flex flex-col items-start md:items-center gap-0.5 w-full pr-[calc(8vw+28px)] md:pr-0">
                 <h1 className="text-4xl md:text-5xl font-bold">{project?.name}</h1>
                 <h2 className="text-2xl italic">{project?.subtitle}</h2>
             </div>
-            <div className="flex flex-col-reverse md:flex-row gap-4 md:gap-28 flex-1">
+            <div className="flex flex-col-reverse md:flex-row gap-12 md:gap-28 flex-1">
                 <div className="flex-1/2 flex flex-col gap-4">
                     <div className="text-md tracking-wider markdown">
                         <Markdown remarkPlugins={[remarkBreaks]}>{project?.description || ''}</Markdown>
@@ -49,7 +49,7 @@ const ProjectPage = () => {
                         )}
                     </div>
                 </div>
-                <div className="flex flex-col gap-16 md:gap-4 flex-1/2">
+                <div className="flex flex-col gap-4 flex-1/2">
                     {medias.map((media, index) => (
                         <div key={index}>
                             {media.type === 'image' ? (
