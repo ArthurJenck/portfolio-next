@@ -12,7 +12,8 @@ interface ProjectDescriptionProps {
     title: string
     subtitle: string
     description: string
-    tags: string
+    date: Date
+    tag: string
     isHovered: boolean
     isDragging: boolean
     width: number
@@ -22,7 +23,8 @@ export const ProjectDescription: React.FC<ProjectDescriptionProps> = ({
     title,
     subtitle,
     description,
-    tags,
+    date,
+    tag,
     isHovered,
     isDragging,
     width,
@@ -73,7 +75,7 @@ export const ProjectDescription: React.FC<ProjectDescriptionProps> = ({
                             transitionDelay: TAGS_OPACITY_TRANSITION.delay,
                         }}
                     >
-                        {tags}
+                        {date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'numeric' })} - {tag}
                     </div>
                 </div>
             </motion.div>

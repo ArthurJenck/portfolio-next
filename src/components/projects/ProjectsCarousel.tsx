@@ -293,17 +293,15 @@ const ProjectsCarousel = ({ projects, isLoading = false }: ProjecsCarouselProps)
                                   </div>
                               </div>
                           ))
-                        : projects.map((p, i) => {
-                              // Récupérer les noms des compétences de la stack
-                              const stackNames = p.stack?.map((skill) => skill.name).join(', ') || ''
-
+                        : projects.map((project, i) => {
                               return (
                                   <ProjectDescription
-                                      key={`titles-${p.id}`}
-                                      title={p.name}
-                                      subtitle={p.subtitle || p.name}
-                                      description={p.summary}
-                                      tags={stackNames}
+                                      key={`titles-${project.id}`}
+                                      title={project.name}
+                                      subtitle={project.subtitle || project.name}
+                                      description={project.summary}
+                                      date={new Date(project.date)}
+                                      tag={project.stack[0].name}
                                       isHovered={hovered === i}
                                       isDragging={isDragging}
                                       width={ITEM_WIDTH}
