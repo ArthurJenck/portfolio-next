@@ -11,7 +11,7 @@ const Burger = () => {
     const [isOpen, setIsOpen] = useState(false)
 
     const burgerLinks = [
-        { title: 'Accueil' },
+        { href: '', title: 'Accueil' },
         { href: '#skills', title: 'Compétences' },
         { href: '#projets', title: 'Projets' },
         { href: '#about', title: 'À propos' },
