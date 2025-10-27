@@ -11,7 +11,7 @@ interface SkillCategoryProps {
 
 const SkillCategory = ({ name, truncatedName, skills }: SkillCategoryProps) => {
     return (
-        <div className="w-fit relative left-[5.5vw] lg:left-[15vw] top-0 mt-[5svh] lg:mt-[13svh]">
+        <div className="w-fit relative left-[5.5vw] lg:left-[15vw] top-0 mt-[7svh] lg:mt-[13svh]">
             <h3 className="md:hidden font-bold sticky top-[50svh] text-[clamp(1.2rem,2.5vw,2.5vw)] float-left text-right tracking-[2px] min-w-16">
                 {truncatedName}
             </h3>
