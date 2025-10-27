@@ -1,8 +1,8 @@
 'use client'
 
-import MobileProjectsList from '@/components/projects/MobileProjectsList'
-import MobileProjectsListSkeleton from '@/components/projects/MobileProjectsListSkeleton'
-import ProjectsCarousel from '@/components/projects/ProjectsCarousel'
+import MobileProjectsList from './MobileProjectsList'
+import MobileProjectsListSkeleton from './MobileProjectsListSkeleton'
+import ProjectsCarousel from './ProjectsCarousel'
 import SectionTitle from '@/components/SectionTitle'
 import { useProjects } from '@/hooks/useProjects'
 

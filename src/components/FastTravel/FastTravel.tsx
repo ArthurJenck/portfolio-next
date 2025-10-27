@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import '../../styles/FastTravel.scss'
+import './FastTravel.scss'
 import FastTravelLink from './FastTravelLink'
 import { FAST_TRAVEL_SECTIONS } from './fastTravelConfig'
 

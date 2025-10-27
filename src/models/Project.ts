@@ -17,6 +17,7 @@ export interface IProject extends Document {
     webLink?: string
     cover_image: string
     medias: IProjectMedia[]
+    color?: string
     createdAt: Date
     updatedAt: Date
 }
@@ -39,6 +40,7 @@ const ProjectSchema = new Schema<IProject>(
                 type: { type: String, enum: ['image', 'video'], required: true },
             },
         ],
+        color: { type: String, required: false, default: '#f0f0f0' },
     },
     { timestamps: true },
 )

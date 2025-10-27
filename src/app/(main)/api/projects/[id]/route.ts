@@ -5,7 +5,7 @@ import connectDB from '@/lib/mongodb'
 import Project from '@/models/Project'
 import Skill from '@/models/Skill'
 import { Types } from 'mongoose'
-import { generateSlug } from '@/lib/utils'
+import { generateSlug, normalizeColor } from '@/lib/utils'
 import { del } from '@vercel/blob'
 
 interface PopulatedSkill {
@@ -38,6 +38,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
             medias: project.medias || [],
             summary: project.summary,
             description: project.description,
+            color: project.color || '#f0f0f0',
             stack: project.stack
                 ? (project.stack as unknown as PopulatedSkill[]).map((skill) => skill._id.toString())
                 : [],
@@ -80,6 +81,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
             'cover_image',
             'medias',
             'order',
+            'color',
         ]
 
         for (const field of allowedFields) {
@@ -89,6 +91,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
                     updateData[field] = body[field].filter(
                         (item: unknown) => typeof item === 'string' && item.length > 0,
                     )
+                } else if (field === 'color' && typeof body[field] === 'string') {
+                    // Normaliser la couleur
+                    updateData[field] = normalizeColor(body[field])
                 } else {
                     updateData[field] = body[field]
                 }

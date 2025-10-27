@@ -13,3 +13,10 @@ export function generateSlug(name: string): string {
         .replace(/[^a-z0-9]+/g, '-') // Remplace les caractères spéciaux par des tirets
         .replace(/^-+|-+$/g, '') // Supprime les tirets en début/fin
 }
+
+export function normalizeColor(color: string): string {
+    if (!color) return '#f0f0f0'
+    const trimmedColor = color.trim()
+    if (trimmedColor.startsWith('#')) return trimmedColor
+    return `#${trimmedColor}`
+}

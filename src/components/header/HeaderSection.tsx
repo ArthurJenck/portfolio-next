@@ -1,10 +1,10 @@
 'use client'
 
-import ImgLink from '../components/ImgLink'
-import Chevron from '../assets/icons/chevron.svg'
-import { useScroll } from '../hooks/useScroll'
-import '../styles/Header.scss'
-import HeroVid from '../components/HeroVid'
+import ImgLink from './ImgLink'
+import Chevron from '../../assets/icons/chevron.svg'
+import { useScroll } from '../../hooks/useScroll'
+import './Header.scss'
+import HeroVid from './HeroVid'
 import Image from 'next/image'
 
 const Header = () => {

@@ -25,7 +25,7 @@ import {
 import { useCarouselBounds } from '@/hooks/useCarouselBounds'
 import { useCarouselDrag } from '@/hooks/useCarouselDrag'
 import { MinimalProjectType } from '@/types/ProjectTypes'
-import { Skeleton } from '@/components/ui/skeleton'
+import { Skeleton } from '@/components/skeleton'
 
 interface ProjecsCarouselProps {
     projects: MinimalProjectType[]
@@ -247,15 +247,15 @@ const ProjectsCarousel = ({ projects, isLoading = false }: ProjecsCarouselProps)
                                   className="rounded-lg flex-shrink-0"
                               />
                           ))
-                        : projects.map((p, i) => {
+                        : projects.map((project, i) => {
                               return (
                                   <ProjectTile
-                                      key={p.id}
-                                      projectSlug={p.slug}
-                                      imageUrl={p.cover_image}
+                                      key={project.id}
+                                      projectSlug={project.slug}
+                                      imageUrl={project.cover_image}
                                       width={ITEM_WIDTH}
                                       height={TILE_HEIGHT}
-                                      color={'#f0f0f0'}
+                                      color={project.color}
                                       onHoverStart={() => setHovered(i)}
                                       onHoverEnd={() => setHovered((s) => (s === i ? null : s))}
                                   />

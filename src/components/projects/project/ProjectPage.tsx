@@ -1,6 +1,5 @@
 'use client'
 
-import ImgLink from '@/components/ImgLink'
 import { useProject } from '@/hooks/useProjects'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
@@ -8,6 +7,7 @@ import Markdown from 'react-markdown'
 import remarkBreaks from 'remark-breaks'
 import ProjectStackTag from './ProjectStackTag'
 import ProjectPageSkeleton from './ProjectPageSkeleton'
+import ImgLink from '@/components/header/ImgLink'
 
 const ProjectPage = () => {
     const { slug } = useParams<{ slug: string }>()

@@ -1,7 +1,7 @@
 'use client'
 
-import ImgLink from './ImgLink'
-import Burger from './Burger'
+import ImgLink from './header/ImgLink'
+import Burger from './burger/Burger'
 import { useScroll, useMotionValue, useSpring, motion } from 'framer-motion'
 import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'

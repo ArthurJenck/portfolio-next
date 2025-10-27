@@ -1,8 +1,8 @@
-import Header from '@/sections/Header'
-import Skills from '@/sections/Skills'
-import About from '@/sections/About'
-import Contact from '@/sections/Contact'
-import Projets from '@/sections/Projects'
+import Header from '@/components/header/HeaderSection'
+import Skills from '@/components/skills/SkillsSection'
+import About from '@/components/about/AboutSection'
+import Contact from '@/components/contact/ContactSection'
+import Projets from '@/components/projects/ProjectsSection'
 import FastTravel from '@/components/FastTravel/FastTravel'
 
 const Home = () => {

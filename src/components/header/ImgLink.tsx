@@ -1,15 +1,15 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Logo from '../assets/icons/logo.svg'
-import linkedinIcon from '../assets/icons/linkedin-icon.svg'
-import githubIcon from '../assets/icons/github-icon.svg'
-import cvIcon from '../assets/icons/cv-icon.svg'
-import extLinkIcon from '../assets/icons/ext-link.svg'
+import Logo from '../../assets/icons/logo.svg'
+import linkedinIcon from '../../assets/icons/linkedin-icon.svg'
+import githubIcon from '../../assets/icons/github-icon.svg'
+import cvIcon from '../../assets/icons/cv-icon.svg'
+import extLinkIcon from '../../assets/icons/ext-link.svg'
 import Link from 'next/link'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
-import { useScroll } from '../hooks/useScroll'
+import { useScroll } from '../../hooks/useScroll'
 import { usePathname } from 'next/navigation'
 
 interface ImgLinkProps {

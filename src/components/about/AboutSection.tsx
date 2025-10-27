@@ -1,7 +1,7 @@
 'use client'
 
 import SectionTitle from '@/components/SectionTitle'
-import AsciiPortrait from '@/components/AsciiPortrait'
+import AsciiPortrait from './AsciiPortrait'
 
 const About = () => {
     return (

@@ -36,6 +36,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
                     : [{ url: project.cover_image, type: 'image' as const }],
             summary: project.summary,
             description: project.description,
+            color: project.color || '#f0f0f0',
             stack: project.stack
                 ? (project.stack as unknown as PopulatedSkill[]).map((skill) => ({
                       id: skill._id.toString(),

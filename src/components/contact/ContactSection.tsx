@@ -1,11 +1,11 @@
 'use client'
 
 import React from 'react'
-import '../styles/Contact.scss'
-import ContactLink from '../components/ContactLink'
+import './Contact.scss'
+import ContactLink from './ContactLink'
 import SectionTitle from '@/components/SectionTitle'
 import { useContactLinks } from '@/hooks/useContactLinks'
-import ContactLinksSkeleton from '@/components/ContactLinksSkeleton'
+import ContactLinksSkeleton from './ContactLinksSkeleton'
 
 const Contact = () => {
     const { data: contactLinks, isLoading } = useContactLinks()

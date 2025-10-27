@@ -1,9 +1,9 @@
 'use client'
 
 import SectionTitle from '@/components/SectionTitle'
-import SkillCategory from '../components/SkillCategory'
+import SkillCategory from './SkillCategory'
 import { useSkills } from '@/hooks/useSkills'
-import SkillsSkeleton from '@/components/skills/SkillsSkeleton'
+import SkillsSkeleton from './SkillsSkeleton'
 
 const Skills = () => {
     const { data: skillCategories, isLoading, error } = useSkills()

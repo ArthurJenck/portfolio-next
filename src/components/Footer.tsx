@@ -1,4 +1,4 @@
-import ImgLink from './ImgLink'
+import ImgLink from './header/ImgLink'
 
 const Footer = () => {
     return (

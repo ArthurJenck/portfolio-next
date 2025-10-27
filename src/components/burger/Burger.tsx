@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import ImgLink from './ImgLink'
-import '../styles/Burger.scss'
+import ImgLink from '../header/ImgLink'
+import './Burger.scss'
 import BurgerLink from './BurgerLink'
 
 const Burger = () => {

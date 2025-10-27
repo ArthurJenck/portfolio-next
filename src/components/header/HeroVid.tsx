@@ -1,6 +1,6 @@
 'use client'
 
-import PlaceHolder from '../assets/images/hero-placeholder.png'
+import PlaceHolder from '../../assets/images/hero-placeholder.png'
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 

@@ -1,4 +1,4 @@
-import { Skeleton } from '@/components/ui/skeleton'
+import { Skeleton } from '@/components/skeleton'
 
 const MobileProjectsListSkeleton = () => {
     // Afficher 5 items pour le skeleton mobile

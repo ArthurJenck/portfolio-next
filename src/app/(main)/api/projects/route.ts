@@ -5,7 +5,7 @@ import connectDB from '@/lib/mongodb'
 import Project from '@/models/Project'
 import Skill from '@/models/Skill'
 import { Types } from 'mongoose'
-import { generateSlug } from '@/lib/utils'
+import { generateSlug, normalizeColor } from '@/lib/utils'
 
 interface PopulatedSkill {
     _id: Types.ObjectId
@@ -30,6 +30,7 @@ export async function GET() {
             slug: project.slug,
             cover_image: project.cover_image,
             summary: project.summary,
+            color: project.color || '#f0f0f0',
             stack: project.stack
                 ? (project.stack as unknown as PopulatedSkill[]).map((skill) => ({
                       id: skill._id.toString(),
@@ -58,6 +59,11 @@ export async function POST(request: Request) {
         // Générer le slug si non fourni
         if (!body.slug && body.name) {
             body.slug = generateSlug(body.name)
+        }
+
+        // Normaliser la couleur si fournie
+        if (body.color) {
+            body.color = normalizeColor(body.color)
         }
 
         // Si medias n'est pas fourni ou est vide, initialiser avec cover_image

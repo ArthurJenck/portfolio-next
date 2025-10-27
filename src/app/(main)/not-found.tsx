@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import '@/styles/404.scss'
-import ImgLink from '@/components/ImgLink'
+import './404.scss'
+import ImgLink from '@/components/header/ImgLink'
 
 const NotFound = () => {
     return (

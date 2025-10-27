@@ -15,6 +15,7 @@ export interface DetailedProjectType {
     medias: ProjectMedia[]
     summary: string
     description: string
+    color: string
     stack: SkillChild[]
     githubLink?: string
     webLink?: string
@@ -29,6 +30,7 @@ export interface MinimalProjectType {
     slug: string
     cover_image: string
     summary: string
+    color: string
     stack: SkillChild[]
 }
 

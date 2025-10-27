@@ -13,6 +13,7 @@ import {
 import { FileUploadInput } from '../components/FileUploadInput'
 import { MediasUploadInput } from '../components/MediasUploadInput'
 import { ProjectSkillsInput } from '../components/ProjectSkillsInput'
+import { ColorInput } from '../components/ColorInput'
 
 export const ProjectList = () => (
     <List>
@@ -48,6 +49,7 @@ export const ProjectEdit = () => (
                 validate={required()}
                 helperText="Description détaillée pour la page du projet"
             />
+            <ColorInput source="color" label="Couleur" helperText="Couleur d'accentuation du projet (ex: #f0f0f0)" />
             <FileUploadInput
                 source="cover_image"
                 label="Image de couverture"
@@ -89,6 +91,7 @@ export const ProjectCreate = () => (
                 validate={required()}
                 helperText="Description détaillée pour la page du projet"
             />
+            <ColorInput source="color" label="Couleur" helperText="Couleur d'accentuation du projet (ex: #f0f0f0)" />
             <FileUploadInput
                 source="cover_image"
                 label="Image de couverture"
