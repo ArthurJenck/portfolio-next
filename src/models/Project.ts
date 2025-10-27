@@ -17,7 +17,6 @@ export interface IProject extends Document {
     webLink?: string
     cover_image: string
     medias: IProjectMedia[]
-    order: number
     createdAt: Date
     updatedAt: Date
 }
@@ -40,11 +39,8 @@ const ProjectSchema = new Schema<IProject>(
                 type: { type: String, enum: ['image', 'video'], required: true },
             },
         ],
-        order: { type: Number, required: true, default: 0 },
     },
     { timestamps: true },
 )
-
-ProjectSchema.index({ order: 1 })
 
 export default mongoose.models.Project || mongoose.model<IProject>('Project', ProjectSchema)

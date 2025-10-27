@@ -12,9 +12,7 @@ import {
     TextInput,
     DateInput,
     required,
-    FunctionField,
 } from 'react-admin'
-import { ReorderButtons } from '../components/ReorderButtons'
 import { FileUploadInput } from '../components/FileUploadInput'
 import { MediasUploadInput } from '../components/MediasUploadInput'
 import { ProjectSkillsInput } from '../components/ProjectSkillsInput'
@@ -33,7 +31,6 @@ export const ProjectList = () => (
             </ReferenceArrayField>
             <TextField source="githubLink" label="GitHub" />
             <TextField source="webLink" label="Site Web" />
-            <FunctionField label="Ordre" render={() => <ReorderButtons resourceName="projects" />} />
         </Datagrid>
     </List>
 )

@@ -19,7 +19,7 @@ export async function GET() {
         await connectDB()
         // Force Skill model registration
         Skill.modelName
-        const projects = await Project.find().populate('stack').sort({ order: 1 })
+        const projects = await Project.find().populate('stack').sort({ date: -1 })
 
         // Renvoyer MinimalProjectType
         const response = projects.map((project) => ({
@@ -58,12 +58,6 @@ export async function POST(request: Request) {
         // Générer le slug si non fourni
         if (!body.slug && body.name) {
             body.slug = generateSlug(body.name)
-        }
-
-        // Si order n'est pas fourni, prendre le max + 1
-        if (body.order === undefined) {
-            const maxProject = await Project.findOne().sort({ order: -1 })
-            body.order = maxProject ? maxProject.order + 1 : 0
         }
 
         // Si medias n'est pas fourni ou est vide, initialiser avec cover_image
