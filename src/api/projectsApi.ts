@@ -12,7 +12,6 @@ export async function getProjects(): Promise<ProjectResponse> {
     return res.json()
 }
 
-// Pour le front - récupération par slug (URLs propres)
 export async function getProject(slug: string): Promise<DetailedProjectType> {
     const res = await fetch(`${API_URL}/api/projects/slug/${slug}`)
 
@@ -23,7 +22,6 @@ export async function getProject(slug: string): Promise<DetailedProjectType> {
     return res.json()
 }
 
-// Pour l'admin - récupération par ID MongoDB
 export async function getProjectById(id: string): Promise<DetailedProjectType> {
     const res = await fetch(`${API_URL}/api/projects/${id}`)
 
