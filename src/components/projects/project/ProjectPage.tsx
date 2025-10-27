@@ -8,17 +8,6 @@ import Markdown from 'react-markdown'
 import remarkBreaks from 'remark-breaks'
 import ProjectStackTag from './ProjectStackTag'
 import ProjectPageSkeleton from './ProjectPageSkeleton'
-import { getProject } from '@/api/projectsApi'
-import { Metadata } from 'next'
-
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-    const { slug } = params
-    const project = await getProject(slug)
-
-    return {
-        title: `Arthur Jenck • ${project?.name}`,
-    }
-}
 
 const ProjectPage = () => {
     const { slug } = useParams<{ slug: string }>()
