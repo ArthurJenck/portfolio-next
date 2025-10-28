@@ -20,36 +20,10 @@ Codé en React Typescript, préprocessé en SCSS
 
 Utilisez votre gestionnaire de projets préféré pour installer les dépendances :
 
-#### NPM
-
-```sh
-> npm i
-```
-
-#### Yarn
-
-```sh
-> yarn
-```
-
-Puis lancez le projet avec :
-
-#### NPM
-
-```sh
-> npm run dev
-```
-
-#### Yarn
-
-```sh
-> yarn vite
-```
-
 ### Futurs ajouts
 
-Mode clair / sombre  
-Version ENG / FR  
+Blog front+back (Pouvoir mettre mes posts Linkedin)
+Afficher mes références (blocs de quote en parallaxe, derrière les compétences ? Derrière le About et Contact ? Ou intercalés entre les sections ?)
 
 ### Liens utiles
 
