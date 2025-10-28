@@ -10,7 +10,7 @@
 
 ## Futurs ajouts
 
-
+- Au touchpad, scroll la liste de projets
 - Bouton Like avec call au back pour avoir un compteur global de likes
 - Blog front+back (Pouvoir mettre mes posts Linkedin)
 - Afficher mes références (blocs de quote en parallaxe, derrière les compétences ? Derrière le About et Contact ? Ou intercalés entre les sections ?)
