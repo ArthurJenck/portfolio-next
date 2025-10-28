@@ -8,29 +8,21 @@
 
 # Portfolio personnel
 
-## Réalisé dans le cadre du projet n°8 du parcours Développeur Web d'OpenClassrooms
+## Futurs ajouts
 
-### Outils utilisés
 
-Carnet pour noter mes différentes idées et dessiner le wireframe  
-Figma pour la création de la maquette du projet  
-Codé en React Typescript, préprocessé en SCSS
+- Bouton Like avec call au back pour avoir un compteur global de likes
+- Blog front+back (Pouvoir mettre mes posts Linkedin)
+- Afficher mes références (blocs de quote en parallaxe, derrière les compétences ? Derrière le About et Contact ? Ou intercalés entre les sections ?)
 
-### Installation
 
-Utilisez votre gestionnaire de projets préféré pour installer les dépendances :
 
-### Futurs ajouts
-
-Blog front+back (Pouvoir mettre mes posts Linkedin)
-Afficher mes références (blocs de quote en parallaxe, derrière les compétences ? Derrière le About et Contact ? Ou intercalés entre les sections ?)
-
-### Liens utiles
+## Liens utiles
 
 Maquette Figma du projet : [figma.com/design/](https://www.figma.com/design/JuFHi8HzvScTfFTQWZJnov/Portfolio-2.0)  
 Lien Google Drive contenant les scans de mon carnet : [drive.google.com/drive/folders/](https://drive.google.com/drive/folders/1f4fpOMN-B1Bi42T_U0PUSnKu0sPL1yy7?usp=sharing)
 
-### Dates du projet
+## Dates du projet
 
 Premières réflexions en 2023  
 Début du design de la maquette le 30 octobre 2024  
@@ -38,7 +30,7 @@ Début du développement le 15 novembre 2024
 Fin officielle du développement le 11 décembre 2024 (modifications régulières)
 Reprise en octobre 2025
 
-### Auteur
+## Auteur
 
 Arthur Jenck  
 <https://arthurjenck.com/>  
