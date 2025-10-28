@@ -13,6 +13,12 @@
     --white: #fdfdfe;
 }
 
+@layer utilities {
+    .text-primary {
+        color: var(--primary);
+    }
+}
+
 html,
 * {
     box-sizing: border-box;
