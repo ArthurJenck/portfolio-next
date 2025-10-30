@@ -203,6 +203,33 @@ const ProjectsCarousel = ({ projects, isLoading = false }: ProjecsCarouselProps)
         }
     }, [])
 
+    // Gestion du scroll horizontal (touchpad) - convertir en scroll vertical
+    useEffect(() => {
+        const section = sectionRef.current
+        if (!section) return
+
+        const handleWheel = (e: WheelEvent) => {
+            if (isDragging || isDraggingOrRecentlyDragged) {
+                return
+            }
+
+            if (Math.abs(e.deltaX) > 0) {
+                window.scrollBy({
+                    top: e.deltaX,
+                    behavior: 'instant' as ScrollBehavior,
+                })
+
+                e.preventDefault()
+            }
+        }
+
+        section.addEventListener('wheel', handleWheel, { passive: false })
+
+        return () => {
+            section.removeEventListener('wheel', handleWheel)
+        }
+    }, [isDragging, isDraggingOrRecentlyDragged])
+
     return (
         <div
             className="relative w-full my-[6vh]"
