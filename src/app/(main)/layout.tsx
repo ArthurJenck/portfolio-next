@@ -26,19 +26,40 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
     title: 'Arthur Jenck',
     description:
-        "Portfolio d'Arthur Jenck, développeur web front-end passionné spécialisé React, expert en UX/UI et Webdesign.",
-    robots: 'index',
+        "Portfolio d'Arthur Jenck, développeur web front-end passionné en région parisienne, spécialisé NextJS, React, Typescript et Tailwind, expert en UX/UI et Webdesign.",
+    robots: { index: true, follow: true },
+    keywords: [
+        'Arthur Jenck',
+        'Développeur Web',
+        'Front-end',
+        'NextJS',
+        'React',
+        'Typescript',
+        'Tailwind',
+        'UX/UI',
+        'Webdesign',
+        'Parisienne',
+        'Région parisienne',
+        'Paris',
+        'France',
+    ],
+    icons: {
+        icon: [
+            { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+            { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+            { url: '/favicon-light.svg', type: 'image/svg+xml', media: '(prefers-color-scheme: light)' },
+            { url: '/favicon-dark.svg', type: 'image/svg+xml', media: '(prefers-color-scheme: dark)' },
+        ],
+        apple: [{ url: '/apple-touch-icon.png', sizes: '180x180' }],
+    },
+    manifest: '/site.webmanifest',
     openGraph: {
         title: "Portfolio d'Arthur Jenck, Développeur Web Front-end",
         type: 'website',
         url: 'https://arthurjenck.com/',
         description:
-            "Portfolio d'Arthur Jenck, développeur web front-end passionné spécialisé React, expert en UX/UI et Webdesign.",
-        images: [
-            {
-                url: 'https://i.ibb.co/r6Pk1wC/share-preview.png',
-            },
-        ],
+            "Portfolio d'Arthur Jenck, développeur web front-end passionné en région parisienne, spécialisé NextJS, React, Typescript et Tailwind, expert en UX/UI et Webdesign.",
+        images: [{ url: 'https://3jrx06emyedlbjzt.public.blob.vercel-storage.com/share-preview.png' }],
     },
     twitter: {
         card: 'summary_large_image',
@@ -46,13 +67,12 @@ export const metadata: Metadata = {
         title: "Portfolio d'Arthur Jenck, Développeur Web Front-end",
         description:
             "Portfolio d'Arthur Jenck, développeur web front-end passionné spécialisé React, expert en UX/UI et Webdesign.",
-        images: ['https://i.ibb.co/r6Pk1wC/share-preview.png'],
+        images: ['https://3jrx06emyedlbjzt.public.blob.vercel-storage.com/share-preview.png'],
     },
-    icons: {
-        icon: [
-            { url: '/favicon.ico', type: 'image/x-icon' },
-            { url: '/favicon.svg', type: 'image/svg+xml' },
-        ],
+    appleWebApp: {
+        title: 'Arthur Jenck',
+        statusBarStyle: 'black-translucent',
+        capable: true,
     },
 }
 
@@ -68,7 +88,7 @@ export default function RootLayout({
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{
                         __html: JSON.stringify({
-                            '@context': 'https://arthurjenck.com/',
+                            '@context': 'https://schema.org',
                             '@type': 'WebSite',
                             name: 'Arthur Jenck – Portfolio',
                             url: 'https://arthurjenck.com/',

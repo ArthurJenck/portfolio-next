@@ -1,6 +1,6 @@
 <p align="center">
 <a href="https://arthurjenck.com/">
-  <img src="https://i.ibb.co/R4tzqky/logo.png" width="75">
+  <img src="https://3jrx06emyedlbjzt.public.blob.vercel-storage.com/logo.png" width="75">
 </a>
 </p>
 
@@ -35,4 +35,4 @@ Arthur Jenck
 <https://arthurjenck.com/>  
 <https://www.linkedin.com/in/arthurjenck/>
 
-<img src="https://i.ibb.co/R4tzqky/logo.png" width="75">
+<img src="https://3jrx06emyedlbjzt.public.blob.vercel-storage.com/logo.png" width="75">
