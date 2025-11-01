@@ -1,13 +1,13 @@
 'use client'
 
 import { useProject } from '@/hooks/useProjects'
-import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import Markdown from 'react-markdown'
 import remarkBreaks from 'remark-breaks'
 import ProjectStackTag from './ProjectStackTag'
 import ProjectPageSkeleton from './ProjectPageSkeleton'
 import ImgLink from '@/components/header/ImgLink'
+import ProjectMediasCarousel from './ProjectMediasCarousel'
 
 const ProjectPage = () => {
     const { slug } = useParams<{ slug: string }>()
@@ -50,23 +50,7 @@ const ProjectPage = () => {
                     </div>
                 </div>
                 <div className="flex flex-col gap-4 flex-1/2">
-                    {medias.map((media, index) => (
-                        <div key={index}>
-                            {media.type === 'image' ? (
-                                <Image
-                                    src={media.url}
-                                    alt={`${project.name} - Media ${index + 1}`}
-                                    width={714}
-                                    height={402}
-                                    className="w-full h-auto"
-                                />
-                            ) : (
-                                <video src={media.url} controls className="w-full h-auto" preload="metadata">
-                                    Votre navigateur ne supporte pas la lecture de vidéos.
-                                </video>
-                            )}
-                        </div>
-                    ))}
+                    <ProjectMediasCarousel medias={medias} project={project} />
                     <div className="flex flex-wrap items-center gap-2">
                         {project?.stack?.map((skill) => (
                             <ProjectStackTag key={skill.id} skill={skill} />
