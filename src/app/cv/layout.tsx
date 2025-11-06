@@ -11,8 +11,28 @@ const sora = Sora({
 
 export const metadata: Metadata = {
     title: 'Arthur Jenck • CV',
-    description: "CV d'Arthur Jenck, développeur web front-end",
-    robots: 'index',
+    description:
+        "CV d'Arthur Jenck, développeur web front-end spécialisé en NextJS, React, TypeScript et Tailwind. Expertise en UX/UI et Webdesign.",
+    robots: 'index, follow',
+    openGraph: {
+        title: 'CV - Arthur Jenck, Développeur Web Front-end',
+        description:
+            "CV d'Arthur Jenck, développeur web front-end spécialisé en NextJS, React, TypeScript et Tailwind.",
+        url: 'https://arthurjenck.com/cv',
+        siteName: 'Arthur Jenck',
+        type: 'website',
+        images: [{ url: 'https://3jrx06emyedlbjzt.public.blob.vercel-storage.com/share-preview.png' }],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'CV - Arthur Jenck, Développeur Web Front-end',
+        description:
+            "CV d'Arthur Jenck, développeur web front-end spécialisé en NextJS, React, TypeScript et Tailwind.",
+        images: ['https://3jrx06emyedlbjzt.public.blob.vercel-storage.com/share-preview.png'],
+    },
+    alternates: {
+        canonical: 'https://arthurjenck.com/cv',
+    },
 }
 
 export default function CVLayout({

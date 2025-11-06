@@ -54,6 +54,9 @@ export const metadata: Metadata = {
         apple: [{ url: '/apple-touch-icon.png', sizes: '180x180' }],
     },
     manifest: '/site.webmanifest',
+    alternates: {
+        canonical: 'https://arthurjenck.com',
+    },
     openGraph: {
         title: "Portfolio d'Arthur Jenck, Développeur Web Front-end",
         siteName: 'Arthur Jenck',
