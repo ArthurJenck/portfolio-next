@@ -8,6 +8,7 @@ import { Analytics } from '@vercel/analytics/next'
 import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
 import { Sora, Montserrat } from 'next/font/google'
+import Script from 'next/script'
 
 const sora = Sora({
     subsets: ['latin'],
@@ -55,6 +56,7 @@ export const metadata: Metadata = {
     manifest: '/site.webmanifest',
     openGraph: {
         title: "Portfolio d'Arthur Jenck, Développeur Web Front-end",
+        siteName: 'Arthur Jenck',
         type: 'website',
         url: 'https://arthurjenck.com/',
         description:
@@ -84,14 +86,36 @@ export default function RootLayout({
     return (
         <html lang="fr">
             <head>
-                <script
+                <Script
+                    id="schema-website"
                     type="application/ld+json"
+                    strategy="afterInteractive"
                     dangerouslySetInnerHTML={{
                         __html: JSON.stringify({
                             '@context': 'https://schema.org',
                             '@type': 'WebSite',
-                            name: 'Arthur Jenck – Portfolio',
+                            name: 'Arthur Jenck',
+                            alternateName: 'Arthur Jenck – Portfolio',
                             url: 'https://arthurjenck.com/',
+                        }),
+                    }}
+                />
+                <Script
+                    id="schema-person"
+                    type="application/ld+json"
+                    strategy="afterInteractive"
+                    dangerouslySetInnerHTML={{
+                        __html: JSON.stringify({
+                            '@context': 'https://schema.org',
+                            '@type': 'Person',
+                            name: 'Arthur Jenck',
+                            jobTitle: 'Développeur web front-end',
+                            url: 'https://arthurjenck.com/',
+                            sameAs: [
+                                'https://github.com/arthurjenck',
+                                'https://www.linkedin.com/in/arthurjenck/',
+                                'https://x.com/ArthurJenck',
+                            ],
                         }),
                     }}
                 />
