@@ -8,13 +8,6 @@
 
 # Portfolio personnel
 
-## Futurs ajouts
-
-- Animation au clic sur un projet, il remplit tout l'écran avant la redirection
-- Bouton Like avec call au back pour avoir un compteur global de likes
-- Blog front+back (Pouvoir mettre mes posts Linkedin)
-- Afficher mes références (blocs de quote en parallaxe, derrière les compétences ? Derrière le About et Contact ? Ou intercalés entre les sections ?)
-
 ## Liens utiles
 
 Maquette Figma du projet : [figma.com/design/](https://www.figma.com/design/JuFHi8HzvScTfFTQWZJnov/Portfolio-2.0)  
