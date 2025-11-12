@@ -10,7 +10,6 @@
 
 ## Futurs ajouts
 
-- Au touchpad, scroll la liste de projets
 - Animation au clic sur un projet, il remplit tout l'écran avant la redirection
 - Bouton Like avec call au back pour avoir un compteur global de likes
 - Blog front+back (Pouvoir mettre mes posts Linkedin)
