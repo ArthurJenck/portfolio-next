@@ -1,19 +1,9 @@
 'use client'
 
+import anime from 'animejs'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
-
-interface AnimeInstance {
-    (params: Record<string, unknown>): void
-    remove: (targets: unknown) => void
-}
-
-declare global {
-    interface Window {
-        anime?: AnimeInstance
-    }
-}
 
 interface ProjectTileProps {
     width: number
@@ -55,17 +45,11 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
         const totalItems = stackItems.length
 
         const removeAnimeTargets = () => {
-            if (typeof window !== 'undefined' && window.anime) {
-                const anime = window.anime
-                anime.remove(stackItems)
-                anime.remove(img)
-            }
+            anime.remove(stackItems)
+            anime.remove(img)
         }
 
         const animateIn = () => {
-            if (typeof window === 'undefined' || !window.anime) return
-            const anime = window.anime
-
             removeAnimeTargets()
 
             stackItems.forEach((e, i) => {
@@ -82,14 +66,14 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
                             return index * 8 + 8
                         },
                         duration: 200,
-                        easing: [0.42, 0, 1, 1],
+                        easing: 'cubicBezier(0.42, 0, 1, 1)',
                     },
                     {
                         value: function (_target: unknown, index: number) {
                             return index * 20 + 20
                         },
                         duration: 700,
-                        easing: [0.2, 1, 0.3, 1],
+                        easing: 'cubicBezier(0.2, 1, 0.3, 1)',
                     },
                 ],
                 rotateX: [
@@ -98,12 +82,12 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
                             return -1 * (index * 2 + 2)
                         },
                         duration: 200,
-                        easing: [0.42, 0, 1, 1],
+                        easing: 'cubicBezier(0.42, 0, 1, 1)',
                     },
                     {
                         value: 0,
                         duration: 700,
-                        easing: [0.2, 1, 0.3, 1],
+                        easing: 'cubicBezier(0.2, 1, 0.3, 1)',
                     },
                 ],
             })
@@ -111,15 +95,12 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
             anime({
                 targets: img,
                 duration: 900,
-                easing: [0.2, 1, 0.3, 1],
+                easing: 'cubicBezier(0.2, 1, 0.3, 1)',
                 scale: 0.7,
             })
         }
 
         const animateOut = () => {
-            if (typeof window === 'undefined' || !window.anime) return
-            const anime = window.anime
-
             removeAnimeTargets()
 
             anime({
@@ -130,12 +111,12 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
                             return index * 20 + 20 - 8
                         },
                         duration: 200,
-                        easing: [0.42, 0, 1, 1],
+                        easing: 'cubicBezier(0.42, 0, 1, 1)',
                     },
                     {
                         value: 0,
                         duration: 900,
-                        easing: [0.2, 1, 0.3, 1],
+                        easing: 'cubicBezier(0.2, 1, 0.3, 1)',
                     },
                 ],
                 rotateX: [
@@ -144,12 +125,12 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
                             return index * 2 + 2
                         },
                         duration: 200,
-                        easing: [0.42, 0, 1, 1],
+                        easing: 'cubicBezier(0.42, 0, 1, 1)',
                     },
                     {
                         value: 0,
                         duration: 900,
-                        easing: [0.2, 1, 0.3, 1],
+                        easing: 'cubicBezier(0.2, 1, 0.3, 1)',
                     },
                 ],
             })
@@ -157,7 +138,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
             anime({
                 targets: img,
                 duration: 900,
-                easing: [0.2, 1, 0.3, 1],
+                easing: 'cubicBezier(0.2, 1, 0.3, 1)',
                 scale: 1,
             })
         }

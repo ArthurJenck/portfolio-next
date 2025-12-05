@@ -190,19 +190,6 @@ const ProjectsCarousel = ({ projects, isLoading = false }: ProjecsCarouselProps)
         }
     }, [isDragging, isDraggingOrRecentlyDragged, scrollX, xImages, imagesCtrl, titlesCtrl])
 
-    useEffect(() => {
-        if ('anime' in window) return
-
-        const script = document.createElement('script')
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/animejs/2.0.2/anime.min.js'
-        script.async = true
-        document.body.appendChild(script)
-
-        return () => {
-            document.body.removeChild(script)
-        }
-    }, [])
-
     // Gestion du scroll horizontal (touchpad) - convertir en scroll vertical
     useEffect(() => {
         const section = sectionRef.current
