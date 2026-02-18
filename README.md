@@ -13,6 +13,26 @@
 Maquette Figma du projet : [figma.com/design/](https://www.figma.com/design/JuFHi8HzvScTfFTQWZJnov/Portfolio-2.0)  
 Lien Google Drive contenant les scans de mon carnet : [drive.google.com/drive/folders/](https://drive.google.com/drive/folders/1f4fpOMN-B1Bi42T_U0PUSnKu0sPL1yy7?usp=sharing)
 
+## Docker (dev)
+
+Copier les variables d'environnement :
+
+```bash
+cp .env.example .env.local
+```
+
+Lancer l'app Next.js + MongoDB :
+
+```bash
+docker compose up --build
+```
+
+Arrêter les containers :
+
+```bash
+docker compose down
+```
+
 ## Dates du projet
 
 Premières réflexions en 2023  
