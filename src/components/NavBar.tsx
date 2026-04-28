@@ -2,14 +2,16 @@
 
 import ImgLink from './header/ImgLink'
 import Burger from './burger/Burger'
-import { useScroll, useMotionValue, useSpring, motion } from 'framer-motion'
+import { useScroll, useMotionValue, useSpring, motion, MotionValue } from 'framer-motion'
 import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
 
 const NavBar = () => {
     const pathname = usePathname()
     const isLanding = pathname === '/'
+    const prefersReducedMotion = usePrefersReducedMotion()
 
     // Utilisation de useScroll de Framer Motion (optimisé avec requestAnimationFrame)
     const { scrollY } = useScroll()
@@ -18,17 +20,20 @@ const NavBar = () => {
     const logoOpacityTarget = useMotionValue(1)
 
     // Ajoute un spring pour adoucir la transition
-    const logoOpacity = useSpring(logoOpacityTarget, {
+    const logoOpacitySpring = useSpring(logoOpacityTarget, {
         stiffness: 300,
         damping: 30,
     })
+
+    // En reduced-motion, on bypasse le spring : l'opacité saute directement à sa cible
+    const logoOpacity: MotionValue<number> = prefersReducedMotion ? logoOpacityTarget : logoOpacitySpring
 
     // Met à jour l'opacité selon le scroll
     useEffect(() => {
         return scrollY.on('change', (latest) => {
             logoOpacityTarget.set(latest > 0 ? 0 : 1)
         })
-    }, [])
+    }, [scrollY, logoOpacityTarget])
 
     return (
         <>

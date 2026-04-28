@@ -1,7 +1,11 @@
+import { usePrefersReducedMotion } from './usePrefersReducedMotion'
+
 export const useScroll = () => {
+    const prefersReducedMotion = usePrefersReducedMotion()
+
     const scrollTo = (value: number) => {
         // On scroll vers la valeur Y transmise en props
-        window.scrollTo({ top: value, behavior: 'smooth' })
+        window.scrollTo({ top: value, behavior: prefersReducedMotion ? 'auto' : 'smooth' })
 
         // "Nettoyer" l'url affichée lors du scroll to top pour ne garder que le nom de domaine
         if (value === 0) {

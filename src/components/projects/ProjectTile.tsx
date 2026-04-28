@@ -4,6 +4,7 @@ import anime from 'animejs'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
 
 interface ProjectTileProps {
     width: number
@@ -25,6 +26,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
     onHoverEnd,
 }) => {
     const router = useRouter()
+    const prefersReducedMotion = usePrefersReducedMotion()
     const stackRef = useRef<HTMLDivElement>(null)
     const stackItemsRef = useRef<HTMLDivElement[]>([])
     const imgRef = useRef<HTMLImageElement>(null)
@@ -47,6 +49,21 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
         const removeAnimeTargets = () => {
             anime.remove(stackItems)
             anime.remove(img)
+        }
+
+        // En reduced-motion, on garde le prefetch au hover mais on coupe
+        // entièrement les animations 3D décoratives (stack qui se déploie).
+        if (prefersReducedMotion) {
+            const onMouseEnterReduced = () => {
+                if (!hasPrefetched.current) {
+                    router.prefetch(`/${projectSlug}`)
+                    hasPrefetched.current = true
+                }
+            }
+            stackEl.addEventListener('mouseenter', onMouseEnterReduced)
+            return () => {
+                stackEl.removeEventListener('mouseenter', onMouseEnterReduced)
+            }
         }
 
         const animateIn = () => {
@@ -160,7 +177,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
             stackEl.removeEventListener('mouseleave', onMouseLeave)
             removeAnimeTargets()
         }
-    }, [projectSlug, router])
+    }, [projectSlug, router, prefersReducedMotion])
 
     const handlePointerDown = (e: React.PointerEvent) => {
         pointerDownPos.current = { x: e.clientX, y: e.clientY }
