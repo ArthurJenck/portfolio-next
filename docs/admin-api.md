@@ -10,8 +10,10 @@ Les routes GET sont publiques sauf mention contraire.
 # Générer un token (une seule fois, à ajouter dans .env.local ET dans les env vars Vercel)
 openssl rand -hex 32
 
-# Charger le token dans le shell courant (ne pas coller en clair dans le terminal)
-export ADMIN_API_TOKEN="$(grep ADMIN_API_TOKEN .env.local | cut -d= -f2)"
+# Charger le token dans le shell courant
+# NOTE : ne pas utiliser `source .env.local` — le & dans l'URI MongoDB casse le parsing.
+# Utiliser grep à la place :
+export ADMIN_API_TOKEN="$(grep '^ADMIN_API_TOKEN=' .env.local | cut -d= -f2-)"
 ```
 
 ---
