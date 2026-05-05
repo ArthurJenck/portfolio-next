@@ -1,5 +1,8 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
+import { getServerSession } from 'next-auth'
+import { NextResponse } from 'next/server'
+import { timingSafeEqual } from 'crypto'
 import bcrypt from 'bcryptjs'
 import connectDB from './mongodb'
 import User from '@/models/User'
@@ -65,4 +68,25 @@ export const authOptions: NextAuthOptions = {
             return session
         },
     },
+}
+
+type AuthResult = { ok: true } | { ok: false; response: NextResponse }
+
+export async function requireAuth(request: Request): Promise<AuthResult> {
+    const session = await getServerSession(authOptions)
+    if (session) return { ok: true }
+
+    const envToken = process.env.ADMIN_API_TOKEN
+    if (envToken) {
+        const authHeader = request.headers.get('authorization') ?? ''
+        const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : ''
+        if (bearer.length > 0) {
+            const a = Buffer.from(bearer)
+            const b = Buffer.from(envToken)
+            const same = a.length === b.length && timingSafeEqual(a, b)
+            if (same) return { ok: true }
+        }
+    }
+
+    return { ok: false, response: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
 }
