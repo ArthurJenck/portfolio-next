@@ -44,6 +44,11 @@ interface PopulatedSkill {
     description?: string
 }
 
+interface ProjectMediaSource {
+    url?: string
+    type?: 'image' | 'video'
+}
+
 interface ProjectWithOptionalOrder {
     _id: Types.ObjectId
     name: string
@@ -56,7 +61,7 @@ interface ProjectWithOptionalOrder {
     githubLink?: string
     webLink?: string
     cover_image: string
-    medias?: ProjectMedia[]
+    medias?: ProjectMediaSource[]
     color?: string
     order?: number
     updatedAt: Date
@@ -76,9 +81,24 @@ const mapSkill = (skill: PopulatedSkill): SkillChild => ({
     description: skill.description || '',
 })
 
-const getProjectMedias = (coverImage: string, medias?: ProjectMedia[]): ProjectMedia[] => {
+const mapProjectMedia = (media: ProjectMediaSource): ProjectMedia | null => {
+    if (!media?.url) {
+        return null
+    }
+
+    return {
+        url: media.url,
+        type: media.type === 'video' ? 'video' : 'image',
+    }
+}
+
+const getProjectMedias = (coverImage: string, medias?: ProjectMediaSource[]): ProjectMedia[] => {
     if (medias && medias.length > 0) {
-        return medias
+        const mappedMedias = medias.map(mapProjectMedia).filter((media): media is ProjectMedia => media !== null)
+
+        if (mappedMedias.length > 0) {
+            return mappedMedias
+        }
     }
 
     return coverImage ? [{ url: coverImage, type: 'image' }] : []

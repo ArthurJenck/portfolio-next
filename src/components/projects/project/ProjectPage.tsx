@@ -28,7 +28,11 @@ const ProjectPage = ({ project }: { project: DetailedProjectType }) => {
                     </div>
                 </div>
                 <div className="flex flex-col gap-4 flex-1/2">
-                    <ProjectMediasCarousel medias={medias} project={project} />
+                    <ProjectMediasCarousel
+                        medias={medias}
+                        projectName={project.name}
+                        projectLink={project.webLink || project.githubLink}
+                    />
                     <div className="flex flex-wrap items-center gap-2">
                         {project.stack.map((skill) => (
                             <ProjectStackTag key={skill.id} skill={skill} />

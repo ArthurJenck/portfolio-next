@@ -1,12 +1,18 @@
 'use client'
 
-import { DetailedProjectType, ProjectMedia } from '@/types/ProjectTypes'
+import { ProjectMedia } from '@/types/ProjectTypes'
 import Image from 'next/image'
 import useEmblaCarousel from 'embla-carousel-react'
 import { useCallback, useEffect, useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-const ProjectMediasCarousel = ({ medias, project }: { medias: ProjectMedia[]; project: DetailedProjectType }) => {
+interface ProjectMediasCarouselProps {
+    medias: ProjectMedia[]
+    projectName: string
+    projectLink?: string
+}
+
+const ProjectMediasCarousel = ({ medias, projectName, projectLink }: ProjectMediasCarouselProps) => {
     const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true })
     const [selectedIndex, setSelectedIndex] = useState(0)
     const [scrollSnaps, setScrollSnaps] = useState<number[]>([])
@@ -47,17 +53,13 @@ const ProjectMediasCarousel = ({ medias, project }: { medias: ProjectMedia[]; pr
     // Si un seul média, pas besoin de carousel
     if (medias.length === 1) {
         const media = medias[0]
+        const href = projectLink || media.url
         return (
-            <a
-                href={project.webLink || project.githubLink || media.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="relative w-full overflow-hidden"
-            >
+            <a href={href} target="_blank" rel="noopener noreferrer" className="relative w-full overflow-hidden">
                 {media.type === 'image' ? (
                     <Image
                         src={media.url}
-                        alt={`${project.name} - Media`}
+                        alt={`${projectName} - Media`}
                         width={714}
                         height={402}
                         className="w-full h-auto"
@@ -82,36 +84,40 @@ const ProjectMediasCarousel = ({ medias, project }: { medias: ProjectMedia[]; pr
         <div className="relative w-full">
             <div className="overflow-hidden" ref={emblaRef}>
                 <div className="flex">
-                    {medias.map((media, index) => (
-                        <a
-                            key={index}
-                            href={project.webLink || project.githubLink || media.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex-[0_0_100%] min-w-0"
-                        >
-                            {media.type === 'image' ? (
-                                <Image
-                                    src={media.url}
-                                    alt={`${project.name} - Media ${index + 1}`}
-                                    width={714}
-                                    height={402}
-                                    className="w-full h-auto"
-                                />
-                            ) : (
-                                <video
-                                    src={media.url}
-                                    controls
-                                    muted
-                                    loop
-                                    preload="metadata"
-                                    className="w-full h-auto aspect-video"
-                                >
-                                    Votre navigateur ne supporte pas la lecture de vidéos.
-                                </video>
-                            )}
-                        </a>
-                    ))}
+                    {medias.map((media, index) => {
+                        const href = projectLink || media.url
+
+                        return (
+                            <a
+                                key={index}
+                                href={href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-[0_0_100%] min-w-0"
+                            >
+                                {media.type === 'image' ? (
+                                    <Image
+                                        src={media.url}
+                                        alt={`${projectName} - Media ${index + 1}`}
+                                        width={714}
+                                        height={402}
+                                        className="w-full h-auto"
+                                    />
+                                ) : (
+                                    <video
+                                        src={media.url}
+                                        controls
+                                        muted
+                                        loop
+                                        preload="metadata"
+                                        className="w-full h-auto aspect-video"
+                                    >
+                                        Votre navigateur ne supporte pas la lecture de vidéos.
+                                    </video>
+                                )}
+                            </a>
+                        )
+                    })}
                 </div>
             </div>
 

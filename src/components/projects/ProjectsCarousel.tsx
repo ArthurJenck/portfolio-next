@@ -1,5 +1,5 @@
 'use client'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
     motion,
     useAnimationControls,
@@ -64,8 +64,9 @@ const ProjectsCarousel = ({ projects, isLoading = false }: ProjecsCarouselProps)
         }
     }, [])
 
-    // Scroll-based animation : écouter le scroll de la section
-    useEffect(() => {
+    // Initialiser la cible avant l'abonnement de useScroll évite les warnings
+    // de calcul d'offset quand la section n'est pas encore résolue.
+    useLayoutEffect(() => {
         sectionRef.current = document.querySelector('#projets')
     }, [])
 
