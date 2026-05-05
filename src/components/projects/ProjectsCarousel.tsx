@@ -2,11 +2,11 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
     motion,
-    useAnimationControls,
     useMotionValue,
-    useScroll,
-    useTransform,
     useMotionValueEvent,
+    useScroll,
+    useSpring,
+    useTransform,
 } from 'framer-motion'
 import ProjectTile from './ProjectTile'
 import { ProjectDescription } from './ProjectDescription'
@@ -37,8 +37,7 @@ const ProjectsCarousel = ({ projects, isLoading = false }: ProjecsCarouselProps)
     const sectionRef = useRef<HTMLElement | null>(null)
 
     const xImages = useMotionValue(0)
-    const imagesCtrl = useAnimationControls()
-    const titlesCtrl = useAnimationControls()
+    const xTitles = useSpring(xImages, TITLE_SPRING)
 
     const [hovered, setHovered] = useState<number | null>(null)
     const [isDraggingOrRecentlyDragged, setIsDraggingOrRecentlyDragged] = useState(false)
@@ -86,6 +85,7 @@ const ProjectsCarousel = ({ projects, isLoading = false }: ProjecsCarouselProps)
     const getScrollPositionFromX = useCallback(
         (x: number) => {
             if (!sectionRef.current) return window.scrollY
+            if (dragBounds.left === 0) return sectionRef.current.offsetTop
 
             const section = sectionRef.current
             const sectionTop = section.offsetTop
@@ -108,38 +108,10 @@ const ProjectsCarousel = ({ projects, isLoading = false }: ProjecsCarouselProps)
         [dragBounds.left],
     )
 
-    const lastScrollX = useRef<number>(0)
     useMotionValueEvent(scrollX, 'change', (latest) => {
-        if (isDragging) {
-            lastScrollX.current = latest
-            return
-        }
+        if (isDragging || isDraggingOrRecentlyDragged || !isMountedRef.current) return
 
-        if (!isDraggingOrRecentlyDragged && isMountedRef.current) {
-            xImages.set(latest)
-            imagesCtrl.set({ x: latest })
-            titlesCtrl.start({
-                x: latest,
-                transition: TITLE_SPRING,
-            })
-            lastScrollX.current = latest
-        } else if (isDraggingOrRecentlyDragged && isMountedRef.current) {
-            const scrollDelta = Math.abs(latest - lastScrollX.current)
-            if (scrollDelta > 5) {
-                setIsDraggingOrRecentlyDragged(false)
-                if (dragEndTimeout.current) {
-                    window.clearTimeout(dragEndTimeout.current)
-                    dragEndTimeout.current = null
-                }
-                xImages.set(latest)
-                imagesCtrl.set({ x: latest })
-                titlesCtrl.start({
-                    x: latest,
-                    transition: TITLE_SPRING,
-                })
-                lastScrollX.current = latest
-            }
-        }
+        xImages.set(latest)
     })
 
     // Fonction de callback pour synchroniser le scroll avec le drag
@@ -156,8 +128,6 @@ const ProjectsCarousel = ({ projects, isLoading = false }: ProjecsCarouselProps)
 
     const { isDragging, handlers } = useCarouselDrag({
         xImages,
-        imagesCtrl,
-        titlesCtrl,
         dragBounds,
         onDragPositionChange,
     })
@@ -166,30 +136,25 @@ const ProjectsCarousel = ({ projects, isLoading = false }: ProjecsCarouselProps)
     useEffect(() => {
         if (isDragging) {
             setIsDraggingOrRecentlyDragged(true)
-            lastScrollX.current = scrollX.get()
+            if (dragEndTimeout.current) {
+                window.clearTimeout(dragEndTimeout.current)
+                dragEndTimeout.current = null
+            }
+        } else if (isDraggingOrRecentlyDragged) {
+            dragEndTimeout.current = window.setTimeout(() => {
+                setIsDraggingOrRecentlyDragged(false)
+                dragEndTimeout.current = null
+            }, 300)
+        }
+    }, [isDragging, isDraggingOrRecentlyDragged])
+
+    useEffect(() => {
+        return () => {
             if (dragEndTimeout.current) {
                 window.clearTimeout(dragEndTimeout.current)
             }
-        } else if (isDraggingOrRecentlyDragged) {
-            // Attendre un peu après le drag avant de re-synchroniser avec le scroll
-            // Pendant ce temps, la position restera stable
-            dragEndTimeout.current = window.setTimeout(() => {
-                setIsDraggingOrRecentlyDragged(false)
-
-                // Forcer une dernière synchronisation pour être sûr que tout est aligné
-                if (isMountedRef.current) {
-                    const currentScrollX = scrollX.get()
-                    xImages.set(currentScrollX)
-                    imagesCtrl.set({ x: currentScrollX })
-                    titlesCtrl.start({
-                        x: currentScrollX,
-                        transition: TITLE_SPRING,
-                    })
-                    lastScrollX.current = currentScrollX
-                }
-            }, 300)
         }
-    }, [isDragging, isDraggingOrRecentlyDragged, scrollX, xImages, imagesCtrl, titlesCtrl])
+    }, [])
 
     // Gestion du scroll horizontal (touchpad) - convertir en scroll vertical
     useEffect(() => {
@@ -238,14 +203,13 @@ const ProjectsCarousel = ({ projects, isLoading = false }: ProjecsCarouselProps)
                 <motion.div
                     className="absolute top-0 left-0 flex items-start cursor-grab active:cursor-grabbing select-none"
                     style={{
+                        x: xImages,
                         gap: ITEM_GAP,
                         willChange: 'transform',
                         transformStyle: 'preserve-3d',
                         paddingLeft: VIEW_PADDING,
                         paddingRight: VIEW_PADDING,
                     }}
-                    animate={imagesCtrl}
-                    initial={{ x: 0 }}
                     onPointerDown={handlers.onPointerDown}
                     onPointerMove={handlers.onPointerMove}
                     onPointerUp={handlers.onPointerUp}
@@ -287,14 +251,13 @@ const ProjectsCarousel = ({ projects, isLoading = false }: ProjecsCarouselProps)
                 <motion.div
                     className="absolute left-0 flex items-start"
                     style={{
+                        x: xTitles,
                         top: `${TILE_HEIGHT + TITLE_TOP_OFFSET}px`,
                         gap: ITEM_GAP,
                         willChange: 'transform',
                         paddingLeft: VIEW_PADDING,
                         paddingRight: VIEW_PADDING,
                     }}
-                    animate={titlesCtrl}
-                    initial={{ x: 0 }}
                 >
                     {isLoading
                         ? skeletonItems.map((item) => (

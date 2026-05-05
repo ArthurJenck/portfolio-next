@@ -1,32 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { MotionValue, useAnimationControls } from 'framer-motion'
+import { animate, MotionValue } from 'framer-motion'
 import {
     DRAG_MULTIPLIER,
     IMAGE_INERTIA_SPRING,
-    IMAGE_SNAP_TRANSITION,
-    IMAGE_SPRING,
     INERTIA_DURATION_MS,
     INERTIA_FACTOR,
     MIN_VELOCITY_FOR_INERTIA,
-    TITLE_INERTIA_SPRING,
-    TITLE_SNAP_TRANSITION,
-    TITLE_SPRING,
 } from '../components/projects/config'
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 
 interface UseCarouselDragOptions {
     xImages: MotionValue<number>
-    imagesCtrl: ReturnType<typeof useAnimationControls>
-    titlesCtrl: ReturnType<typeof useAnimationControls>
     dragBounds: { left: number; right: number }
     onDragPositionChange?: (x: number) => void
 }
 
 export const useCarouselDrag = ({
     xImages,
-    imagesCtrl,
-    titlesCtrl,
     dragBounds,
     onDragPositionChange,
 }: UseCarouselDragOptions) => {
@@ -39,6 +30,21 @@ export const useCarouselDrag = ({
     const lastMoveTime = useRef<number>(0)
     const lastMoveX = useRef<number>(0)
     const velocityX = useRef<number>(0)
+    const xAnimation = useRef<ReturnType<typeof animate> | null>(null)
+    const windowListeners = useRef<{
+        move: (e: PointerEvent) => void
+        up: (e: PointerEvent) => void
+        cancel: (e: PointerEvent) => void
+    } | null>(null)
+
+    const clearWindowListeners = useCallback(() => {
+        if (!windowListeners.current) return
+
+        window.removeEventListener('pointermove', windowListeners.current.move)
+        window.removeEventListener('pointerup', windowListeners.current.up)
+        window.removeEventListener('pointercancel', windowListeners.current.cancel)
+        windowListeners.current = null
+    }, [])
 
     const updateDragPosition = useCallback(
         (clientX: number) => {
@@ -62,24 +68,15 @@ export const useCarouselDrag = ({
             if (onDragPositionChange) {
                 onDragPositionChange(clamped)
             }
-
-            imagesCtrl.start({
-                x: clamped,
-                transition: IMAGE_SPRING,
-            })
-
-            titlesCtrl.start({
-                x: clamped,
-                transition: TITLE_SPRING,
-            })
         },
-        [dragBounds.left, dragBounds.right, imagesCtrl, onDragPositionChange, titlesCtrl, xImages],
+        [dragBounds.left, dragBounds.right, onDragPositionChange, xImages],
     )
 
     const finishDrag = useCallback(
         (pointerId: number, shouldApplyInertia: boolean) => {
             if (!isDragging || activePointerId.current !== pointerId) return
 
+            clearWindowListeners()
             activePointerId.current = null
             setIsDragging(false)
             const currentX = xImages.get()
@@ -91,41 +88,26 @@ export const useCarouselDrag = ({
             const hasSignificantVelocity = Math.abs(velocity) > MIN_VELOCITY_FOR_INERTIA
 
             if (hasSignificantVelocity) {
-                xImages.set(clampedTargetX)
-
                 if (onDragPositionChange) {
                     onDragPositionChange(clampedTargetX)
                 }
 
-                imagesCtrl.start({
-                    x: clampedTargetX,
-                    transition: IMAGE_INERTIA_SPRING,
-                })
-                titlesCtrl.start({
-                    x: clampedTargetX,
-                    transition: TITLE_INERTIA_SPRING,
-                })
+                xAnimation.current?.stop()
+                xAnimation.current = animate(xImages, clampedTargetX, IMAGE_INERTIA_SPRING)
             } else {
                 if (onDragPositionChange) {
                     onDragPositionChange(currentX)
                 }
-
-                imagesCtrl.start({
-                    x: currentX,
-                    transition: IMAGE_SNAP_TRANSITION,
-                })
-                titlesCtrl.start({
-                    x: currentX,
-                    transition: TITLE_SNAP_TRANSITION,
-                })
             }
         },
-        [dragBounds.left, dragBounds.right, imagesCtrl, isDragging, onDragPositionChange, titlesCtrl, xImages],
+        [clearWindowListeners, dragBounds.left, dragBounds.right, isDragging, onDragPositionChange, xImages],
     )
 
     const onPointerDown = (e: React.PointerEvent) => {
         if (activePointerId.current !== null) return
 
+        xAnimation.current?.stop()
+        clearWindowListeners()
         activePointerId.current = e.pointerId
         setIsDragging(true)
         dragStartX.current = e.clientX
@@ -137,12 +119,32 @@ export const useCarouselDrag = ({
         lastMoveTime.current = Date.now()
         lastMoveX.current = currentX
         velocityX.current = 0
+
+        const handleWindowPointerMove = (event: PointerEvent) => {
+            if (activePointerId.current !== event.pointerId) return
+            updateDragPosition(event.clientX)
+        }
+
+        const handleWindowPointerUp = (event: PointerEvent) => {
+            finishDrag(event.pointerId, true)
+        }
+
+        const handleWindowPointerCancel = (event: PointerEvent) => {
+            finishDrag(event.pointerId, false)
+        }
+
+        window.addEventListener('pointermove', handleWindowPointerMove)
+        window.addEventListener('pointerup', handleWindowPointerUp)
+        window.addEventListener('pointercancel', handleWindowPointerCancel)
+
+        windowListeners.current = {
+            move: handleWindowPointerMove,
+            up: handleWindowPointerUp,
+            cancel: handleWindowPointerCancel,
+        }
     }
 
-    const onPointerMove = (e: React.PointerEvent) => {
-        if (!isDragging || activePointerId.current !== e.pointerId) return
-        updateDragPosition(e.clientX)
-    }
+    const onPointerMove = () => {}
 
     const onPointerUp = (e: React.PointerEvent) => {
         finishDrag(e.pointerId, true)
@@ -153,31 +155,11 @@ export const useCarouselDrag = ({
     }
 
     useEffect(() => {
-        if (!isDragging) return
-
-        const handleWindowPointerMove = (e: PointerEvent) => {
-            if (activePointerId.current !== e.pointerId) return
-            updateDragPosition(e.clientX)
-        }
-
-        const handleWindowPointerUp = (e: PointerEvent) => {
-            finishDrag(e.pointerId, true)
-        }
-
-        const handleWindowPointerCancel = (e: PointerEvent) => {
-            finishDrag(e.pointerId, false)
-        }
-
-        window.addEventListener('pointermove', handleWindowPointerMove)
-        window.addEventListener('pointerup', handleWindowPointerUp)
-        window.addEventListener('pointercancel', handleWindowPointerCancel)
-
         return () => {
-            window.removeEventListener('pointermove', handleWindowPointerMove)
-            window.removeEventListener('pointerup', handleWindowPointerUp)
-            window.removeEventListener('pointercancel', handleWindowPointerCancel)
+            xAnimation.current?.stop()
+            clearWindowListeners()
         }
-    }, [finishDrag, isDragging, updateDragPosition])
+    }, [clearWindowListeners])
 
     // Le wheel scroll n'est plus géré ici, c'est le scroll naturel
     // de la page qui est transformé en mouvement horizontal via le pinning
