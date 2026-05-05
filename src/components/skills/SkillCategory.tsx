@@ -1,5 +1,3 @@
-'use client'
-
 import SkillDiv from './SkillDiv'
 import { SkillChild } from '@/types/SkillsTypes'
 

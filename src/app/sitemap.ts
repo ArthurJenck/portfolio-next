@@ -1,27 +1,24 @@
 import { MetadataRoute } from 'next'
-import connectDB from '@/lib/mongodb'
-import Project from '@/models/Project'
+import { getPublicCv, getPublicProjectSitemapEntries } from '@/lib/public-content'
 
 const BASE_URL = 'https://arthurjenck.com'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     try {
-        await connectDB()
-
-        // Récupérer tous les projets avec leurs slugs et dates de mise à jour
-        const projects = await Project.find({}, 'slug updatedAt').lean()
+        const [projects, cv] = await Promise.all([getPublicProjectSitemapEntries(), getPublicCv()])
+        const latestProjectUpdate = projects[0] ? new Date(projects[0].updatedAt) : new Date()
 
         // URLs statiques
         const staticRoutes: MetadataRoute.Sitemap = [
             {
                 url: BASE_URL,
-                lastModified: new Date(),
+                lastModified: latestProjectUpdate,
                 changeFrequency: 'weekly',
                 priority: 1,
             },
             {
                 url: `${BASE_URL}/cv`,
-                lastModified: new Date(),
+                lastModified: cv ? new Date(cv.uploadedAt) : latestProjectUpdate,
                 changeFrequency: 'monthly',
                 priority: 0.8,
             },
@@ -30,7 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         // URLs dynamiques des projets
         const projectRoutes: MetadataRoute.Sitemap = projects.map((project) => ({
             url: `${BASE_URL}/${project.slug}`,
-            lastModified: project.updatedAt || new Date(),
+            lastModified: new Date(project.updatedAt),
             changeFrequency: 'monthly' as const,
             priority: 0.7,
         }))

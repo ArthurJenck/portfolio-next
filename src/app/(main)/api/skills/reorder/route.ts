@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import Skill from '@/models/Skill'
+import { revalidateSkillsContent } from '@/lib/revalidate-public-content'
 
 export async function POST(request: Request) {
     const auth = await requireAuth(request)
@@ -35,6 +36,7 @@ export async function POST(request: Request) {
 
         await currentSkill.save()
         await swapSkill.save()
+        revalidateSkillsContent()
 
         return NextResponse.json({ success: true })
     } catch (error) {

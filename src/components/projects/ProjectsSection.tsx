@@ -1,14 +1,9 @@
-'use client'
-
 import MobileProjectsList from './MobileProjectsList'
-import MobileProjectsListSkeleton from './MobileProjectsListSkeleton'
 import ProjectsCarousel from './ProjectsCarousel'
 import SectionTitle from '@/components/SectionTitle'
-import { useProjects } from '@/hooks/useProjects'
+import { ProjectResponse } from '@/types/ProjectTypes'
 
-const Projets = () => {
-    const { data: projects, isLoading, error } = useProjects()
-
+const Projets = ({ projects }: { projects: ProjectResponse }) => {
     return (
         <section id="projets" className="relative h-full md:h-[600vh]">
             {/* Container sticky qui reste fixé pendant le scroll - contient tout */}
@@ -19,25 +14,11 @@ const Projets = () => {
                 </div>
 
                 <div className="hidden md:flex items-center flex-1">
-                    {(error || !projects) && !isLoading ? (
-                        <div className="flex items-center justify-center w-full h-full">
-                            <div className="text-red-500">Erreur lors du chargement des projets</div>
-                        </div>
-                    ) : (
-                        <ProjectsCarousel projects={projects || []} isLoading={isLoading} />
-                    )}
+                    <ProjectsCarousel projects={projects} />
                 </div>
 
                 <div className="md:hidden flex-1">
-                    {isLoading ? (
-                        <MobileProjectsListSkeleton />
-                    ) : error || !projects ? (
-                        <div className="flex items-center justify-center w-full h-full">
-                            <div className="text-red-500">Erreur lors du chargement des projets</div>
-                        </div>
-                    ) : (
-                        <MobileProjectsList projects={projects} />
-                    )}
+                    <MobileProjectsList projects={projects} />
                 </div>
             </div>
         </section>

@@ -3,23 +3,18 @@ import { requireAuth } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import CV from '@/models/CV'
 import { del } from '@vercel/blob'
+import { getPublicCv } from '@/lib/public-content'
+import { revalidateCvContent } from '@/lib/revalidate-public-content'
 
 export async function GET() {
     try {
-        await connectDB()
-        const cv = await CV.findOne()
+        const cv = await getPublicCv()
 
         if (!cv) {
             return NextResponse.json({ error: 'CV not found' }, { status: 404 })
         }
 
-        return NextResponse.json({
-            id: cv._id.toString(),
-            url: cv.url,
-            fileName: cv.fileName,
-            customName: cv.customName,
-            uploadedAt: cv.uploadedAt,
-        })
+        return NextResponse.json(cv)
     } catch (error) {
         console.error('Error fetching CV:', error)
         return NextResponse.json({ error: 'Failed to fetch CV' }, { status: 500 })
@@ -61,6 +56,8 @@ export async function POST(request: Request) {
         } else {
             cv = await CV.create(cvData)
         }
+
+        revalidateCvContent()
 
         return NextResponse.json({
             id: cv._id.toString(),

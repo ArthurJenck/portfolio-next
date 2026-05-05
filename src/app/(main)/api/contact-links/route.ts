@@ -2,22 +2,12 @@ import { NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import ContactLink from '@/models/ContactLink'
+import { getPublicContactLinks } from '@/lib/public-content'
+import { revalidateContactLinksContent } from '@/lib/revalidate-public-content'
 
 export async function GET() {
     try {
-        await connectDB()
-        const contactLinks = await ContactLink.find().sort({ order: 1 })
-
-        const response = contactLinks.map((link) => ({
-            id: link._id.toString(),
-            _id: link._id.toString(),
-            href: link.href,
-            display_text: link.display_text,
-            copy_text: link.copy_text,
-            order: link.order,
-        }))
-
-        return NextResponse.json(response)
+        return NextResponse.json(await getPublicContactLinks())
     } catch (error) {
         console.error('Error fetching contact links:', error)
         return NextResponse.json({ error: 'Failed to fetch contact links' }, { status: 500 })
@@ -39,6 +29,7 @@ export async function POST(request: Request) {
         }
 
         const contactLink = await ContactLink.create(body)
+        revalidateContactLinksContent()
 
         return NextResponse.json(contactLink, { status: 201 })
     } catch (error) {

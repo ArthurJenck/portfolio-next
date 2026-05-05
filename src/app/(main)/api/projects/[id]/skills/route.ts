@@ -4,6 +4,7 @@ import connectDB from '@/lib/mongodb'
 import Project from '@/models/Project'
 import Skill from '@/models/Skill'
 import { Types } from 'mongoose'
+import { revalidateProjectSkillsContent } from '@/lib/revalidate-public-content'
 
 interface SkillWithStatus {
     id: string
@@ -82,6 +83,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         const project = await Project.findByIdAndUpdate(id, { stack: validSkillIds }, { new: true })
 
         if (!project) return NextResponse.json({ error: 'Project not found' }, { status: 404 })
+
+        revalidateProjectSkillsContent(project.slug)
 
         return NextResponse.json({
             success: true,

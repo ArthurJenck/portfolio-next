@@ -4,16 +4,23 @@ import About from '@/components/about/AboutSection'
 import Contact from '@/components/contact/ContactSection'
 import Projets from '@/components/projects/ProjectsSection'
 import FastTravel from '@/components/FastTravel/FastTravel'
+import { getPublicContactLinks, getPublicProjects, getPublicSkillCategories } from '@/lib/public-content'
 
-const Home = () => {
+const Home = async () => {
+    const [skillCategories, projects, contactLinks] = await Promise.all([
+        getPublicSkillCategories(),
+        getPublicProjects(),
+        getPublicContactLinks(),
+    ])
+
     return (
         <>
             <FastTravel />
             <Header />
-            <Skills />
-            <Projets />
+            <Skills skillCategories={skillCategories} />
+            <Projets projects={projects} />
             <About />
-            <Contact />
+            <Contact contactLinks={contactLinks} />
         </>
     )
 }

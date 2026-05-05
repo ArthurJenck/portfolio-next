@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import SkillCategory from '@/models/SkillCategory'
+import { revalidateSkillsContent } from '@/lib/revalidate-public-content'
 
 export async function GET() {
     try {
@@ -30,6 +31,7 @@ export async function POST(request: Request) {
         }
 
         const category = await SkillCategory.create(body)
+        revalidateSkillsContent()
 
         return NextResponse.json(category, { status: 201 })
     } catch (error) {

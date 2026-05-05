@@ -3,6 +3,7 @@ import { requireAuth } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import CV from '@/models/CV'
 import { del } from '@vercel/blob'
+import { revalidateCvContent } from '@/lib/revalidate-public-content'
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
@@ -46,6 +47,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         }
 
         const cv = await CV.findByIdAndUpdate(id, body, { new: true })
+        revalidateCvContent()
 
         return NextResponse.json({
             id: cv._id.toString(),
@@ -78,6 +80,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
         }
 
         await CV.findByIdAndDelete(id)
+        revalidateCvContent()
 
         return NextResponse.json({ success: true })
     } catch (error) {

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import ContactLink from '@/models/ContactLink'
+import { revalidateContactLinksContent } from '@/lib/revalidate-public-content'
 
 export async function POST(request: Request) {
     const auth = await requireAuth(request)
@@ -41,6 +42,8 @@ export async function POST(request: Request) {
                 await ContactLink.findByIdAndUpdate(nextLink._id, { order: currentOrder })
             }
         }
+
+        revalidateContactLinksContent()
 
         return NextResponse.json({ success: true })
     } catch (error) {

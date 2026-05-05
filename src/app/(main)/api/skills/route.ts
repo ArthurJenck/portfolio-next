@@ -2,37 +2,12 @@ import { NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import Skill from '@/models/Skill'
-import SkillCategory from '@/models/SkillCategory'
-import { Types } from 'mongoose'
-
-interface PopulatedSkill {
-    _id: Types.ObjectId
-    name: string
-    icon?: string
-    description?: string
-}
+import { getPublicSkillCategories } from '@/lib/public-content'
+import { revalidateSkillsContent } from '@/lib/revalidate-public-content'
 
 export async function GET() {
     try {
-        await connectDB()
-
-        // Récupérer toutes les catégories triées par order avec populate des skills
-        const categories = await SkillCategory.find().sort({ order: 1 }).populate('skills')
-
-        // Construire la réponse avec les skills de chaque catégorie
-        const response = categories.map((category) => ({
-            id: category._id.toString(),
-            name: category.name,
-            truncatedName: category.truncatedName,
-            skills: (category.skills as unknown as PopulatedSkill[]).map((skill) => ({
-                id: skill._id.toString(),
-                name: skill.name,
-                icon: skill.icon || '',
-                description: skill.description || '',
-            })),
-        }))
-
-        return NextResponse.json(response)
+        return NextResponse.json(await getPublicSkillCategories())
     } catch (error) {
         console.error('Error fetching skills:', error)
         return NextResponse.json({ error: 'Failed to fetch skills' }, { status: 500 })
@@ -54,6 +29,7 @@ export async function POST(request: Request) {
         }
 
         const skill = await Skill.create(body)
+        revalidateSkillsContent()
 
         return NextResponse.json(skill, { status: 201 })
     } catch (error) {

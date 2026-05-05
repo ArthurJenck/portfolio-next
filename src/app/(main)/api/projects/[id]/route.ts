@@ -6,6 +6,7 @@ import Skill from '@/models/Skill'
 import { Types } from 'mongoose'
 import { generateSlug, normalizeColor } from '@/lib/utils'
 import { del } from '@vercel/blob'
+import { revalidateProjectContent } from '@/lib/revalidate-public-content'
 
 interface PopulatedSkill {
     _id: Types.ObjectId
@@ -146,6 +147,13 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
         const project = await Project.findByIdAndUpdate(id, updateData, { new: true })
 
+        if (!project) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+        revalidateProjectContent({
+            currentSlug: project.slug,
+            previousSlug: currentProject.slug,
+        })
+
         return NextResponse.json(project)
     } catch (error) {
         console.error('Error updating project:', error)
@@ -188,6 +196,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 
         // Supprimer le projet de MongoDB
         await Project.findByIdAndDelete(id)
+        revalidateProjectContent({ previousSlug: project.slug })
 
         return NextResponse.json({ success: true })
     } catch (error) {

@@ -1,17 +1,9 @@
-'use client'
+import { getPublicCv } from '@/lib/public-content'
 
-import { useEffect } from 'react'
-import { useCV } from '@/hooks/useCV'
+const CV = async () => {
+    const cv = await getPublicCv()
 
-const CV = () => {
-    const { data: cv, isLoading, error } = useCV()
-
-    useEffect(() => {
-        document.title = 'Arthur Jenck – CV'
-        document.body.style.overflow = 'hidden'
-    }, [])
-
-    if (isLoading) {
+    if (!cv) {
         return (
             <div
                 style={{
@@ -22,23 +14,7 @@ const CV = () => {
                     fontFamily: 'system-ui',
                 }}
             >
-                Chargement du CV...
-            </div>
-        )
-    }
-
-    if (error || !cv) {
-        return (
-            <div
-                style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: '100dvh',
-                    fontFamily: 'system-ui',
-                }}
-            >
-                Erreur lors du chargement du CV
+                CV introuvable
             </div>
         )
     }

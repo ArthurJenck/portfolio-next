@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Sora } from 'next/font/google'
 import '../globals.css'
-import { QueryProvider } from '@/providers/QueryProvider'
 
 const sora = Sora({
     subsets: ['latin'],
@@ -42,7 +41,7 @@ export default function CVLayout({
 }>) {
     return (
         <html lang="fr">
-            <body className={sora.className}>
+            <body className={`${sora.className} overflow-hidden`}>
                 <div
                     className="fixed inset-0 h-svh -z-10 top-svh"
                     style={{
@@ -52,7 +51,7 @@ export default function CVLayout({
                         backgroundPosition: '0 0',
                     }}
                 />
-                <QueryProvider>{children}</QueryProvider>
+                {children}
             </body>
         </html>
     )

@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server'
-import connectDB from '@/lib/mongodb'
-import CV from '@/models/CV'
+import { getPublicCv } from '@/lib/public-content'
 
 export async function GET() {
     try {
-        await connectDB()
-        const cv = await CV.findOne()
+        const cv = await getPublicCv()
 
         if (!cv) {
             return NextResponse.json({ error: 'CV not found' }, { status: 404 })

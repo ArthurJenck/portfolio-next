@@ -1,16 +1,16 @@
 import ProjectPage from '@/components/projects/project/ProjectPage'
 import { Metadata } from 'next'
-import connectDB from '@/lib/mongodb'
-import Project, { IProject } from '@/models/Project'
+import { notFound } from 'next/navigation'
+import { getPublicProjectBySlug, getPublicProjectSitemapEntries } from '@/lib/public-content'
 
 const BASE_URL = 'https://arthurjenck.com'
+export const dynamicParams = true
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params
 
     try {
-        await connectDB()
-        const project = (await Project.findOne({ slug }).lean()) as unknown as IProject | null
+        const project = await getPublicProjectBySlug(slug)
 
         if (!project) {
             return {
@@ -56,8 +56,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export async function generateStaticParams() {
     try {
-        await connectDB()
-        const projects = (await Project.find({}, 'slug').lean()) as unknown as Pick<IProject, 'slug'>[]
+        const projects = await getPublicProjectSitemapEntries()
 
         return projects.map((project) => ({
             slug: project.slug,
@@ -68,8 +67,15 @@ export async function generateStaticParams() {
     }
 }
 
-const page = () => {
-    return <ProjectPage />
+const Page = async ({ params }: { params: Promise<{ slug: string }> }) => {
+    const { slug } = await params
+    const project = await getPublicProjectBySlug(slug)
+
+    if (!project) {
+        notFound()
+    }
+
+    return <ProjectPage project={project} />
 }
 
-export default page
+export default Page

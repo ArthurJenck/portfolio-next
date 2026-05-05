@@ -1,31 +1,19 @@
-'use client'
-
 import SectionTitle from '@/components/SectionTitle'
 import SkillCategory from './SkillCategory'
-import { useSkills } from '@/hooks/useSkills'
-import SkillsSkeleton from './SkillsSkeleton'
+import { SkillResponse } from '@/types/SkillsTypes'
 
-const Skills = () => {
-    const { data: skillCategories, isLoading, error } = useSkills()
-
+const Skills = ({ skillCategories }: { skillCategories: SkillResponse }) => {
     return (
         <section id="skills" className="py-16 relative">
             <SectionTitle title="Compétences" />
-            {/* Chaque catégorie (Front-end, Back...) aura sa propre partie */}
-            {isLoading ? (
-                <SkillsSkeleton />
-            ) : error || !skillCategories ? (
-                <div>Erreur lors du chargement des compétences</div>
-            ) : (
-                skillCategories?.map((category) => (
-                    <SkillCategory
-                        key={category.id}
-                        name={category.name}
-                        truncatedName={category.truncatedName}
-                        skills={category.skills}
-                    />
-                ))
-            )}
+            {skillCategories.map((category) => (
+                <SkillCategory
+                    key={category.id}
+                    name={category.name}
+                    truncatedName={category.truncatedName}
+                    skills={category.skills}
+                />
+            ))}
         </section>
     )
 }

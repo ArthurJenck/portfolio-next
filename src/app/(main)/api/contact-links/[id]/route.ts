@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import ContactLink from '@/models/ContactLink'
+import { revalidateContactLinksContent } from '@/lib/revalidate-public-content'
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
@@ -48,6 +49,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         const contactLink = await ContactLink.findByIdAndUpdate(id, updateData, { new: true })
 
         if (!contactLink) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+        revalidateContactLinksContent()
 
         return NextResponse.json(contactLink)
     } catch (error) {
@@ -68,6 +70,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
         if (!contactLink) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
         await ContactLink.findByIdAndDelete(id)
+        revalidateContactLinksContent()
 
         return NextResponse.json({ success: true })
     } catch (error) {

@@ -1,7 +1,5 @@
 import type { Metadata } from 'next'
 import '@/app/globals.css'
-import { QueryProvider } from '@/providers/QueryProvider'
-import { PrefetchProvider } from '@/providers/PrefetchProvider'
 import { MotionProvider } from '@/providers/MotionProvider'
 import { cn } from '@/lib/utils'
 import { SpeedInsights } from '@vercel/speed-insights/next'
@@ -134,20 +132,16 @@ export default function RootLayout({
                         backgroundPosition: '0 0',
                     }}
                 />
-                <QueryProvider>
-                    <PrefetchProvider>
-                        <MotionProvider>
-                            <div className="min-h-screen flex flex-col">
-                                <NavBar />
-                                {children}
-                                <Footer />
-                            </div>
-                            {/* TODO: remettre le debug */}
-                            <Analytics debug={false} />
-                            <SpeedInsights debug={false} />
-                        </MotionProvider>
-                    </PrefetchProvider>
-                </QueryProvider>
+                <MotionProvider>
+                    <div className="min-h-screen flex flex-col">
+                        <NavBar />
+                        {children}
+                        <Footer />
+                    </div>
+                    {/* TODO: remettre le debug */}
+                    <Analytics debug={false} />
+                    <SpeedInsights debug={false} />
+                </MotionProvider>
             </body>
         </html>
     )

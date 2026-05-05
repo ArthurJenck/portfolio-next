@@ -3,6 +3,7 @@
 Base URL : `https://arthurjenck.com`  
 Toutes les routes d'écriture exigent le header `Authorization: Bearer $ADMIN_API_TOKEN`.  
 Les routes GET sont publiques sauf mention contraire.
+Les mutations qui touchent le contenu public déclenchent une revalidation ciblée du portfolio (`/`, pages projet concernées, `/cv`, `sitemap`) pour republier les changements sans redeploy.
 
 ## Setup
 
