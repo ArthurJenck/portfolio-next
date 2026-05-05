@@ -249,7 +249,7 @@ const ProjectsCarousel = ({ projects, isLoading = false }: ProjecsCarouselProps)
                     onPointerDown={handlers.onPointerDown}
                     onPointerMove={handlers.onPointerMove}
                     onPointerUp={handlers.onPointerUp}
-                    onPointerLeave={handlers.onPointerUp}
+                    onPointerCancel={handlers.onPointerCancel}
                 >
                     {isLoading
                         ? skeletonItems.map((item) => (

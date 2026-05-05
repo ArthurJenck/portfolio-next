@@ -34,12 +34,17 @@ export const useCarouselDrag = ({
 
     const dragStartX = useRef(0)
     const contentStartX = useRef(0)
+    const activePointerId = useRef<number | null>(null)
 
     const lastMoveTime = useRef<number>(0)
     const lastMoveX = useRef<number>(0)
     const velocityX = useRef<number>(0)
 
     const onPointerDown = (e: React.PointerEvent) => {
+        if (activePointerId.current !== null) return
+
+        activePointerId.current = e.pointerId
+        e.currentTarget.setPointerCapture(e.pointerId)
         setIsDragging(true)
         dragStartX.current = e.clientX
 
@@ -53,7 +58,7 @@ export const useCarouselDrag = ({
     }
 
     const onPointerMove = (e: React.PointerEvent) => {
-        if (!isDragging) return
+        if (!isDragging || activePointerId.current !== e.pointerId) return
         const deltaX = (e.clientX - dragStartX.current) * DRAG_MULTIPLIER
         const newX = contentStartX.current + deltaX
         const clamped = clamp(newX, dragBounds.left, dragBounds.right)
@@ -86,13 +91,14 @@ export const useCarouselDrag = ({
         })
     }
 
-    const onPointerUp = () => {
-        if (!isDragging) return
+    const finishDrag = (pointerId: number, shouldApplyInertia: boolean) => {
+        if (!isDragging || activePointerId.current !== pointerId) return
 
+        activePointerId.current = null
         setIsDragging(false)
         const currentX = xImages.get()
 
-        const velocity = velocityX.current
+        const velocity = shouldApplyInertia ? velocityX.current : 0
         const targetX = currentX + velocity * INERTIA_DURATION_MS * INERTIA_FACTOR
         const clampedTargetX = clamp(targetX, dragBounds.left, dragBounds.right)
 
@@ -131,6 +137,14 @@ export const useCarouselDrag = ({
         }
     }
 
+    const onPointerUp = (e: React.PointerEvent) => {
+        finishDrag(e.pointerId, true)
+    }
+
+    const onPointerCancel = (e: React.PointerEvent) => {
+        finishDrag(e.pointerId, false)
+    }
+
     // Le wheel scroll n'est plus géré ici, c'est le scroll naturel
     // de la page qui est transformé en mouvement horizontal via le pinning
 
@@ -140,6 +154,7 @@ export const useCarouselDrag = ({
             onPointerDown,
             onPointerMove,
             onPointerUp,
+            onPointerCancel,
         },
     }
 }
