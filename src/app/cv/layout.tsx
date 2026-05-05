@@ -40,7 +40,7 @@ export default function CVLayout({
     children: React.ReactNode
 }>) {
     return (
-        <html lang="fr">
+        <html lang="fr" data-scroll-behavior="smooth">
             <body className={`${sora.className} overflow-hidden`}>
                 <div
                     className="fixed inset-0 h-svh -z-10 top-svh"
