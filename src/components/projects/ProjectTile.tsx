@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
 
+const IMAGE_REST_SCALE = 1.35
+const IMAGE_HOVER_SCALE = 1
+
 interface ProjectTileProps {
     width: number
     height: number
@@ -113,7 +116,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
                 targets: img,
                 duration: 900,
                 easing: 'cubicBezier(0.2, 1, 0.3, 1)',
-                scale: 0.7,
+                scale: IMAGE_HOVER_SCALE,
             })
         }
 
@@ -156,7 +159,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
                 targets: img,
                 duration: 900,
                 easing: 'cubicBezier(0.2, 1, 0.3, 1)',
-                scale: 1,
+                scale: IMAGE_REST_SCALE,
             })
         }
 
@@ -259,11 +262,15 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
                         draggable={false}
                         onDragStart={(e) => e.preventDefault()}
                         ref={imgRef}
-                        className="relative block flex-none max-w-none w-auto h-auto select-none pointer-events-none"
+                        className="select-none pointer-events-none object-cover will-change-transform"
                         src={imageUrl}
                         alt="Image"
-                        width={1920}
-                        height={1080}
+                        fill
+                        sizes={`${width}px`}
+                        style={{
+                            transform: `scale(${IMAGE_REST_SCALE})`,
+                            transformOrigin: 'center center',
+                        }}
                     />
                 </div>
             </div>
