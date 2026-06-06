@@ -45,9 +45,9 @@ export const ProjectEdit = () => (
                 source="description"
                 label="Description"
                 multiline
-                rows={4}
+                rows={6}
                 validate={required()}
-                helperText="Description détaillée pour la page du projet"
+                helperText="Markdown pour la page projet : séparer les paragraphes par une ligne vide. Chaque paragraphe devient une colonne."
             />
             <ColorInput source="color" label="Couleur" helperText="Couleur d'accentuation du projet (ex: #f0f0f0)" />
             <FileUploadInput
@@ -87,9 +87,9 @@ export const ProjectCreate = () => (
                 source="description"
                 label="Description"
                 multiline
-                rows={4}
+                rows={6}
                 validate={required()}
-                helperText="Description détaillée pour la page du projet"
+                helperText="Markdown pour la page projet : séparer les paragraphes par une ligne vide. Chaque paragraphe devient une colonne."
             />
             <ColorInput source="color" label="Couleur" helperText="Couleur d'accentuation du projet (ex: #f0f0f0)" />
             <FileUploadInput

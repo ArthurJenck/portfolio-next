@@ -60,7 +60,7 @@ curl -s -X POST https://arthurjenck.com/api/projects \
     "subtitle": "Sous-titre optionnel",
     "date": "2024-06-01T00:00:00.000Z",
     "summary": "Résumé affiché en listing.",
-    "description": "Description longue en **Markdown**.",
+    "description": "Paragraphe 1 en **Markdown**.\n\nParagraphe 2 en Markdown.\n\nParagraphe 3 en Markdown.",
     "cover_image": "https://xxxx.vercel-storage.com/cover.png",
     "stack": ["<skill_id_1>", "<skill_id_2>"],
     "medias": [
@@ -94,6 +94,7 @@ curl -s https://arthurjenck.com/api/projects/<id>/skills \
 
 **Gotchas** :
 - `name`, `date`, `summary`, `description`, `cover_image` sont requis à la création
+- `description` accepte du Markdown : séparer chaque paragraphe par une ligne vide (`\n\n`). Sur la page projet, chaque paragraphe devient une colonne.
 - `slug` est auto-généré depuis `name` si absent (alphanumérique + tirets, unique)
 - `color` est normalisée (hex : `#rgb`, `#rrggbb`, `#rrggbbaa`)
 - `stack` attend des ObjectId Mongo en string — récupérer les IDs via `/api/skills/all` d'abord
