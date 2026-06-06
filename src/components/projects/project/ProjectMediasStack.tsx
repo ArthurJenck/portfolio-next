@@ -24,13 +24,26 @@ const ProjectMediasStack = ({ medias, projectName }: ProjectMediasStackProps) =>
                                 className="absolute inset-0 w-full h-full object-cover"
                             />
                         ) : (
-                            <Image
-                                src={media.url}
-                                alt={`${projectName} - media ${i + 1}`}
-                                fill
-                                className="object-cover"
-                                sizes="100vw"
-                            />
+                            <>
+                                {media.mobileUrl && (
+                                    <Image
+                                        src={media.mobileUrl}
+                                        alt={`${projectName} - media ${i + 1}`}
+                                        fill
+                                        className="object-cover md:hidden"
+                                        sizes="100vw"
+                                        quality={90}
+                                    />
+                                )}
+                                <Image
+                                    src={media.url}
+                                    alt={`${projectName} - media ${i + 1}`}
+                                    fill
+                                    className={`object-cover${media.mobileUrl ? ' hidden md:block' : ''}`}
+                                    sizes="100vw"
+                                    quality={90}
+                                />
+                            </>
                         )}
                     </div>
                 </section>

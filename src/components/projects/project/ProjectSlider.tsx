@@ -12,12 +12,13 @@ import './ProjectPage.scss'
 interface ProjectSliderProps {
     name: string
     coverImage: string
+    mobileCoverImage?: string
     children: ReactNode
 }
 
 const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min), max)
 
-const ProjectSlider = ({ name, coverImage, children }: ProjectSliderProps) => {
+const ProjectSlider = ({ name, coverImage, mobileCoverImage, children }: ProjectSliderProps) => {
     const prefersReducedMotion = usePrefersReducedMotion()
     const coverProgress = useMotionValue(0)
 
@@ -89,7 +90,7 @@ const ProjectSlider = ({ name, coverImage, children }: ProjectSliderProps) => {
 
     return (
         <ProjectSliderContext.Provider value={value}>
-            <ProjectCoverBackground name={name} coverImage={coverImage} />
+            <ProjectCoverBackground name={name} coverImage={coverImage} mobileCoverImage={mobileCoverImage} />
             <div className="embla" ref={emblaRef}>
                 <div className="embla__container">{children}</div>
             </div>

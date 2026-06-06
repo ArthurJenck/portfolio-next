@@ -7,9 +7,10 @@ import { useProjectSlider } from './ProjectSliderContext'
 interface ProjectCoverBackgroundProps {
     name: string
     coverImage: string
+    mobileCoverImage?: string
 }
 
-const ProjectCoverBackground = ({ name, coverImage }: ProjectCoverBackgroundProps) => {
+const ProjectCoverBackground = ({ name, coverImage, mobileCoverImage }: ProjectCoverBackgroundProps) => {
     const { coverProgress } = useProjectSlider()
 
     const blurPx = useTransform(coverProgress, [0.25, 1], [0, 5])
@@ -21,7 +22,10 @@ const ProjectCoverBackground = ({ name, coverImage }: ProjectCoverBackgroundProp
     return (
         <div className="project-cover-background fixed inset-0 overflow-hidden">
             <motion.div className="absolute inset-0" style={{ filter: imageFilter }}>
-                <Image src={coverImage} alt={name} fill priority className="object-cover cover-image" sizes="100vw" />
+                {mobileCoverImage && (
+                    <Image src={mobileCoverImage} alt={name} fill priority className="object-cover cover-image md:hidden" sizes="100vw" quality={90} />
+                )}
+                <Image src={coverImage} alt={name} fill priority className={`object-cover cover-image${mobileCoverImage ? ' hidden md:block' : ''}`} sizes="100vw" quality={90} />
             </motion.div>
             <motion.div className="absolute inset-0 bg-black" style={{ opacity: overlayOpacity }} />
         </div>

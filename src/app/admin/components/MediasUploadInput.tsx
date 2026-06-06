@@ -2,7 +2,7 @@
 
 import { useInput } from 'react-admin'
 import { useState, useRef, DragEvent } from 'react'
-import { Upload, X, Loader2, Image as ImageIcon, Video, GripVertical } from 'lucide-react'
+import { Upload, X, Loader2, Image as ImageIcon, Video, GripVertical, Smartphone } from 'lucide-react'
 import {
     DndContext,
     closestCenter,
@@ -27,18 +27,23 @@ interface MediasUploadInputProps {
 interface Media {
     url: string
     type: 'image' | 'video'
+    mobileUrl?: string
 }
 
 interface SortableMediaItemProps {
     media: Media
     index: number
     onRemove: (index: number) => void
+    onAddMobileUrl: (index: number, url: string) => void
+    onRemoveMobileUrl: (index: number) => void
 }
 
-const SortableMediaItem = ({ media, index, onRemove }: SortableMediaItemProps) => {
+const SortableMediaItem = ({ media, index, onRemove, onAddMobileUrl, onRemoveMobileUrl }: SortableMediaItemProps) => {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: `media-${index}`,
     })
+    const [uploadingMobile, setUploadingMobile] = useState(false)
+    const mobileInputRef = useRef<HTMLInputElement>(null)
 
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -48,6 +53,25 @@ const SortableMediaItem = ({ media, index, onRemove }: SortableMediaItemProps) =
 
     const isImage = media.type === 'image'
     const isVideo = media.type === 'video'
+
+    const handleMobileFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        setUploadingMobile(true)
+        try {
+            const formData = new FormData()
+            formData.append('file', file)
+            const response = await fetch('/api/upload', { method: 'POST', body: formData })
+            if (response.ok) {
+                const data = await response.json()
+                onAddMobileUrl(index, data.url)
+            }
+        } finally {
+            setUploadingMobile(false)
+            if (mobileInputRef.current) mobileInputRef.current.value = ''
+        }
+    }
 
     return (
         <div
@@ -84,7 +108,46 @@ const SortableMediaItem = ({ media, index, onRemove }: SortableMediaItemProps) =
                             {media.type === 'image' ? 'Image' : 'Vidéo'}
                         </p>
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 break-all">{media.url}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 break-all mb-3">{media.url}</p>
+
+                    {/* Mobile variant */}
+                    {media.mobileUrl ? (
+                        <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
+                            <Smartphone className="w-4 h-4 text-green-500 flex-shrink-0" />
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={media.mobileUrl} alt="Mobile preview" className="w-10 h-10 object-cover rounded" />
+                            <p className="text-xs text-gray-500 dark:text-gray-400 break-all flex-1 min-w-0">{media.mobileUrl}</p>
+                            <button
+                                type="button"
+                                onClick={() => onRemoveMobileUrl(index)}
+                                className="flex-shrink-0 p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
+                                title="Supprimer variante mobile"
+                            >
+                                <X className="w-4 h-4 text-gray-500" />
+                            </button>
+                        </div>
+                    ) : (
+                        <button
+                            type="button"
+                            disabled={uploadingMobile}
+                            onClick={() => mobileInputRef.current?.click()}
+                            className="flex items-center gap-2 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 border border-dashed border-gray-300 dark:border-gray-600 rounded-md hover:border-gray-400 dark:hover:border-gray-500 transition-colors disabled:opacity-50"
+                        >
+                            {uploadingMobile ? (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                            ) : (
+                                <Smartphone className="w-3 h-3" />
+                            )}
+                            {uploadingMobile ? 'Upload...' : 'Ajouter variante mobile'}
+                        </button>
+                    )}
+                    <input
+                        ref={mobileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleMobileFileChange}
+                        className="hidden"
+                    />
                 </div>
 
                 <button
@@ -167,7 +230,6 @@ export const MediasUploadInput = ({
             await uploadFile(files[i])
         }
 
-        // Reset input
         if (fileInputRef.current) {
             fileInputRef.current.value = ''
         }
@@ -197,6 +259,20 @@ export const MediasUploadInput = ({
 
     const handleRemove = (index: number) => {
         const newMedias = medias.filter((_, i) => i !== index)
+        field.onChange(newMedias)
+    }
+
+    const handleAddMobileUrl = (index: number, url: string) => {
+        const newMedias = medias.map((m, i) => (i === index ? { ...m, mobileUrl: url } : m))
+        field.onChange(newMedias)
+    }
+
+    const handleRemoveMobileUrl = (index: number) => {
+        const newMedias = medias.map((m, i) => {
+            if (i !== index) return m
+            const { mobileUrl: _, ...rest } = m
+            return rest as Media
+        })
         field.onChange(newMedias)
     }
 
@@ -280,6 +356,8 @@ export const MediasUploadInput = ({
                                     media={media}
                                     index={index}
                                     onRemove={handleRemove}
+                                    onAddMobileUrl={handleAddMobileUrl}
+                                    onRemoveMobileUrl={handleRemoveMobileUrl}
                                 />
                             ))}
                         </div>

@@ -35,6 +35,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
             date: project.date.toISOString(),
             slug: project.slug,
             cover_image: project.cover_image,
+            mobile_cover_image: project.mobile_cover_image,
             medias: project.medias || [],
             summary: project.summary,
             description: project.description,
@@ -79,6 +80,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
             'githubLink',
             'webLink',
             'cover_image',
+            'mobile_cover_image',
             'medias',
             'order',
             'color',
@@ -124,22 +126,43 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
                 await del(currentProject.cover_image)
             } catch (error) {
                 console.error('Error deleting old project cover_image from Vercel Blob:', error)
-                // Continue même si la suppression échoue
+            }
+        }
+
+        // Si mobile_cover_image change, supprimer l'ancienne de Vercel Blob
+        if (
+            updateData.mobile_cover_image !== undefined &&
+            currentProject.mobile_cover_image &&
+            updateData.mobile_cover_image !== currentProject.mobile_cover_image
+        ) {
+            try {
+                await del(currentProject.mobile_cover_image)
+            } catch (error) {
+                console.error('Error deleting old project mobile_cover_image from Vercel Blob:', error)
             }
         }
 
         // Si les medias changent, supprimer les anciens medias de Vercel Blob
         if (updateData.medias && Array.isArray(updateData.medias)) {
-            const newMediaUrls = updateData.medias.map((m: { url: string }) => m.url)
+            const newUrls = new Set([
+                ...updateData.medias.map((m: { url: string }) => m.url),
+                ...updateData.medias.filter((m: { mobileUrl?: string }) => m.mobileUrl).map((m: { mobileUrl?: string }) => m.mobileUrl as string),
+            ])
             const oldMedias = currentProject.medias || []
 
             for (const oldMedia of oldMedias) {
-                if (!newMediaUrls.includes(oldMedia.url)) {
+                if (!newUrls.has(oldMedia.url)) {
                     try {
                         await del(oldMedia.url)
                     } catch (error) {
                         console.error('Error deleting old media from Vercel Blob:', error)
-                        // Continue même si la suppression échoue
+                    }
+                }
+                if (oldMedia.mobileUrl && !newUrls.has(oldMedia.mobileUrl)) {
+                    try {
+                        await del(oldMedia.mobileUrl)
+                    } catch (error) {
+                        console.error('Error deleting old media mobileUrl from Vercel Blob:', error)
                     }
                 }
             }
@@ -172,24 +195,24 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 
         if (!project) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-        // Supprimer la cover_image de Vercel Blob
-        if (project.cover_image) {
+        // Supprimer la cover_image et mobile_cover_image de Vercel Blob
+        for (const url of [project.cover_image, project.mobile_cover_image].filter(Boolean)) {
             try {
-                await del(project.cover_image)
+                await del(url as string)
             } catch (error) {
-                console.error('Error deleting project cover_image from Vercel Blob:', error)
-                // Continue même si la suppression échoue
+                console.error('Error deleting project cover from Vercel Blob:', error)
             }
         }
 
-        // Supprimer tous les medias de Vercel Blob
+        // Supprimer tous les medias de Vercel Blob (url + mobileUrl)
         if (project.medias && project.medias.length > 0) {
             for (const media of project.medias) {
-                try {
-                    await del(media.url)
-                } catch (error) {
-                    console.error('Error deleting media from Vercel Blob:', error)
-                    // Continue même si la suppression échoue
+                for (const url of [media.url, media.mobileUrl].filter(Boolean)) {
+                    try {
+                        await del(url as string)
+                    } catch (error) {
+                        console.error('Error deleting media from Vercel Blob:', error)
+                    }
                 }
             }
         }

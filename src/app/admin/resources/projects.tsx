@@ -56,11 +56,16 @@ export const ProjectEdit = () => (
                 required
                 helperText="Taille recommandée : 1440x810 pixels - Utilisée dans la liste des projets"
             />
+            <FileUploadInput
+                source="mobile_cover_image"
+                label="Image de couverture (mobile)"
+                helperText="Optionnel — variante portrait pour mobile (≤767px). Si absente, la cover desktop est utilisée."
+            />
             <MediasUploadInput
                 source="medias"
                 label="Médias du projet"
                 accept="image/*,video/*"
-                helperText="Images et vidéos affichées sur la page du projet (réordonnables par glisser-déposer)"
+                helperText="Images et vidéos affichées sur la page du projet (réordonnables par glisser-déposer). Chaque image peut avoir une variante mobile optionnelle."
             />
             <ProjectSkillsInput source="stack" label="Stack technique" />
             <TextInput source="githubLink" label="Lien GitHub" />
@@ -98,11 +103,16 @@ export const ProjectCreate = () => (
                 required
                 helperText="Taille recommandée : 1440x810 pixels - Utilisée dans la liste des projets"
             />
+            <FileUploadInput
+                source="mobile_cover_image"
+                label="Image de couverture (mobile)"
+                helperText="Optionnel — variante portrait pour mobile (≤767px). Si absente, la cover desktop est utilisée."
+            />
             <MediasUploadInput
                 source="medias"
                 label="Médias du projet"
                 accept="image/*,video/*"
-                helperText="Images et vidéos affichées sur la page du projet (réordonnables par glisser-déposer)"
+                helperText="Images et vidéos affichées sur la page du projet (réordonnables par glisser-déposer). Chaque image peut avoir une variante mobile optionnelle."
             />
             <ProjectSkillsInput source="stack" label="Stack technique" />
             <TextInput source="githubLink" label="Lien GitHub" />

@@ -14,7 +14,7 @@ const ProjectPage = ({ project }: { project: DetailedProjectType }) => {
 
     return (
         <div className="project-page">
-            <ProjectSlider name={project.name} coverImage={project.cover_image}>
+            <ProjectSlider name={project.name} coverImage={project.cover_image} mobileCoverImage={project.mobile_cover_image}>
                 <ProjectCover name={project.name} />
                 <ProjectTextSection
                     subtitle={project.subtitle}

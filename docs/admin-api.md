@@ -29,7 +29,7 @@ curl -s -X POST https://arthurjenck.com/api/upload \
   -F "customName=mon-projet-cover.png"
 ```
 
-`url` est l'URL publique Vercel Blob à injecter dans `cover_image` ou `medias[]`.
+`url` est l'URL publique Vercel Blob à injecter dans `cover_image`, `mobile_cover_image`, `medias[]` ou `medias[].mobileUrl`.
 
 ---
 
@@ -62,9 +62,10 @@ curl -s -X POST https://arthurjenck.com/api/projects \
     "summary": "Résumé affiché en listing.",
     "description": "Paragraphe 1 en **Markdown**.\n\nParagraphe 2 en Markdown.\n\nParagraphe 3 en Markdown.",
     "cover_image": "https://xxxx.vercel-storage.com/cover.png",
+    "mobile_cover_image": "https://xxxx.vercel-storage.com/cover-mobile.png",
     "stack": ["<skill_id_1>", "<skill_id_2>"],
     "medias": [
-      { "url": "https://xxxx.vercel-storage.com/cover.png", "type": "image" }
+      { "url": "https://xxxx.vercel-storage.com/screen.png", "type": "image", "mobileUrl": "https://xxxx.vercel-storage.com/screen-mobile.png" }
     ],
     "githubLink": "https://github.com/...",
     "webLink": "https://...",
@@ -99,6 +100,8 @@ curl -s https://arthurjenck.com/api/projects/<id>/skills \
 - `color` est normalisée (hex : `#rgb`, `#rrggbb`, `#rrggbbaa`)
 - `stack` attend des ObjectId Mongo en string — récupérer les IDs via `/api/skills/all` d'abord
 - `medias[]` est auto-rempli avec `cover_image` si absent/vide à la création
+- `mobile_cover_image` est optionnel — si absent, la cover desktop est affichée sur mobile (fallback automatique)
+- `medias[].mobileUrl` est optionnel — si absent, `medias[].url` est affiché sur tous les viewports
 - `date` en ISO 8601 : `"2024-06-01T00:00:00.000Z"`
 
 ---

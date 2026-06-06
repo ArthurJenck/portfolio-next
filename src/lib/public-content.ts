@@ -47,6 +47,7 @@ interface PopulatedSkill {
 interface ProjectMediaSource {
     url?: string
     type?: 'image' | 'video'
+    mobileUrl?: string
 }
 
 interface ProjectWithOptionalOrder {
@@ -61,6 +62,7 @@ interface ProjectWithOptionalOrder {
     githubLink?: string
     webLink?: string
     cover_image: string
+    mobile_cover_image?: string
     medias?: ProjectMediaSource[]
     color?: string
     order?: number
@@ -89,6 +91,7 @@ const mapProjectMedia = (media: ProjectMediaSource): ProjectMedia | null => {
     return {
         url: media.url,
         type: media.type === 'video' ? 'video' : 'image',
+        mobileUrl: media.mobileUrl,
     }
 }
 
@@ -123,6 +126,7 @@ const mapDetailedProject = (project: ProjectWithOptionalOrder): DetailedProjectT
     date: project.date.toISOString(),
     slug: project.slug,
     cover_image: project.cover_image,
+    mobile_cover_image: project.mobile_cover_image,
     medias: getProjectMedias(project.cover_image, project.medias),
     summary: project.summary,
     description: project.description,

@@ -3,6 +3,7 @@ import { SkillChild } from './SkillsTypes'
 export interface ProjectMedia {
     url: string
     type: 'image' | 'video'
+    mobileUrl?: string
 }
 
 export interface DetailedProjectType {
@@ -12,6 +13,7 @@ export interface DetailedProjectType {
     date: string
     slug: string
     cover_image: string
+    mobile_cover_image?: string
     medias: ProjectMedia[]
     summary: string
     description: string
