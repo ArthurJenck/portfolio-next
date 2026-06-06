@@ -1,6 +1,5 @@
 import { ProjectMedia } from '@/types/ProjectTypes'
 import Image from 'next/image'
-import './ProjectPage.scss'
 
 interface ProjectMediasStackProps {
     medias: ProjectMedia[]
@@ -31,7 +30,6 @@ const ProjectMediasStack = ({ medias, projectName }: ProjectMediasStackProps) =>
                                 fill
                                 className="object-cover"
                                 sizes="100vw"
-                                priority={i === 0}
                             />
                         )}
                     </div>

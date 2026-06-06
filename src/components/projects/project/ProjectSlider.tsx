@@ -54,6 +54,9 @@ const ProjectSlider = ({ name, coverImage, children }: ProjectSliderProps) => {
         if (!emblaApi) return
 
         const handleKeyDown = (event: KeyboardEvent) => {
+            const target = event.target as HTMLElement | null
+            if (target?.closest('a, button, input, textarea, select, [role="button"], [contenteditable]')) return
+
             if (event.key === 'ArrowDown' || event.key === 'PageDown' || event.key === ' ') {
                 event.preventDefault()
                 emblaApi.scrollNext()

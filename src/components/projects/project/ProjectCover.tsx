@@ -4,7 +4,6 @@ import Image from 'next/image'
 import Chevron from '@/assets/icons/chevron.svg'
 import { type KeyboardEvent } from 'react'
 import { useProjectSlider } from './ProjectSliderContext'
-import './ProjectPage.scss'
 
 interface ProjectCoverProps {
     name: string
