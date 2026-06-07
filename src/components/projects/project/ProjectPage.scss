@@ -178,6 +178,14 @@ body.project-scroll-page footer {
         grid-template-columns: 1fr;
         gap: 1rem;
     }
+
+    .project-text-column:nth-child(n + 3) {
+        display: none;
+    }
+
+    .project-text-stack > *:nth-child(n + 4) {
+        display: none;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
