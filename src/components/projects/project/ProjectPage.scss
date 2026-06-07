@@ -165,8 +165,17 @@ body.project-scroll-page footer {
 
 @media (max-width: 767px) {
     .project-text-slide {
-        align-items: flex-start;
-        padding: clamp(5.5rem, 12vh, 7rem) 1.25rem 2.5rem;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 0 1.25rem;
+    }
+
+    .project-text-inner {
+        flex: 0 1 auto;
+        min-height: 0;
+        max-height: 100%;
+        overflow-y: auto;
     }
 
     .project-text-title {
