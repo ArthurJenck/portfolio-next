@@ -36,9 +36,11 @@ const ProjectTextSection = ({ subtitle, columns, stack, webLink, githubLink }: P
                                 {githubLink && <ImgLink type="github" link={githubLink} className="size-11" />}
                             </div>
                         )}
-                        {(webLink || githubLink) && stack.length > 0 && <div className="w-px self-stretch bg-white/30 mx-1 shrink-0" />}
+                        {(webLink || githubLink) && stack.length > 0 && (
+                            <div className="w-px self-stretch bg-white/30 mx-1 shrink-0" />
+                        )}
                         {stack.length > 0 && (
-                            <div className="project-text-stack flex flex-wrap items-center gap-4">
+                            <div className="project-text-stack flex flex-wrap items-center gap-2 md:gap-3">
                                 {stack.map((skill) => (
                                     <ProjectStackTag key={skill.id} skill={skill} />
                                 ))}

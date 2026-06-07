@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
         silenceDeprecations: ['legacy-js-api'],
     },
     images: {
+        qualities: [90],
         formats: ['image/avif', 'image/webp'],
         remotePatterns: [
             {
