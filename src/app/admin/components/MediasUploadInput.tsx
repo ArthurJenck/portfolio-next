@@ -177,6 +177,8 @@ export const MediasUploadInput = ({
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     const medias: Media[] = field.value || []
+    const mediasRef = useRef<Media[]>(medias)
+    mediasRef.current = medias
 
     const sensors = useSensors(
         useSensor(PointerSensor),
@@ -185,34 +187,58 @@ export const MediasUploadInput = ({
         }),
     )
 
-    const detectMediaType = (url: string): 'image' | 'video' => {
+    const detectMediaType = (url: string, fileType?: string): 'image' | 'video' => {
+        if (fileType?.startsWith('video/')) return 'video'
+        if (fileType?.startsWith('image/')) return 'image'
+
         const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi']
         const lowerUrl = url.toLowerCase()
         return videoExtensions.some((ext) => lowerUrl.includes(ext)) ? 'video' : 'image'
     }
 
-    const uploadFile = async (file: File) => {
+    const uploadFile = async (file: File): Promise<Media> => {
+        const formData = new FormData()
+        formData.append('file', file)
+
+        const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+        })
+
+        if (!response.ok) {
+            throw new Error(`Upload failed for ${file.name}`)
+        }
+
+        const data = await response.json()
+        return {
+            url: data.url,
+            type: detectMediaType(data.url, file.type),
+        }
+    }
+
+    const uploadFiles = async (files: File[]) => {
+        if (files.length === 0) return
+
         setUploading(true)
         setError(null)
 
         try {
-            const formData = new FormData()
-            formData.append('file', file)
+            const results = await Promise.allSettled(files.map(uploadFile))
+            const uploadedMedias = results
+                .filter((result): result is PromiseFulfilledResult<Media> => result.status === 'fulfilled')
+                .map((result) => result.value)
 
-            const response = await fetch('/api/upload', {
-                method: 'POST',
-                body: formData,
-            })
+            if (uploadedMedias.length > 0) {
+                field.onChange([...mediasRef.current, ...uploadedMedias])
+            }
 
-            if (response.ok) {
-                const data = await response.json()
-                const newMedia: Media = {
-                    url: data.url,
-                    type: detectMediaType(data.url),
-                }
-                field.onChange([...medias, newMedia])
-            } else {
-                setError("Erreur lors de l'upload")
+            const failedUploads = results.length - uploadedMedias.length
+            if (failedUploads > 0) {
+                setError(
+                    failedUploads === 1
+                        ? "Un fichier n'a pas pu être uploadé"
+                        : `${failedUploads} fichiers n'ont pas pu être uploadés`,
+                )
             }
         } catch (err) {
             console.error('Upload error:', err)
@@ -226,9 +252,7 @@ export const MediasUploadInput = ({
         const files = e.target.files
         if (!files || files.length === 0) return
 
-        for (let i = 0; i < files.length; i++) {
-            await uploadFile(files[i])
-        }
+        await uploadFiles(Array.from(files))
 
         if (fileInputRef.current) {
             fileInputRef.current.value = ''
@@ -251,9 +275,7 @@ export const MediasUploadInput = ({
 
         const files = e.dataTransfer.files
         if (files.length > 0) {
-            for (let i = 0; i < files.length; i++) {
-                await uploadFile(files[i])
-            }
+            await uploadFiles(Array.from(files))
         }
     }
 
@@ -270,8 +292,7 @@ export const MediasUploadInput = ({
     const handleRemoveMobileUrl = (index: number) => {
         const newMedias = medias.map((m, i) => {
             if (i !== index) return m
-            const { mobileUrl: _, ...rest } = m
-            return rest as Media
+            return { url: m.url, type: m.type }
         })
         field.onChange(newMedias)
     }

@@ -27,7 +27,7 @@ export const ProjectList = () => (
 )
 
 export const ProjectEdit = () => (
-    <Edit>
+    <Edit mutationMode="pessimistic">
         <SimpleForm>
             <TextInput source="name" label="Nom du projet" validate={required()} />
             <TextInput source="subtitle" label="Sous-titre" />
