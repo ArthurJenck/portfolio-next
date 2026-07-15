@@ -15,7 +15,13 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'No file provided' }, { status: 400 })
         }
 
-        const fileName = customName || file.name
+        const extensionMatch = file.name.match(/\.[^./\\]+$/)
+        const extension = extensionMatch ? extensionMatch[0] : ''
+
+        let fileName = customName || file.name
+        if (extension && !fileName.toLowerCase().endsWith(extension.toLowerCase())) {
+            fileName += extension
+        }
 
         // Upload vers Vercel Blob
         const blob = await put(fileName, file, {
