@@ -72,6 +72,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         const updateData: Record<string, unknown> = {}
         const allowedFields = [
             'name',
+            'slug',
             'subtitle',
             'date',
             'summary',
@@ -96,14 +97,17 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
                 } else if (field === 'color' && typeof body[field] === 'string') {
                     // Normaliser la couleur
                     updateData[field] = normalizeColor(body[field])
+                } else if (field === 'slug' && typeof body[field] === 'string') {
+                    // Normaliser le slug custom pour rester URL-safe
+                    updateData[field] = generateSlug(body[field])
                 } else {
                     updateData[field] = body[field]
                 }
             }
         }
 
-        // Si le nom change, regénérer le slug
-        if (updateData.name && updateData.name !== currentProject.name) {
+        // Si le nom change, regénérer le slug (sauf slug custom explicite)
+        if (updateData.name && updateData.name !== currentProject.name && body.slug === undefined) {
             updateData.slug = generateSlug(updateData.name as string)
         }
 
