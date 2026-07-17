@@ -15,14 +15,26 @@ const ProjectMediasStack = ({ medias, projectName }: ProjectMediasStackProps) =>
                 <section key={i} className="project-slide embla__slide media-slide">
                     <div className="media-slide__frame">
                         {media.type === 'video' ? (
-                            <video
-                                src={media.url}
-                                autoPlay
-                                muted
-                                loop
-                                playsInline
-                                className="absolute inset-0 w-full h-full object-cover"
-                            />
+                            <>
+                                {media.mobileUrl && (
+                                    <video
+                                        src={media.mobileUrl}
+                                        autoPlay
+                                        muted
+                                        loop
+                                        playsInline
+                                        className="absolute inset-0 w-full h-full object-cover md:hidden"
+                                    />
+                                )}
+                                <video
+                                    src={media.url}
+                                    autoPlay
+                                    muted
+                                    loop
+                                    playsInline
+                                    className={`absolute inset-0 w-full h-full object-cover${media.mobileUrl ? ' hidden md:block' : ''}`}
+                                />
+                            </>
                         ) : (
                             <>
                                 {media.mobileUrl && (
