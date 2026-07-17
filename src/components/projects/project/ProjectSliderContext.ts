@@ -6,6 +6,7 @@ import type { MotionValue } from 'framer-motion'
 interface ProjectSliderContextValue {
     scrollTo: (index: number) => void
     coverProgress: MotionValue<number>
+    isMobile: boolean
 }
 
 export const ProjectSliderContext = createContext<ProjectSliderContextValue | null>(null)

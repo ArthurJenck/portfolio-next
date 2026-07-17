@@ -5,6 +5,7 @@ import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures'
 import { useMotionValue } from 'framer-motion'
 import { useCallback, useEffect, useMemo, type ReactNode } from 'react'
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
+import { useIsMobile } from '@/hooks/useIsMobile'
 import { ProjectSliderContext } from './ProjectSliderContext'
 import ProjectCoverBackground from './ProjectCoverBackground'
 import './ProjectPage.scss'
@@ -20,6 +21,7 @@ const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min)
 
 const ProjectSlider = ({ name, coverImage, mobileCoverImage, children }: ProjectSliderProps) => {
     const prefersReducedMotion = usePrefersReducedMotion()
+    const isMobile = useIsMobile()
     const coverProgress = useMotionValue(0)
 
     const plugins = useMemo(() => [WheelGesturesPlugin({ forceWheelAxis: 'y' })], [])
@@ -86,7 +88,11 @@ const ProjectSlider = ({ name, coverImage, mobileCoverImage, children }: Project
         }
     }, [])
 
-    const value = useMemo(() => ({ scrollTo, coverProgress }), [scrollTo, coverProgress])
+    useEffect(() => {
+        emblaApi?.reInit()
+    }, [emblaApi, isMobile])
+
+    const value = useMemo(() => ({ scrollTo, coverProgress, isMobile }), [scrollTo, coverProgress, isMobile])
 
     return (
         <ProjectSliderContext.Provider value={value}>
