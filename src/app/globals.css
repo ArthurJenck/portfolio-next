@@ -7,10 +7,11 @@
 }
 
 :root {
+    --white: #fdfdfe;
     --primary: #110f1e;
     --secondary: #2c253e;
     --accent: #714e97;
-    --white: #fdfdfe;
+    --accent-like: #f12a40;
 }
 
 html {

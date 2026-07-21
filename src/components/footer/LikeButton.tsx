@@ -75,7 +75,10 @@ const LikeButton = ({ initialCount }: { initialCount: number }) => {
                     transition={{ duration: 0.45, ease: 'easeOut' }}
                 >
                     <Heart
-                        className={cn('size-5 transition-colors duration-300', liked ? 'text-[var(--accent)]' : 'text-[var(--secondary)]')}
+                        className={cn(
+                            'size-5 transition-colors duration-300',
+                            liked ? 'text-[var(--accent-like)]' : 'text-[var(--secondary)]',
+                        )}
                         fill="currentColor"
                     />
                 </motion.span>
