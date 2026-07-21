@@ -43,17 +43,20 @@ const LikeButton = ({ initialCount }: { initialCount: number }) => {
     }
 
     return (
-        <button
+        <motion.button
             type="button"
             onClick={handleClick}
             className="relative flex flex-col items-center gap-1.5 cursor-pointer"
             aria-label="Liker le portfolio"
+            transition={{ type: 'spring', stiffness: 400, damping: 12 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
         >
             <span className="relative flex items-center justify-center size-11 rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.35)]">
                 {particles.map((particle) => (
                     <motion.span
                         key={particle.id}
-                        className="absolute pointer-events-none text-[var(--accent)]"
+                        className="absolute pointer-events-none text-[var(--accent-like)]"
                         initial={{ opacity: 1, scale: 0.4, x: 0, y: 0, rotate: 0 }}
                         animate={{
                             opacity: 0,
@@ -92,7 +95,7 @@ const LikeButton = ({ initialCount }: { initialCount: number }) => {
             >
                 {count}
             </motion.span>
-        </button>
+        </motion.button>
     )
 }
 
