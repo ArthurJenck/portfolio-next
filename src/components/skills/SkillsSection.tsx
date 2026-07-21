@@ -36,7 +36,7 @@ const Skills = ({ skillCategories }: { skillCategories: SkillResponse }) => {
             <div ref={containerRef} className="relative">
                 <div
                     style={{ height: height + 'px' }}
-                    className="absolute top-0 left-[calc(5.5vw+3rem)] md:left-[17vw] lg:left-[26vw] w-[2px] overflow-hidden rounded-full bg-gradient-to-b from-transparent via-[var(--white)]/15 to-transparent [mask-image:linear-gradient(to_bottom,transparent_0%,black_8%,black_92%,transparent_100%)] z-0"
+                    className="absolute top-0 left-[calc(5.5vw+2.5rem)] md:left-[15vw] lg:left-[25vw] w-[2px] overflow-hidden rounded-full bg-gradient-to-b from-transparent via-[var(--white)]/15 to-transparent [mask-image:linear-gradient(to_bottom,transparent_0%,black_8%,black_92%,transparent_100%)] z-0"
                 >
                     <motion.div
                         style={{ height: heightTransform, opacity: opacityTransform }}

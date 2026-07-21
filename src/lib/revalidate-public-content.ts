@@ -48,3 +48,7 @@ export function revalidateCvContent() {
     revalidateTag(publicContentTags.cv)
     revalidatePath('/cv')
 }
+
+export function revalidateLikesContent() {
+    revalidateTag(publicContentTags.likes)
+}
