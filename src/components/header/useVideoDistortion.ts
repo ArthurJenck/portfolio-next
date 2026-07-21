@@ -110,6 +110,8 @@ export function useVideoDistortion(
         const canvas = canvasRef.current
         if (!container || !video || !canvas) return
 
+        const pointerTarget = container.parentElement ?? container
+
         const gl: GLContext | null = canvas.getContext('webgl2') ?? canvas.getContext('webgl')
         if (!gl) return
 
@@ -162,7 +164,7 @@ export function useVideoDistortion(
         resize()
 
         const handlePointerMove = (e: PointerEvent) => {
-            const rect = container.getBoundingClientRect()
+            const rect = pointerTarget.getBoundingClientRect()
             mouse.x = (e.clientX - rect.left) / rect.width
             mouse.y = 1 - (e.clientY - rect.top) / rect.height
         }
@@ -203,8 +205,8 @@ export function useVideoDistortion(
         )
         intersectionObserver.observe(container)
 
-        container.addEventListener('pointermove', handlePointerMove)
-        container.addEventListener('pointerleave', handlePointerLeave)
+        pointerTarget.addEventListener('pointermove', handlePointerMove)
+        pointerTarget.addEventListener('pointerleave', handlePointerLeave)
         document.addEventListener('visibilitychange', handleVisibility)
 
         gl.useProgram(program)
@@ -257,8 +259,8 @@ export function useVideoDistortion(
             stopLoop()
             resizeObserver.disconnect()
             intersectionObserver.disconnect()
-            container.removeEventListener('pointermove', handlePointerMove)
-            container.removeEventListener('pointerleave', handlePointerLeave)
+            pointerTarget.removeEventListener('pointermove', handlePointerMove)
+            pointerTarget.removeEventListener('pointerleave', handlePointerLeave)
             document.removeEventListener('visibilitychange', handleVisibility)
             gl.deleteTexture(texture)
             gl.deleteBuffer(positionBuffer)

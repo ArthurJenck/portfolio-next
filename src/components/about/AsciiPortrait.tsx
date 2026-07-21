@@ -20,7 +20,7 @@ const AsciiPortrait = () => {
     return (
         <div
             ref={containerRef}
-            className="relative lg:sticky lg:top-30 w-[min(380px,100%)] md:w-[380px] @container md:@container-normal"
+            className="relative lg:sticky lg:top-30 w-[min(380px,100%)] md:w-[380px] shrink-0 @container md:@container-normal"
         >
             {interactive ? (
                 <canvas ref={canvasRef} className="block w-full" />
