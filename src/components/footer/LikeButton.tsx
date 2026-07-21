@@ -46,10 +46,10 @@ const LikeButton = ({ initialCount }: { initialCount: number }) => {
         <button
             type="button"
             onClick={handleClick}
-            className="relative flex flex-col items-center gap-1 cursor-pointer group"
+            className="relative flex flex-col items-center gap-1.5 cursor-pointer"
             aria-label="Liker le portfolio"
         >
-            <span className="relative flex items-center justify-center size-10">
+            <span className="relative flex items-center justify-center size-11 rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.35)]">
                 {particles.map((particle) => (
                     <motion.span
                         key={particle.id}
@@ -75,11 +75,8 @@ const LikeButton = ({ initialCount }: { initialCount: number }) => {
                     transition={{ duration: 0.45, ease: 'easeOut' }}
                 >
                     <Heart
-                        className={cn(
-                            'size-7 transition-colors duration-300',
-                            liked ? 'text-[var(--accent)]' : 'text-white/70 group-hover:text-[var(--accent)]',
-                        )}
-                        fill={liked ? 'currentColor' : 'none'}
+                        className={cn('size-5 transition-colors duration-300', liked ? 'text-[var(--accent)]' : 'text-[var(--secondary)]')}
+                        fill="currentColor"
                     />
                 </motion.span>
             </span>
