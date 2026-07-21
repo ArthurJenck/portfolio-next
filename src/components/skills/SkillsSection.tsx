@@ -36,11 +36,11 @@ const Skills = ({ skillCategories }: { skillCategories: SkillResponse }) => {
             <div ref={containerRef} className="relative">
                 <div
                     style={{ height: height + 'px' }}
-                    className="absolute top-0 left-[calc(5.5vw+2.5rem)] md:left-[15vw] lg:left-[25vw] w-[2px] overflow-hidden rounded-full bg-gradient-to-b from-transparent via-[var(--white)]/15 to-transparent [mask-image:linear-gradient(to_bottom,transparent_0%,black_8%,black_92%,transparent_100%)] z-0"
+                    className="absolute top-0 left-[calc(5.5vw+2.5rem)] md:left-[15vw] lg:left-[25vw] w-0.5 overflow-hidden rounded-full bg-linear-to-b from-transparent via-(--white)/15 to-transparent mask-[linear-gradient(to_bottom,transparent_0%,black_8%,black_92%,transparent_100%)] z-0"
                 >
                     <motion.div
                         style={{ height: heightTransform, opacity: opacityTransform }}
-                        className="absolute inset-x-0 top-0 w-[2px] rounded-full bg-gradient-to-t from-[#5a3e79] via-[#714e97] to-[#8d6aac]"
+                        className="absolute inset-x-0 top-0 w-0.5 rounded-full bg-linear-to-t from-[#5a3e79] via-[#714e97] to-[#8d6aac]"
                     />
                 </div>
                 <div ref={timelineRef} className="relative z-10">
