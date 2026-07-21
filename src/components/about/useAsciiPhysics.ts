@@ -216,8 +216,14 @@ export function useAsciiPhysics(
 
         const handlePointerMove = (e: PointerEvent) => {
             const rect = container.getBoundingClientRect()
-            pointer.x = e.clientX - rect.left
-            pointer.y = e.clientY - rect.top
+            const nextX = e.clientX - rect.left
+            const nextY = e.clientY - rect.top
+            if (!pointer.active) {
+                prevPointer.x = nextX
+                prevPointer.y = nextY
+            }
+            pointer.x = nextX
+            pointer.y = nextY
             pointer.active = true
             wake()
         }

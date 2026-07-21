@@ -6,6 +6,7 @@ import Skill from '@/models/Skill'
 import SkillCategoryModel from '@/models/SkillCategory'
 import ContactLink from '@/models/ContactLink'
 import CV from '@/models/CV'
+import Like from '@/models/Like'
 import { DetailedProjectType, MinimalProjectType, ProjectMedia } from '@/types/ProjectTypes'
 import { SkillCategory, SkillChild } from '@/types/SkillsTypes'
 
@@ -14,6 +15,7 @@ export const publicContentTags = {
     skills: 'public:skills',
     contactLinks: 'public:contact-links',
     cv: 'public:cv',
+    likes: 'public:likes',
 } as const
 
 export interface PublicContactLink {
@@ -265,4 +267,20 @@ export async function getPublicContactLinks() {
 
 export async function getPublicCv() {
     return getPublicCvCached()
+}
+
+const getPublicLikeCountCached = unstable_cache(
+    async (): Promise<number> => {
+        await connectDB()
+
+        const like = await Like.findOne()
+
+        return like?.count ?? 0
+    },
+    ['public-like-count'],
+    { tags: [publicContentTags.likes] },
+)
+
+export async function getPublicLikeCount() {
+    return getPublicLikeCountCached()
 }
