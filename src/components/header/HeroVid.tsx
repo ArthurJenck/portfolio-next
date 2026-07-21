@@ -1,8 +1,9 @@
 'use client'
 
 import PlaceHolder from '../../assets/images/hero-placeholder.png'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
+import { useVideoDistortion } from './useVideoDistortion'
 
 // Chemins vers les vidéos dans le dossier public
 const BG_Webm = '/videos/portfolio-bg.webm'
@@ -16,8 +17,18 @@ const isSafari = () => {
 }
 
 const HeroVid = () => {
+    const containerRef = useRef<HTMLDivElement>(null)
     const videoRef = useRef<HTMLVideoElement>(null)
+    const canvasRef = useRef<HTMLCanvasElement>(null)
     const [shouldUseImg, setShouldUseImg] = useState(false)
+    const [distortionEnabled, setDistortionEnabled] = useState(false)
+    const [canvasReady, setCanvasReady] = useState(false)
+
+    useEffect(() => {
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        const hasFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches
+        setDistortionEnabled(!reducedMotion && hasFinePointer)
+    }, [])
 
     useEffect(() => {
         const video = videoRef.current
@@ -70,6 +81,10 @@ const HeroVid = () => {
         }
     }, [])
 
+    const handleCanvasReady = useCallback(() => setCanvasReady(true), [])
+
+    useVideoDistortion(containerRef, videoRef, canvasRef, distortionEnabled && !shouldUseImg, handleCanvasReady)
+
     if (shouldUseImg) {
         return (
             <Image
@@ -84,18 +99,29 @@ const HeroVid = () => {
     }
 
     return (
-        <video
-            ref={videoRef}
-            className="size-full object-cover absolute top-0 left-0 z-[-1] brightness-30"
-            loop
-            muted
-            autoPlay
-            playsInline
-            aria-hidden="true"
-        >
-            <source src={BG_Webm} type="video/webm" />
-            <source src={BG_Mp4} type="video/mp4" />
-        </video>
+        <div ref={containerRef} className="absolute top-0 left-0 size-full z-[-1]">
+            <video
+                ref={videoRef}
+                className={`size-full object-cover absolute top-0 left-0 brightness-30 ${
+                    canvasReady ? 'invisible' : ''
+                }`}
+                loop
+                muted
+                autoPlay
+                playsInline
+                aria-hidden="true"
+            >
+                <source src={BG_Webm} type="video/webm" />
+                <source src={BG_Mp4} type="video/mp4" />
+            </video>
+            {distortionEnabled && (
+                <canvas
+                    ref={canvasRef}
+                    aria-hidden="true"
+                    className={`size-full absolute top-0 left-0 brightness-30 ${canvasReady ? '' : 'invisible'}`}
+                />
+            )}
+        </div>
     )
 }
 
