@@ -93,7 +93,9 @@ function createProgram(gl: GLContext, vertexSrc: string, fragmentSrc: string) {
 const MOUSE_SMOOTHING = 0.12
 const STRENGTH = 0.055
 const ABERRATION = 0.005
-const OFFSCREEN = -10
+const ENERGY_ATTACK = 0.35
+const ENERGY_DECAY = 0.9
+const IDLE_MS = 60
 
 export function useVideoDistortion(
     containerRef: RefObject<HTMLDivElement | null>,
@@ -149,6 +151,8 @@ export function useVideoDistortion(
         const smoothMouse = { x: 0.5, y: 0.5 }
         const prevSmooth = { x: 0.5, y: 0.5 }
         const velocity = { x: 0, y: 0 }
+        let energy = 0
+        let lastMoveTime = 0
 
         const resize = () => {
             const rect = container.getBoundingClientRect()
@@ -167,11 +171,11 @@ export function useVideoDistortion(
             const rect = pointerTarget.getBoundingClientRect()
             mouse.x = (e.clientX - rect.left) / rect.width
             mouse.y = 1 - (e.clientY - rect.top) / rect.height
+            lastMoveTime = performance.now()
         }
 
         const handlePointerLeave = () => {
-            mouse.x = OFFSCREEN
-            mouse.y = OFFSCREEN
+            lastMoveTime = 0
         }
 
         const startLoop = () => {
@@ -230,6 +234,9 @@ export function useVideoDistortion(
             prevSmooth.x = smoothMouse.x
             prevSmooth.y = smoothMouse.y
 
+            const movingRecently = performance.now() - lastMoveTime < IDLE_MS
+            energy = movingRecently ? energy + (1 - energy) * ENERGY_ATTACK : energy * ENERGY_DECAY
+
             gl.viewport(0, 0, width, height)
             gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
             gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0)
@@ -241,8 +248,8 @@ export function useVideoDistortion(
             gl.uniform2f(uVideoResolution, video.videoWidth || 1920, video.videoHeight || 1080)
             gl.uniform2f(uMouse, smoothMouse.x, smoothMouse.y)
             gl.uniform2f(uMouseVelocity, velocity.x, velocity.y)
-            gl.uniform1f(uStrength, STRENGTH)
-            gl.uniform1f(uAberration, ABERRATION)
+            gl.uniform1f(uStrength, STRENGTH * energy)
+            gl.uniform1f(uAberration, ABERRATION * energy)
 
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
 
