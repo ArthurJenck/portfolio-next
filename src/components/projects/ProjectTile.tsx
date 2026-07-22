@@ -1,10 +1,15 @@
 'use client'
 
-import anime from 'animejs'
+import { gsap } from 'gsap'
+import { CustomEase } from 'gsap/CustomEase'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
+
+gsap.registerPlugin(CustomEase)
+CustomEase.create('tileIn', 'M0,0 C0.42,0,1,1,1,1')
+CustomEase.create('tileOut', 'M0,0 C0.2,1,0.3,1,1,1')
 
 const IMAGE_REST_SCALE = 1.35
 const IMAGE_HOVER_SCALE = 1
@@ -49,9 +54,9 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
 
         const totalItems = stackItems.length
 
-        const removeAnimeTargets = () => {
-            anime.remove(stackItems)
-            anime.remove(img)
+        const killTweens = () => {
+            gsap.killTweensOf(stackItems)
+            gsap.killTweensOf(img)
         }
 
         // En reduced-motion, on garde le prefetch au hover mais on coupe
@@ -70,7 +75,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
         }
 
         const animateIn = () => {
-            removeAnimeTargets()
+            killTweens()
 
             stackItems.forEach((e, i) => {
                 if (e) {
@@ -78,87 +83,53 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
                 }
             })
 
-            anime({
-                targets: stackItems,
-                translateZ: [
+            gsap.to(stackItems, {
+                keyframes: [
                     {
-                        value: function (_target: unknown, index: number) {
-                            return index * 8 + 8
-                        },
-                        duration: 200,
-                        easing: 'cubicBezier(0.42, 0, 1, 1)',
+                        z: (index: number) => index * 8 + 8,
+                        rotationX: (index: number) => -1 * (index * 2 + 2),
+                        duration: 0.2,
+                        ease: 'tileIn',
                     },
                     {
-                        value: function (_target: unknown, index: number) {
-                            return index * 20 + 20
-                        },
-                        duration: 700,
-                        easing: 'cubicBezier(0.2, 1, 0.3, 1)',
-                    },
-                ],
-                rotateX: [
-                    {
-                        value: function (_target: unknown, index: number) {
-                            return -1 * (index * 2 + 2)
-                        },
-                        duration: 200,
-                        easing: 'cubicBezier(0.42, 0, 1, 1)',
-                    },
-                    {
-                        value: 0,
-                        duration: 700,
-                        easing: 'cubicBezier(0.2, 1, 0.3, 1)',
+                        z: (index: number) => index * 20 + 20,
+                        rotationX: 0,
+                        duration: 0.7,
+                        ease: 'tileOut',
                     },
                 ],
             })
 
-            anime({
-                targets: img,
-                duration: 900,
-                easing: 'cubicBezier(0.2, 1, 0.3, 1)',
+            gsap.to(img, {
+                duration: 0.9,
+                ease: 'tileOut',
                 scale: IMAGE_HOVER_SCALE,
             })
         }
 
         const animateOut = () => {
-            removeAnimeTargets()
+            killTweens()
 
-            anime({
-                targets: stackItems,
-                translateZ: [
+            gsap.to(stackItems, {
+                keyframes: [
                     {
-                        value: function (_target: unknown, index: number) {
-                            return index * 20 + 20 - 8
-                        },
-                        duration: 200,
-                        easing: 'cubicBezier(0.42, 0, 1, 1)',
+                        z: (index: number) => index * 20 + 20 - 8,
+                        rotationX: (index: number) => index * 2 + 2,
+                        duration: 0.2,
+                        ease: 'tileIn',
                     },
                     {
-                        value: 0,
-                        duration: 900,
-                        easing: 'cubicBezier(0.2, 1, 0.3, 1)',
-                    },
-                ],
-                rotateX: [
-                    {
-                        value: function (_target: unknown, index: number) {
-                            return index * 2 + 2
-                        },
-                        duration: 200,
-                        easing: 'cubicBezier(0.42, 0, 1, 1)',
-                    },
-                    {
-                        value: 0,
-                        duration: 900,
-                        easing: 'cubicBezier(0.2, 1, 0.3, 1)',
+                        z: 0,
+                        rotationX: 0,
+                        duration: 0.9,
+                        ease: 'tileOut',
                     },
                 ],
             })
 
-            anime({
-                targets: img,
-                duration: 900,
-                easing: 'cubicBezier(0.2, 1, 0.3, 1)',
+            gsap.to(img, {
+                duration: 0.9,
+                ease: 'tileOut',
                 scale: IMAGE_REST_SCALE,
             })
         }
@@ -178,7 +149,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
         return () => {
             stackEl.removeEventListener('mouseenter', onMouseEnter)
             stackEl.removeEventListener('mouseleave', onMouseLeave)
-            removeAnimeTargets()
+            killTweens()
         }
     }, [projectSlug, router, prefersReducedMotion])
 
