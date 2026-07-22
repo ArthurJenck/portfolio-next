@@ -1,0 +1,34 @@
+.site-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary);
+    opacity: 1;
+    transition: opacity 0.4s ease-out;
+
+    &.is-exiting {
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+
+// Visite déjà vue dans cette session : le loader ne doit jamais s'afficher, sans flash
+.loader-seen .site-loader {
+    display: none;
+}
+
+// Première visite (JS actif) : le hero reste invisible tant que le loader n'a pas cédé sa place
+// (chaque élément est explicitement retenu, sinon son animation "appear" se déclenche
+// normalement au montage et serait déjà terminée quand le loader se retire)
+.loader-active header {
+    h1,
+    h1 .hero-typing,
+    .socials,
+    .chevron {
+        animation: none !important;
+        opacity: 0;
+    }
+}

@@ -6,8 +6,21 @@ import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Analytics } from '@vercel/analytics/next'
 import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
+import SiteLoader from '@/components/loader/SiteLoader'
 import { Sora, Montserrat } from 'next/font/google'
 import Script from 'next/script'
+
+// Ce script doit s'exécuter avant le premier paint (pas de "next/script" ici) pour éviter
+// tout flash : il pose la classe qui retient le hero (1re visite) ou masque le loader (déjà vu)
+const loaderInitScript = `
+try {
+    if (sessionStorage.getItem('site-loaded')) {
+        document.documentElement.classList.add('loader-seen');
+    } else {
+        document.documentElement.classList.add('loader-active');
+    }
+} catch (e) {}
+`
 
 const sora = Sora({
     subsets: ['latin'],
@@ -86,7 +99,7 @@ export default function RootLayout({
     children: React.ReactNode
 }>) {
     return (
-        <html lang="fr" data-scroll-behavior="smooth">
+        <html lang="fr" data-scroll-behavior="smooth" suppressHydrationWarning>
             <head>
                 <Script
                     id="schema-website"
@@ -121,6 +134,10 @@ export default function RootLayout({
                         }),
                     }}
                 />
+                <script dangerouslySetInnerHTML={{ __html: loaderInitScript }} />
+                <noscript>
+                    <style>{'.site-loader { display: none !important; }'}</style>
+                </noscript>
             </head>
             <body className={cn('overflow-x-hidden', sora.className, sora.variable, montserrat.variable)}>
                 <div
@@ -132,6 +149,7 @@ export default function RootLayout({
                         backgroundPosition: '0 0',
                     }}
                 />
+                <SiteLoader />
                 <MotionProvider>
                     <div className="min-h-screen flex flex-col">
                         <NavBar />
