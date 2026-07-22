@@ -33,7 +33,7 @@ const LogoLottie = ({ onLoopComplete, autoplay = true, isExiting = false }: Logo
             loop
             autoplay={autoplay}
             onLoopComplete={onLoopComplete}
-            className="w-[220px] h-[220px] md:w-[260px] md:h-[260px]"
+            className="size-55 md:size-[25vw]"
         />
     )
 }
