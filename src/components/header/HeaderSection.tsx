@@ -28,7 +28,7 @@ const Header = () => {
                 <br />
                 Jenck{' '}
                 <span className="hero-typing size-fit block mx-auto tracking-normal leading-normal whitespace-nowrap overflow-hidden border-white border-r-2 text-[clamp(10px,3.5vw,1rem)] md:text-[1.5vw]">
-                    Développeur Web Front-End
+                    Développeur Créatif sur Paris
                 </span>
             </h1>
             {/* Le stopPropagation évite le scroll en cliquant sur les liens extenes */}

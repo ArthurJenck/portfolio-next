@@ -20,8 +20,10 @@ interface ProjectTileProps {
     color?: string
     imageUrl: string
     projectSlug: string
+    projectName: string
     onHoverStart?: () => void
     onHoverEnd?: () => void
+    onFocusTile?: () => void
 }
 
 const ProjectTile: React.FC<ProjectTileProps> = ({
@@ -30,11 +32,14 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
     color = '#ffffff',
     imageUrl,
     projectSlug,
+    projectName,
     onHoverStart,
     onHoverEnd,
+    onFocusTile,
 }) => {
     const router = useRouter()
     const prefersReducedMotion = usePrefersReducedMotion()
+    const rootRef = useRef<HTMLDivElement>(null)
     const stackRef = useRef<HTMLDivElement>(null)
     const stackItemsRef = useRef<HTMLDivElement[]>([])
     const imgRef = useRef<HTMLImageElement>(null)
@@ -42,6 +47,14 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
     const pointerDownTime = useRef(0)
     const longPressTimer = useRef<number | null>(null)
     const hasPrefetched = useRef(false)
+    const isKeyboardFocused = useRef(false)
+    const animationsRef = useRef<{ in: () => void; out: () => void } | null>(null)
+
+    const prefetchProject = () => {
+        if (hasPrefetched.current) return
+        router.prefetch(`/${projectSlug}`)
+        hasPrefetched.current = true
+    }
 
     useEffect(() => {
         const stackEl = stackRef.current
@@ -143,10 +156,13 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
         }
         const onMouseLeave = () => animateOut()
 
+        animationsRef.current = { in: animateIn, out: animateOut }
+
         stackEl.addEventListener('mouseenter', onMouseEnter)
         stackEl.addEventListener('mouseleave', onMouseLeave)
 
         return () => {
+            animationsRef.current = null
             stackEl.removeEventListener('mouseenter', onMouseEnter)
             stackEl.removeEventListener('mouseleave', onMouseLeave)
             killTweens()
@@ -184,14 +200,46 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
         }
     }
 
+    const handleFocus = () => {
+        if (!rootRef.current?.matches(':focus-visible')) return
+
+        isKeyboardFocused.current = true
+        animationsRef.current?.in()
+        onHoverStart?.()
+        onFocusTile?.()
+        prefetchProject()
+    }
+
+    const handleBlur = () => {
+        if (!isKeyboardFocused.current) return
+
+        isKeyboardFocused.current = false
+        animationsRef.current?.out()
+        onHoverEnd?.()
+    }
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return
+
+        e.preventDefault()
+        router.push(`/${projectSlug}`)
+    }
+
     return (
         <div
-            className="relative block flex-none cursor-pointer no-underline outline-none"
+            ref={rootRef}
+            role="link"
+            tabIndex={0}
+            aria-label={`Voir le projet ${projectName}`}
+            className="relative block flex-none cursor-pointer no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
             style={{ transformStyle: 'preserve-3d', width }}
             onMouseEnter={onHoverStart}
             onMouseLeave={onHoverEnd}
             onPointerDown={handlePointerDown}
             onPointerUp={handlePointerUp}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
         >
             <div ref={stackRef} className="relative w-full" style={{ transformStyle: 'preserve-3d', height }}>
                 <div
@@ -235,7 +283,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
                         ref={imgRef}
                         className="select-none pointer-events-none object-cover will-change-transform"
                         src={imageUrl}
-                        alt="Image"
+                        alt={projectName}
                         fill
                         sizes={`${width}px`}
                         style={{

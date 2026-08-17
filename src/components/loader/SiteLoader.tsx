@@ -3,10 +3,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import LogoLottie from './LogoLottie'
+import { releaseHeroPlay } from '@/lib/hero-playback'
 import './SiteLoader.scss'
 
 const STORAGE_KEY = 'site-loaded'
-const TIMEOUT_MS = 6000
+const TIMEOUT_MS = 3000
 const EXIT_DURATION_MS = 400
 
 const waitForWindowLoad = (): Promise<void> =>
@@ -20,7 +21,16 @@ const waitForWindowLoad = (): Promise<void> =>
 
 const waitForTimeout = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms))
 
-// Attend que la vidéo (ou l'image de secours) du hero soit prête à être affichée
+const waitForImageSrc = (src: string): Promise<void> =>
+    new Promise((resolve) => {
+        const img = new window.Image()
+        img.onload = () => resolve()
+        img.onerror = () => resolve()
+        img.src = src
+        if (img.complete) resolve()
+    })
+
+// Attend au plus le poster (ou l'image de secours) du hero, jamais le fichier vidéo
 const waitForHeroMedia = (): Promise<void> =>
     new Promise((resolve) => {
         let settled = false
@@ -33,8 +43,9 @@ const waitForHeroMedia = (): Promise<void> =>
         const checkExisting = () => {
             const video = document.querySelector<HTMLVideoElement>('header video')
             if (video) {
-                if (video.readyState >= 2) done()
-                else video.addEventListener('loadeddata', done, { once: true })
+                const poster = video.getAttribute('poster')
+                if (poster) waitForImageSrc(poster).then(done)
+                else done()
                 return true
             }
             const img = document.querySelector<HTMLImageElement>('header .hero-bg')
@@ -95,6 +106,7 @@ const SiteLoader = () => {
 
     const exit = () => {
         document.documentElement.classList.remove('loader-active')
+        releaseHeroPlay()
         setPhase('exiting')
         window.setTimeout(() => {
             try {
@@ -115,6 +127,7 @@ const SiteLoader = () => {
         }
 
         if (alreadySeen) {
+            releaseHeroPlay()
             setPhase('done')
             return
         }

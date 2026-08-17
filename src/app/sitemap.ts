@@ -1,7 +1,8 @@
 import { MetadataRoute } from 'next'
 import { getPublicCv, getPublicProjectSitemapEntries } from '@/lib/public-content'
+import { SITE_URL } from '@/lib/site-config'
 
-const BASE_URL = 'https://arthurjenck.com'
+const BASE_URL = SITE_URL
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     try {

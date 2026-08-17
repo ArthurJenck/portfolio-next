@@ -8,7 +8,7 @@ import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
 import SiteLoader from '@/components/loader/SiteLoader'
 import { Sora, Montserrat } from 'next/font/google'
-import Script from 'next/script'
+import { SITE_URL } from '@/lib/site-config'
 
 // Ce script doit s'exécuter avant le premier paint (pas de "next/script" ici) pour éviter
 // tout flash : il pose la classe qui retient le hero (1re visite) ou masque le loader (déjà vu)
@@ -36,10 +36,18 @@ const montserrat = Montserrat({
     variable: '--font-montserrat',
 })
 
+const HOME_DESCRIPTION =
+    "Portfolio d'Arthur Jenck, développeur créatif & front-end à Paris. Expériences web immersives avec React, Next.js, TypeScript, GSAP et un vrai soin UX/UI."
+
 export const metadata: Metadata = {
-    title: 'Arthur Jenck',
-    description:
-        "Portfolio d'Arthur Jenck, développeur web front-end passionné en région parisienne, spécialisé NextJS, React, Typescript et Tailwind, expert en UX/UI et Webdesign.",
+    metadataBase: new URL(SITE_URL),
+    title: {
+        default: 'Arthur Jenck · Développeur Créatif & Front-End à Paris',
+        template: '%s · Arthur Jenck',
+    },
+    description: HOME_DESCRIPTION,
+    authors: [{ name: 'Arthur Jenck', url: SITE_URL }],
+    creator: 'Arthur Jenck',
     robots: { index: true, follow: true },
     keywords: [
         'Arthur Jenck',
@@ -67,23 +75,29 @@ export const metadata: Metadata = {
     },
     manifest: '/site.webmanifest',
     alternates: {
-        canonical: 'https://arthurjenck.com',
+        canonical: SITE_URL,
     },
     openGraph: {
-        title: "Portfolio d'Arthur Jenck, Développeur Web Front-end",
+        title: 'Arthur Jenck · Développeur Créatif & Front-End à Paris',
         siteName: 'Arthur Jenck',
         type: 'website',
-        url: 'https://arthurjenck.com/',
-        description:
-            "Portfolio d'Arthur Jenck, développeur web front-end passionné en région parisienne, spécialisé NextJS, React, Typescript et Tailwind, expert en UX/UI et Webdesign.",
-        images: [{ url: 'https://3jrx06emyedlbjzt.public.blob.vercel-storage.com/share-preview.png' }],
+        url: `${SITE_URL}/`,
+        locale: 'fr_FR',
+        description: HOME_DESCRIPTION,
+        images: [
+            {
+                url: 'https://3jrx06emyedlbjzt.public.blob.vercel-storage.com/share-preview.png',
+                width: 1199,
+                height: 630,
+                alt: "Portfolio d'Arthur Jenck, développeur créatif & front-end à Paris",
+            },
+        ],
     },
     twitter: {
         card: 'summary_large_image',
         site: '@ArthurJenck',
-        title: "Portfolio d'Arthur Jenck, Développeur Web Front-end",
-        description:
-            "Portfolio d'Arthur Jenck, développeur web front-end passionné spécialisé React, expert en UX/UI et Webdesign.",
+        title: 'Arthur Jenck · Développeur Créatif & Front-End à Paris',
+        description: HOME_DESCRIPTION,
         images: ['https://3jrx06emyedlbjzt.public.blob.vercel-storage.com/share-preview.png'],
     },
     appleWebApp: {
@@ -101,31 +115,60 @@ export default function RootLayout({
     return (
         <html lang="fr" data-scroll-behavior="smooth" suppressHydrationWarning>
             <head>
-                <Script
-                    id="schema-website"
+                <script
                     type="application/ld+json"
-                    strategy="afterInteractive"
                     dangerouslySetInnerHTML={{
                         __html: JSON.stringify({
                             '@context': 'https://schema.org',
                             '@type': 'WebSite',
                             name: 'Arthur Jenck',
                             alternateName: 'Arthur Jenck – Portfolio',
-                            url: 'https://arthurjenck.com/',
+                            url: `${SITE_URL}/`,
+                            inLanguage: 'fr-FR',
+                            publisher: {
+                                '@id': `${SITE_URL}/#person`,
+                            },
                         }),
                     }}
                 />
-                <Script
-                    id="schema-person"
+                <script
                     type="application/ld+json"
-                    strategy="afterInteractive"
                     dangerouslySetInnerHTML={{
                         __html: JSON.stringify({
                             '@context': 'https://schema.org',
                             '@type': 'Person',
+                            '@id': `${SITE_URL}/#person`,
                             name: 'Arthur Jenck',
-                            jobTitle: 'Développeur web front-end',
-                            url: 'https://arthurjenck.com/',
+                            jobTitle: 'Développeur créatif & front-end',
+                            url: `${SITE_URL}/`,
+                            email: 'mailto:arthurjenckdev@gmail.com',
+                            address: {
+                                '@type': 'PostalAddress',
+                                addressLocality: 'Paris',
+                                addressRegion: 'Île-de-France',
+                                addressCountry: 'FR',
+                            },
+                            alumniOf: [
+                                { '@type': 'EducationalOrganization', name: 'ECV Paris' },
+                                { '@type': 'EducationalOrganization', name: 'OpenClassrooms' },
+                                { '@type': 'EducationalOrganization', name: 'Hetic' },
+                            ],
+                            affiliation: {
+                                '@type': 'EducationalOrganization',
+                                name: "Gobelins, l'école de l'image",
+                            },
+                            knowsAbout: [
+                                'React',
+                                'Next.js',
+                                'TypeScript',
+                                'Tailwind CSS',
+                                'GSAP',
+                                'Three.js',
+                                'UX/UI Design',
+                                'Webdesign',
+                                'Framer Motion',
+                                'Node.js',
+                            ],
                             sameAs: [
                                 'https://github.com/arthurjenck',
                                 'https://www.linkedin.com/in/arthurjenck/',
