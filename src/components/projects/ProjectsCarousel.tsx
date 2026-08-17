@@ -108,6 +108,41 @@ const ProjectsCarousel = ({ projects, isLoading = false }: ProjecsCarouselProps)
         [dragBounds.left],
     )
 
+    const resetHorizontalScrollAncestors = useCallback(() => {
+        let node: HTMLElement | null = viewportRef.current
+
+        while (node) {
+            if (node.scrollLeft !== 0) {
+                node.scrollLeft = 0
+            }
+            node = node.parentElement
+        }
+    }, [])
+
+    // Le carousel est piloté par le scroll vertical de la section pinnée :
+    // amener une tuile focusée en vue revient donc à scroller la page.
+    const handleTileFocus = useCallback(
+        (index: number) => {
+            resetHorizontalScrollAncestors()
+            window.requestAnimationFrame(resetHorizontalScrollAncestors)
+
+            const viewportWidth = viewportRef.current?.offsetWidth || window.innerWidth
+            const targetX = Math.max(
+                dragBounds.left,
+                Math.min(
+                    dragBounds.right,
+                    viewportWidth / 2 - ITEM_WIDTH / 2 - VIEW_PADDING - index * (ITEM_WIDTH + ITEM_GAP),
+                ),
+            )
+
+            window.scrollTo({
+                top: getScrollPositionFromX(targetX),
+                behavior: 'smooth',
+            })
+        },
+        [dragBounds.left, dragBounds.right, getScrollPositionFromX, resetHorizontalScrollAncestors],
+    )
+
     useMotionValueEvent(scrollX, 'change', (latest) => {
         if (isDragging || isDraggingOrRecentlyDragged || !isMountedRef.current) return
 
@@ -231,12 +266,14 @@ const ProjectsCarousel = ({ projects, isLoading = false }: ProjecsCarouselProps)
                                   <ProjectTile
                                       key={project.id}
                                       projectSlug={project.slug}
+                                      projectName={project.name}
                                       imageUrl={project.cover_image}
                                       width={ITEM_WIDTH}
                                       height={TILE_HEIGHT}
                                       color={project.color}
                                       onHoverStart={() => setHovered(i)}
                                       onHoverEnd={() => setHovered((s) => (s === i ? null : s))}
+                                      onFocusTile={() => handleTileFocus(i)}
                                   />
                               )
                           })}

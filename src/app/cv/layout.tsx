@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Sora } from 'next/font/google'
 import '../globals.css'
+import { SITE_URL } from '@/lib/site-config'
 
 const sora = Sora({
     subsets: ['latin'],
@@ -9,6 +10,7 @@ const sora = Sora({
 })
 
 export const metadata: Metadata = {
+    metadataBase: new URL(SITE_URL),
     title: 'Arthur Jenck • CV',
     description:
         "CV d'Arthur Jenck, développeur web front-end spécialisé en NextJS, React, TypeScript et Tailwind. Expertise en UX/UI et Webdesign.",
@@ -17,9 +19,10 @@ export const metadata: Metadata = {
         title: 'CV - Arthur Jenck, Développeur Web Front-end',
         description:
             "CV d'Arthur Jenck, développeur web front-end spécialisé en NextJS, React, TypeScript et Tailwind.",
-        url: 'https://arthurjenck.com/cv',
+        url: `${SITE_URL}/cv`,
         siteName: 'Arthur Jenck',
         type: 'website',
+        locale: 'fr_FR',
         images: [{ url: 'https://3jrx06emyedlbjzt.public.blob.vercel-storage.com/share-preview.png' }],
     },
     twitter: {
@@ -30,7 +33,7 @@ export const metadata: Metadata = {
         images: ['https://3jrx06emyedlbjzt.public.blob.vercel-storage.com/share-preview.png'],
     },
     alternates: {
-        canonical: 'https://arthurjenck.com/cv',
+        canonical: `${SITE_URL}/cv`,
     },
 }
 

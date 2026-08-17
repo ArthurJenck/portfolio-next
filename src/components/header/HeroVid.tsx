@@ -4,6 +4,7 @@ import PlaceHolder from '../../assets/images/hero-placeholder.png'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import { useVideoDistortion } from './useVideoDistortion'
+import { onHeroPlay } from '@/lib/hero-playback'
 
 // Chemins vers les vidéos dans le dossier public
 const BG_Webm = '/videos/portfolio-bg.webm'
@@ -34,16 +35,16 @@ const HeroVid = () => {
         const video = videoRef.current
         if (!video) return
 
-        const initVideo = async () => {
+        let cancelled = false
+
+        const startVideo = async () => {
             try {
                 // Force les attributs manuellement pour Safari/iOS
                 // Safari ne respecte pas toujours les attributs JSX React
                 video.muted = true
                 video.playsInline = true
-                video.autoplay = true
                 video.setAttribute('muted', 'true')
                 video.setAttribute('playsinline', 'true')
-                video.setAttribute('autoplay', 'true')
 
                 // Pour Safari, forcer aussi les attributs webkit
                 if (isSafari()) {
@@ -53,31 +54,22 @@ const HeroVid = () => {
                     await new Promise((resolve) => setTimeout(resolve, 100))
                 }
 
-                // Attendre que la vidéo soit chargée
-                if (video.readyState < 2) {
-                    await new Promise((resolve) => {
-                        video.addEventListener('loadeddata', resolve, {
-                            once: true,
-                        })
-                    })
-                }
+                if (cancelled) return
 
-                // Forcer le play() après navigation ou au montage
                 await video.play()
             } catch (error) {
                 console.warn('Vidéo ne peut pas être lancée, fallback image:', error)
-                setShouldUseImg(true)
+                if (!cancelled) setShouldUseImg(true)
             }
         }
 
-        // Lancer l'initialisation
-        initVideo()
+        const unsubscribe = onHeroPlay(startVideo)
 
         // Cleanup
         return () => {
-            if (video) {
-                video.pause()
-            }
+            cancelled = true
+            unsubscribe()
+            video.pause()
         }
     }, [])
 
@@ -89,7 +81,7 @@ const HeroVid = () => {
         return (
             <Image
                 src={PlaceHolder}
-                alt="Image de fond"
+                alt="Fond animé du portfolio d'Arthur Jenck"
                 className="hero-bg"
                 fill
                 priority
@@ -107,8 +99,9 @@ const HeroVid = () => {
                 }`}
                 loop
                 muted
-                autoPlay
                 playsInline
+                preload="metadata"
+                poster="/videos/portfolio-bg-poster.jpg"
                 aria-hidden="true"
             >
                 <source src={BG_Webm} type="video/webm" />

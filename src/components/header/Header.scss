@@ -15,10 +15,20 @@ header {
 
         // Le span suivant imite la barre de typing sur le sous-titre du h1
         .hero-typing {
-            opacity: 0;
+            width: 0;
             animation:
-                appear 0.3s ease-out calc($base-appear-delay + 0.2s) forwards,
+                typing-reveal 1.3s steps(var(--type-steps, 29), end) forwards,
                 typing-cursor 1s step-end infinite;
+            animation-play-state: paused;
+
+            html.hero-play & {
+                animation-play-state: running;
+            }
+
+            &.is-typed {
+                width: fit-content;
+                animation: typing-cursor 1s step-end infinite;
+            }
         }
     }
 
@@ -58,6 +68,15 @@ header {
     to {
         bottom: 2.5vw;
         opacity: 1;
+    }
+}
+
+@keyframes typing-reveal {
+    from {
+        width: 0;
+    }
+    to {
+        width: var(--type-width, 0);
     }
 }
 

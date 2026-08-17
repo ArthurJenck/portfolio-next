@@ -19,7 +19,7 @@ const ContactLink = ({ href, displayText, copyText }: ContactLinkProps) => {
             onMouseLeave={() => setIsHovered(false)}
             className="about-link relative flex mt-12"
         >
-            <Link href={href} target="_blank" className="font-bold">
+            <Link href={href} target="_blank" rel="noopener noreferrer" className="font-bold">
                 {displayText}
             </Link>
             <CopyBtn copyText={copyText} isHovered={isHovered} />

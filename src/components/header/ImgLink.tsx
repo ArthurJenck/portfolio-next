@@ -56,7 +56,7 @@ const ImgLink = ({ type, link: customLink, alt: customAlt, className }: ImgLinkP
                 return {
                     link: '/',
                     icon: Logo,
-                    alt: 'Logo blanc',
+                    alt: 'Logo Arthur Jenck',
                 }
         }
     }

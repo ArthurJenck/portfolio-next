@@ -17,10 +17,12 @@ const Home = async () => {
         <>
             <FastTravel />
             <Header />
-            <Skills skillCategories={skillCategories} />
-            <Projets projects={projects} />
-            <About />
-            <Contact contactLinks={contactLinks} />
+            <main>
+                <Skills skillCategories={skillCategories} />
+                <Projets projects={projects} />
+                <About />
+                <Contact contactLinks={contactLinks} />
+            </main>
         </>
     )
 }

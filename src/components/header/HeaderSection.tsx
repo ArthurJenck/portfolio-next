@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import ImgLink from './ImgLink'
 import Chevron from '../../assets/icons/chevron.svg'
 import { useScroll } from '../../hooks/useScroll'
@@ -9,11 +10,36 @@ import Image from 'next/image'
 
 const Header = () => {
     const scrollTo = useScroll()
+    const typingRef = useRef<HTMLSpanElement>(null)
 
     // On récupère l'emplacement vertical de la souris et on le convertit en font-weight pour animer le titre
     const handleH1Wght = (e: React.MouseEvent) => {
         document.querySelector('header')!.style.setProperty('--h1-weight', JSON.stringify(e.pageY))
     }
+
+    useEffect(() => {
+        const el = typingRef.current
+        if (!el) return
+
+        el.style.setProperty('--type-steps', `${el.textContent?.length ?? 0}`)
+
+        const updateWidth = () => {
+            const borderRight = parseFloat(getComputedStyle(el).borderRightWidth) || 0
+            el.style.setProperty('--type-width', `${el.scrollWidth + borderRight}px`)
+        }
+        updateWidth()
+
+        const handleAnimationEnd = (e: AnimationEvent) => {
+            if (e.animationName === 'typing-reveal') el.classList.add('is-typed')
+        }
+
+        window.addEventListener('resize', updateWidth)
+        el.addEventListener('animationend', handleAnimationEnd)
+        return () => {
+            window.removeEventListener('resize', updateWidth)
+            el.removeEventListener('animationend', handleAnimationEnd)
+        }
+    }, [])
     //
     return (
         <header
@@ -27,8 +53,11 @@ const Header = () => {
                 Arthur
                 <br />
                 Jenck{' '}
-                <span className="hero-typing size-fit block mx-auto tracking-normal leading-normal whitespace-nowrap overflow-hidden border-white border-r-2 text-[clamp(10px,3.5vw,1rem)] md:text-[1.5vw]">
-                    Développeur Web Front-End
+                <span
+                    ref={typingRef}
+                    className="hero-typing block mx-auto tracking-normal leading-normal whitespace-nowrap overflow-hidden border-white border-r-2 text-[clamp(10px,3.5vw,1rem)] md:text-[1.5vw]"
+                >
+                    Développeur Créatif sur Paris
                 </span>
             </h1>
             {/* Le stopPropagation évite le scroll en cliquant sur les liens extenes */}
