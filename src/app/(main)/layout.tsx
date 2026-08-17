@@ -179,7 +179,9 @@ export default function RootLayout({
                 />
                 <script dangerouslySetInnerHTML={{ __html: loaderInitScript }} />
                 <noscript>
-                    <style>{'.site-loader { display: none !important; }'}</style>
+                    <style>
+                        {'.site-loader { display: none !important; } .hero-typing { width: fit-content !important; animation: none !important; }'}
+                    </style>
                 </noscript>
             </head>
             <body className={cn('overflow-x-hidden', sora.className, sora.variable, montserrat.variable)}>
