@@ -11,7 +11,7 @@ const NotFound = () => {
 
             <div className="flex gap-1 font-bold">
                 <p className="text-[clamp(0.85rem,2vw,2rem)] relative">Vous êtes perdu ?</p>
-                <Link href="/" className="not-found__link relative text-[clamp(0.85rem,2vw,2rem)]">
+                <Link data-sfx="link" href="/" className="not-found__link relative text-[clamp(0.85rem,2vw,2rem)]">
                     Revenir en lieu sûr
                 </Link>
             </div>

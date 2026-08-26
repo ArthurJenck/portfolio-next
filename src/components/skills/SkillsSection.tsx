@@ -43,7 +43,7 @@ const Skills = ({ skillCategories }: { skillCategories: SkillResponse }) => {
                         className="absolute inset-x-0 top-0 w-0.5 rounded-full bg-linear-to-t from-[#5a3e79] via-[#714e97] to-[#8d6aac]"
                     />
                 </div>
-                <div ref={timelineRef} className="relative z-10">
+                <div ref={timelineRef} className="relative">
                     {skillCategories.map((category) => (
                         <SkillCategory
                             key={category.id}

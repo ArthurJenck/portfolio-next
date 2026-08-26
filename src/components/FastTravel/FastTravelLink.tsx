@@ -33,6 +33,7 @@ const FastTravelLink = ({ section, isActive }: FastTravelLinkProps) => {
     return (
         <li className="fast-travel__link relative rounded-full">
             <Link
+                data-sfx="link"
                 href={section.href}
                 onClick={handleClick}
                 className={cn(

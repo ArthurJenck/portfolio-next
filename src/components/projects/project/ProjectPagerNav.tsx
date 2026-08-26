@@ -31,7 +31,7 @@ const ProjectPagerNav = async ({ slug }: { slug: string }) => {
             aria-label="Navigation entre les projets"
             className="pointer-events-none fixed inset-x-0 bottom-0 z-20 flex items-end justify-between gap-6 px-[4vw] pb-5 md:pb-7 [text-shadow:0_2px_14px_rgba(0,0,0,0.55)]"
         >
-            <Link href={`/${next.slug}`} className={linkClass} rel="next">
+            <Link data-sfx="link" href={`/${next.slug}`} className={linkClass} rel="next">
                 <span className={labelClass}>
                     <MoveLeft size={20} />
                     {isFirst ? 'Aller à la fin' : 'Projet précédent'}
@@ -39,7 +39,12 @@ const ProjectPagerNav = async ({ slug }: { slug: string }) => {
                 <span className={nameClass}>{next.name}</span>
             </Link>
 
-            <Link href={`/${previous.slug}`} className={`${linkClass} items-end text-right`} rel="previous">
+            <Link
+                data-sfx="link"
+                href={`/${previous.slug}`}
+                className={`${linkClass} items-end text-right`}
+                rel="previous"
+            >
                 <span className={labelClass}>
                     {isLast ? 'Retour au début' : 'Projet suivant'}
                     <MoveRight size={20} />

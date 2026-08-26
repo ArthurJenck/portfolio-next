@@ -2,16 +2,20 @@
 
 import ImgLink from './header/ImgLink'
 import Burger from './burger/Burger'
+import SoundToggle from './audio/SoundToggle'
 import { useScroll, useMotionValue, useSpring, motion, MotionValue } from 'framer-motion'
 import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
+import { useAudioSignals } from '@/hooks/useAudioSignals'
 
 const NavBar = () => {
     const pathname = usePathname()
     const isLanding = pathname === '/'
     const prefersReducedMotion = usePrefersReducedMotion()
+
+    useAudioSignals()
 
     // Utilisation de useScroll de Framer Motion (optimisé avec requestAnimationFrame)
     const { scrollY } = useScroll()
@@ -53,7 +57,8 @@ const NavBar = () => {
                         <ImgLink type="logo" className="size-[4rem]" />
                     </motion.div>
                 )}
-                <div className="pointer-events-auto">
+                <div className="pointer-events-auto flex items-center gap-10">
+                    <SoundToggle />
                     <Burger />
                 </div>
             </nav>
@@ -61,7 +66,8 @@ const NavBar = () => {
             {/* Version desktop : logo toujours visible */}
             <nav className="hidden md:flex fixed top-8 left-[4vw] right-[4vw] z-50 h-fit justify-between items-center pointer-events-none">
                 <ImgLink type="logo" className="size-[5vw] pointer-events-auto" />
-                <div className="pointer-events-auto">
+                <div className="pointer-events-auto flex items-center gap-12">
+                    <SoundToggle />
                     <Burger />
                 </div>
             </nav>

@@ -23,6 +23,7 @@ const Burger = () => {
         <div className={isOpen ? 'burger open' : 'burger'}>
             {/* Le toggle du burger change l'état au clic */}
             <motion.div
+                data-sfx="button"
                 className="burger-toggle relative z-4 ml-auto flex flex-col gap-2 cursor-pointer"
                 onClick={() => setIsOpen(!isOpen)}
                 whileHover={{ scale: 1.1 }}

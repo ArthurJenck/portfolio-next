@@ -15,6 +15,7 @@ const ContactLink = ({ href, displayText, copyText }: ContactLinkProps) => {
 
     return (
         <li
+            data-sfx="link-ext"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             className="about-link relative flex mt-12"

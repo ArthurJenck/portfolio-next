@@ -9,7 +9,7 @@ interface MobileProjectItemProps {
 
 const MobileProjectItem = ({ project }: MobileProjectItemProps) => {
     return (
-        <Link href={`/${project.slug}`} className="flex flex-col gap-1">
+        <Link data-sfx="link" href={`/${project.slug}`} className="flex flex-col gap-1">
             <Image src={project.cover_image} alt={project.name} width={300} height={100} className="w-full h-auto" />
             <div className="text-xl">
                 <h3 className="font-semibold">{project.name}</h3>

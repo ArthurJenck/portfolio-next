@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
+import { useAmbientAudio } from '@/providers/ambient-audio-context'
 
 gsap.registerPlugin(CustomEase)
 CustomEase.create('tileIn', 'M0,0 C0.42,0,1,1,1,1')
@@ -39,6 +40,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
 }) => {
     const router = useRouter()
     const prefersReducedMotion = usePrefersReducedMotion()
+    const { playSfx } = useAmbientAudio()
     const rootRef = useRef<HTMLDivElement>(null)
     const stackRef = useRef<HTMLDivElement>(null)
     const stackItemsRef = useRef<HTMLDivElement[]>([])
@@ -169,6 +171,11 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
         }
     }, [projectSlug, router, prefersReducedMotion])
 
+    const tilePan = (clientX?: number) => {
+        const x = clientX ?? (rootRef.current?.getBoundingClientRect().left ?? 0) + width / 2
+        return (x / window.innerWidth) * 1.4 - 0.7
+    }
+
     const handlePointerDown = (e: React.PointerEvent) => {
         pointerDownPos.current = { x: e.clientX, y: e.clientY }
         pointerDownTime.current = Date.now()
@@ -196,6 +203,9 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
         const holdDuration = Date.now() - pointerDownTime.current
 
         if (totalMovement < 10 && holdDuration < 300) {
+            // Le son vit ici et non dans SfxDelegate : lui seul connaît la condition qui
+            // sépare un vrai clic d'une fin de drag du carousel.
+            playSfx('navInternal', { pan: tilePan(e.clientX), still: prefersReducedMotion })
             router.push(`/${projectSlug}`)
         }
     }
@@ -222,12 +232,14 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
         if (e.key !== 'Enter' && e.key !== ' ') return
 
         e.preventDefault()
+        playSfx('navInternal', { pan: tilePan(), still: prefersReducedMotion })
         router.push(`/${projectSlug}`)
     }
 
     return (
         <div
             ref={rootRef}
+            data-sfx="tile"
             role="link"
             tabIndex={0}
             aria-label={`Voir le projet ${projectName}`}
