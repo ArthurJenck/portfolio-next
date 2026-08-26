@@ -1,0 +1,100 @@
+.sound-toggle-wrap {
+    display: flex;
+    align-items: center;
+}
+
+.sound-toggle-label {
+    display: none;
+    position: absolute;
+    right: 100%;
+    margin-right: 1.25rem;
+    white-space: nowrap;
+    font-family: var(--font-montserrat);
+    font-weight: 400;
+    font-size: 0.625rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--white);
+    pointer-events: none;
+    opacity: 0;
+    transform: translateX(6px);
+    transition:
+        opacity 0.35s ease,
+        transform 0.35s ease;
+}
+
+@media (min-width: 768px) {
+    .sound-toggle-label {
+        display: block;
+    }
+}
+
+.sound-toggle-wrap:hover .sound-toggle-label,
+.sound-toggle-wrap:has(.sound-toggle:focus-visible) .sound-toggle-label {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.sound-toggle {
+    position: relative;
+    display: grid;
+    place-items: center;
+    background: none;
+    border: 0;
+    padding: 0;
+
+    // Sert à agrandir la zone de clic, comme sur le burger : le trait ne fait que
+    // quelques pixels de haut. Reste à l'écart des 5rem × 4rem du burger.
+    &::before {
+        content: '';
+        width: 4rem;
+        height: 3rem;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    svg {
+        display: block;
+        overflow: visible;
+        opacity: 0.55;
+        transition: opacity 0.25s ease;
+    }
+
+    path {
+        fill: none;
+        stroke: var(--white);
+        stroke-linecap: round;
+    }
+
+    &:hover svg,
+    &:focus-visible svg,
+    &[aria-pressed='true'] svg {
+        opacity: 1;
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--white);
+        outline-offset: 8px;
+        border-radius: 4px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .sound-toggle::before {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sound-toggle svg {
+        transition: none;
+    }
+
+    .sound-toggle-label {
+        transition: none;
+        transform: none;
+    }
+}

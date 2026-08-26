@@ -79,6 +79,7 @@ const ImgLink = ({ type, link: customLink, alt: customAlt, className }: ImgLinkP
             <>
                 {/* Version mobile : sans animation */}
                 <a
+                    data-sfx="link-ext"
                     href={link}
                     className={cn('select-none md:hidden', className)}
                     target="_blank"
@@ -89,6 +90,7 @@ const ImgLink = ({ type, link: customLink, alt: customAlt, className }: ImgLinkP
 
                 {/* Version desktop : avec animations */}
                 <motion.a
+                    data-sfx="link-ext"
                     href={link}
                     className={cn('select-none hidden md:block', className)}
                     target="_blank"
@@ -106,13 +108,18 @@ const ImgLink = ({ type, link: customLink, alt: customAlt, className }: ImgLinkP
         return (
             <>
                 {/* Version mobile : téléchargement direct du PDF */}
-                <motion.a href={linkMobile} className={cn('select-none block md:hidden', className)} download>
+                <motion.a
+                    data-sfx="button"
+                    href={linkMobile}
+                    className={cn('select-none block md:hidden', className)}
+                    download
+                >
                     <Image src={icon} alt={alt} width={100} height={100} style={{ width: '100%', height: '100%' }} />
                 </motion.a>
 
                 {/* Version desktop : lien vers la page CV avec animations */}
                 <motion.div className={cn('hidden md:block', className)}>
-                    <Link href={link} className="select-none">
+                    <Link data-sfx="link" href={link} className="select-none">
                         <motion.div {...animationProps}>
                             <Image
                                 src={icon}
@@ -133,6 +140,7 @@ const ImgLink = ({ type, link: customLink, alt: customAlt, className }: ImgLinkP
         <>
             {/* Version mobile : sans animation */}
             <Link
+                data-sfx="link"
                 href={link}
                 onClick={
                     isLogoWithoutLink && isHomePage
@@ -156,6 +164,7 @@ const ImgLink = ({ type, link: customLink, alt: customAlt, className }: ImgLinkP
 
             {/* Version desktop : avec animations */}
             <Link
+                data-sfx="link"
                 href={link}
                 className={cn('select-none hidden md:block', className)}
                 onClick={

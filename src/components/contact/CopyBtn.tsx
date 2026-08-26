@@ -44,6 +44,7 @@ const CopyBtn = ({ copyText, isHovered }: CopyBtnProps) => {
         <>
             {/* Version mobile - toujours visible */}
             <div
+                data-sfx="button"
                 className="md:hidden w-3.5 absolute -right-6 top-1/2 -translate-y-1/2 cursor-pointer pointer-events-auto"
                 onClick={handleCopyClick}
             >
@@ -58,6 +59,7 @@ const CopyBtn = ({ copyText, isHovered }: CopyBtnProps) => {
 
             {/* Version desktop - visible au hover */}
             <div
+                data-sfx="button"
                 className={cn(
                     'hidden md:block w-3.5 absolute -right-6 top-1/2 -translate-y-1/2 cursor-pointer pointer-events-auto',
                     shouldBeVisible ? 'opacity-100' : 'opacity-0',

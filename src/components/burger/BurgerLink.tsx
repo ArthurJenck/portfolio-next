@@ -15,6 +15,7 @@ const BurgerLink = ({ href, title }: BurgerLinkProps) => {
         <li>
             {/* Le preventDefault sert à éviter le rechargement de la page en cliquant sur le lien. On utilise alors la fonction scrollTo pour remonter en haut de la page et nettoyer l'url */}
             <a
+                data-sfx="link"
                 className="burger-link font-bold text-2xl tracking-[1px] relative select-none cursor-pointer"
                 href={isHomePage ? href : `/${href}`}
                 onClick={(e) => {

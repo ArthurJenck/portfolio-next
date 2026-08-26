@@ -45,6 +45,7 @@ const LikeButton = ({ initialCount }: { initialCount: number }) => {
     return (
         <button
             type="button"
+            data-sfx="like"
             onClick={handleClick}
             className="relative flex flex-col items-center gap-1.5 cursor-pointer"
             aria-label="Liker le portfolio"

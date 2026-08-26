@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import '@/app/globals.css'
 import { MotionProvider } from '@/providers/MotionProvider'
+import AudioProvider from '@/providers/AudioProvider'
 import { cn } from '@/lib/utils'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Analytics } from '@vercel/analytics/next'
@@ -196,11 +197,13 @@ export default function RootLayout({
                 />
                 <SiteLoader />
                 <MotionProvider>
-                    <div className="min-h-screen flex flex-col">
-                        <NavBar />
-                        {children}
-                        <Footer />
-                    </div>
+                    <AudioProvider>
+                        <div className="min-h-screen flex flex-col">
+                            <NavBar />
+                            {children}
+                            <Footer />
+                        </div>
+                    </AudioProvider>
                     {/* TODO: remettre le debug */}
                     <Analytics debug={false} />
                     <SpeedInsights debug={false} />
