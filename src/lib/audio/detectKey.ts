@@ -5,6 +5,7 @@
 // fréquences connues d'avance (12 classes de hauteur × 5 octaves).
 
 import { SEMITONES_PER_OCTAVE } from './audio.config'
+import { foldSemitones } from './audio.utils'
 import {
     ANALYSIS_SAMPLE_RATE,
     FRAME_SIZE,
@@ -100,11 +101,7 @@ const correlate = (chroma: number[], profile: number[], tonic: number): number =
 }
 
 // Offset en demi-tons vs BASE_HZ (Ré2), ramené dans [-6, 5].
-const rootOffsetFromPitchClass = (pitchClass: number): number => {
-    const half = SEMITONES_PER_OCTAVE / 2
-    const raw = pitchClass - ROOT_PITCH_CLASS_INDEX
-    return (((raw + half) % SEMITONES_PER_OCTAVE) + SEMITONES_PER_OCTAVE) % SEMITONES_PER_OCTAVE - half
-}
+const rootOffsetFromPitchClass = (pitchClass: number): number => foldSemitones(pitchClass - ROOT_PITCH_CLASS_INDEX)
 
 export const detectKey = async (file: File): Promise<DetectedKey | null> => {
     if (typeof window === 'undefined') return null

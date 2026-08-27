@@ -20,6 +20,13 @@ export const pitchClassDistance = (a: number, b: number): number => {
     return Math.min(raw, SEMITONES_PER_OCTAVE - raw)
 }
 
+// Replie un nombre de demi-tons dans [-6, 5] par octaves : la classe de hauteur
+// est préservée, seul le registre absolu change.
+export const foldSemitones = (semitones: number): number => {
+    const half = SEMITONES_PER_OCTAVE / 2
+    return ((((semitones + half) % SEMITONES_PER_OCTAVE) + SEMITONES_PER_OCTAVE) % SEMITONES_PER_OCTAVE) - half
+}
+
 // Constantes de l'algorithme mulberry32 (Tommy Ettinger) : fixes, non réglables.
 const MULBERRY32_INCREMENT = 0x6d2b79f5
 const MULBERRY32_SHIFT_A = 15

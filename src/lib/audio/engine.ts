@@ -46,6 +46,7 @@ import {
     clamp01,
     createPrng,
     createSeed,
+    foldSemitones,
     intimacyFromDepth,
     lerp,
     msToSeconds,
@@ -811,7 +812,7 @@ export class AmbientEngine {
     }
 
     private sfxHz(degree: number, octave: number): number {
-        return this.currentRootHz() * semitoneRatio(degree + octave * SEMITONES_PER_OCTAVE)
+        return BASE_HZ * semitoneRatio(foldSemitones(this.rootOffset) + degree + octave * SEMITONES_PER_OCTAVE)
     }
 
     private sfxBi(): number {
