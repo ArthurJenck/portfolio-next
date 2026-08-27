@@ -75,6 +75,15 @@ export const MIX = {
     dryIntimacyLow: 0.5,
 }
 
+export const MUSIC = {
+    // Fondu exponentiel entre l'ambiance générative et la musique d'un projet, dans
+    // les deux sens.
+    crossfadeSeconds: 0.6,
+    defaultVolume: 0.5,
+    // Marge après le fondu de coupure avant de mettre l'élément <audio> en pause.
+    pauseBufferMs: 50,
+}
+
 export const REVERB = {
     seconds: 4.5,
     predelayMs: 22,

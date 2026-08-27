@@ -16,6 +16,7 @@ import {
     METALLIC,
     MIN_AUDIBLE_GAIN,
     MIX,
+    MUSIC,
     OUTPUT,
     PIANO,
     REVERB,
@@ -116,6 +117,11 @@ export class AmbientEngine {
     private convolver: ConvolverNode
     private bus: GainNode
     private brillance: BiquadFilterNode
+    private compressor: DynamicsCompressorNode
+    // Un seul point de coupure pour tout le contenu génératif (drone + events + vent,
+    // dry et queue de reverb) : dry et wet y convergent tous les deux avant preMix, donc
+    // un unique fondu ici les éteint ensemble sans toucher aux SFX ni à une piste projet.
+    private generativeMute: GainNode
 
     private droneFilter: BiquadFilterNode
     private droneStack: DroneStack | null = null
@@ -135,6 +141,16 @@ export class AmbientEngine {
     private sfxLast = new Map<SfxName, number>()
     private sfxBurst = new Map<SfxName, number>()
     private sfxLastAny = 0
+
+    // Piste projet : lue en parallèle du moteur génératif, sur son propre fondu
+    // (trackFade), routée après l'EQ de sortie taillée pour le drone (cf. constructeur).
+    private trackAudio: HTMLAudioElement | null = null
+    private trackSource: MediaElementAudioSourceNode | null = null
+    private trackGain: GainNode
+    private trackFade: GainNode
+    private currentTrackUrl: string | null = null
+    private trackStopTimer = 0
+    private generativeSuspended = false
 
     private params: AmbientParams = { ...DEFAULT_PARAMS }
     private timers: number[] = []
@@ -185,12 +201,12 @@ export class AmbientEngine {
         this.brillance.frequency.value = OUTPUT.brillanceCeiling
         this.brillance.Q.value = 0.4
 
-        const compressor = ctx.createDynamicsCompressor()
-        compressor.threshold.value = -26
-        compressor.knee.value = 28
-        compressor.ratio.value = 3
-        compressor.attack.value = 0.05
-        compressor.release.value = 0.5
+        this.compressor = ctx.createDynamicsCompressor()
+        this.compressor.threshold.value = -26
+        this.compressor.knee.value = 28
+        this.compressor.ratio.value = 3
+        this.compressor.attack.value = 0.05
+        this.compressor.release.value = 0.5
 
         const limiter = ctx.createDynamicsCompressor()
         limiter.threshold.value = -3
@@ -206,17 +222,31 @@ export class AmbientEngine {
         this.master.connect(rumble)
         rumble.connect(tame)
         tame.connect(this.brillance)
-        this.brillance.connect(compressor)
-        compressor.connect(limiter)
+        this.brillance.connect(this.compressor)
+        this.compressor.connect(limiter)
         limiter.connect(ctx.destination)
 
         this.dry = ctx.createGain()
         this.wet = ctx.createGain()
         this.convolver = ctx.createConvolver()
         this.convolver.buffer = this.createImpulse()
-        this.dry.connect(this.preMix)
+        this.generativeMute = ctx.createGain()
+        this.dry.connect(this.generativeMute)
         this.convolver.connect(this.wet)
-        this.wet.connect(this.preMix)
+        this.wet.connect(this.generativeMute)
+        this.generativeMute.connect(this.preMix)
+
+        // Piste projet : bypasse l'EQ this.master → rumble/tame/brillance (taillée pour
+        // le drone, elle étoufferait un morceau masterisé), mais garde le glue/limiteur
+        // via this.compressor. Le tap vers l'analyser est parallèle, sans sortie propre :
+        // sans lui le visualizer resterait plat pendant toute la lecture.
+        this.trackGain = ctx.createGain()
+        this.trackGain.gain.value = MUSIC.defaultVolume
+        this.trackFade = ctx.createGain()
+        this.trackFade.gain.value = 0
+        this.trackGain.connect(this.trackFade)
+        this.trackFade.connect(this.compressor)
+        this.trackFade.connect(this.analyser)
 
         this.bus = ctx.createGain()
         this.bus.connect(this.dry)
@@ -400,7 +430,13 @@ export class AmbientEngine {
         if (!stack) return
         const now = this.ctx.currentTime
         stack.gain.gain.cancelScheduledValues(now)
-        stack.gain.gain.setValueCurveAtTime(fadeCurve(false), now, fadeOutSeconds)
+        // setValueCurveAtTime exige une durée strictement positive : suspendGenerative(0)
+        // (deep-link direct sur un projet avec musique) demande une coupure instantanée.
+        if (fadeOutSeconds > 0) {
+            stack.gain.gain.setValueCurveAtTime(fadeCurve(false), now, fadeOutSeconds)
+        } else {
+            stack.gain.gain.setValueAtTime(0, now)
+        }
         stack.oscillators.forEach((osc) => {
             try {
                 osc.stop(now + fadeOutSeconds + DRONE.stopBufferSeconds)
@@ -411,7 +447,10 @@ export class AmbientEngine {
     }
 
     private modulate = (): void => {
-        if (!this.running) return
+        // Suspendu pendant la lecture d'une piste projet : une modulation ici referait
+        // un droneStack sur un bus muet et changerait rootOffset au hasard, désaccordant
+        // les SFX de la tonalité du morceau en cours.
+        if (!this.running || this.generativeSuspended) return
         if (ROOT_STEPS.length > 1) {
             let next = this.rootOffset
             while (next === this.rootOffset) next = ROOT_STEPS[Math.floor(this.random() * ROOT_STEPS.length)]
@@ -1139,6 +1178,132 @@ export class AmbientEngine {
         }
     }
 
+    // exponentialRampToValueAtTime ne peut ni viser ni partir de zéro strict : on
+    // rampe vers SILENCE_GAIN puis on force 0, et on part toujours d'une valeur
+    // courante plancherée au même niveau.
+    private rampExponential(param: AudioParam, target: number, seconds: number): void {
+        const now = this.ctx.currentTime
+        param.cancelScheduledValues(now)
+        // Une rampe de durée nulle (coupure instantanée, ex. deep-link direct sur un
+        // projet avec musique) donnerait un ratio 0/0 à exponentialRampToValueAtTime :
+        // on bascule alors la valeur directement.
+        if (seconds <= 0) {
+            param.setValueAtTime(target, now)
+            return
+        }
+        const current = Math.max(SILENCE_GAIN, param.value)
+        param.setValueAtTime(current, now)
+        if (target <= SILENCE_GAIN) {
+            param.exponentialRampToValueAtTime(SILENCE_GAIN, now + seconds)
+            param.setValueAtTime(0, now + seconds)
+        } else {
+            param.exponentialRampToValueAtTime(target, now + seconds)
+        }
+    }
+
+    // Force la racine utilisée par currentRootHz() (donc par sfxHz()) : c'est ce qui
+    // accorde les SFX de micro-interaction sur la tonalité d'une piste projet.
+    setRootOffset(semitones: number): void {
+        this.rootOffset = semitones
+    }
+
+    // Coupe la générative (drone, voix, métallique, piano, vent) au profit d'une piste
+    // projet. Les SFX ne sont pas concernés : ils vivent sur un bus séparé.
+    suspendGenerative(fadeSeconds: number = MUSIC.crossfadeSeconds): void {
+        if (this.disposed || this.generativeSuspended) return
+        this.generativeSuspended = true
+
+        this.timers.forEach((id) => window.clearTimeout(id))
+        this.timers = []
+        this.activeVoices = []
+
+        const previousDrone = this.droneStack
+        this.droneStack = null
+        this.killDroneStack(previousDrone, fadeSeconds)
+
+        this.rampExponential(this.generativeMute.gain, 0, fadeSeconds)
+    }
+
+    // Relance la générative (nouveau drone stack, boucles de composition) quand plus
+    // aucune piste projet n'est active.
+    resumeGenerative(fadeSeconds: number = MUSIC.crossfadeSeconds): void {
+        if (this.disposed || !this.generativeSuspended) return
+        this.generativeSuspended = false
+
+        this.droneStack = this.createDroneStack(fadeSeconds)
+        this.rampExponential(this.generativeMute.gain, 1, fadeSeconds)
+
+        if (this.running) {
+            this.scheduleVoice()
+            this.scheduleMetallic()
+            this.schedulePiano()
+            this.scheduleModulation()
+        }
+    }
+
+    private ensureTrackNodes(): void {
+        if (this.trackAudio) return
+        const audio = new Audio()
+        audio.crossOrigin = 'anonymous'
+        audio.loop = true
+        audio.preload = 'auto'
+        this.trackAudio = audio
+        this.trackSource = this.ctx.createMediaElementSource(audio)
+        this.trackSource.connect(this.trackGain)
+    }
+
+    // startAt ne s'applique qu'au premier lancement d'une piste : la boucle native de
+    // l'élément <audio> reprend ensuite au timecode 0.
+    async playTrack(
+        track: { url: string; startAt?: number; volume?: number; rootOffset?: number },
+        fadeSeconds: number = MUSIC.crossfadeSeconds,
+    ): Promise<void> {
+        if (this.disposed) return
+        this.ensureTrackNodes()
+        const audio = this.trackAudio
+        if (!audio) return
+
+        window.clearTimeout(this.trackStopTimer)
+
+        const isNewTrack = this.currentTrackUrl !== track.url
+        this.currentTrackUrl = track.url
+
+        if (typeof track.rootOffset === 'number') this.setRootOffset(track.rootOffset)
+        this.trackGain.gain.value = track.volume ?? MUSIC.defaultVolume
+
+        if (isNewTrack) {
+            audio.src = track.url
+            audio.currentTime = track.startAt ?? 0
+        }
+
+        if (this.running) {
+            try {
+                await audio.play()
+            } catch {
+                // Lecture bloquée par la politique d'autoplay : reprendra au prochain
+                // geste utilisateur, qui relance start().
+            }
+        }
+
+        this.rampExponential(this.trackFade.gain, 1, fadeSeconds)
+    }
+
+    stopTrack(fadeSeconds: number = MUSIC.crossfadeSeconds): void {
+        if (!this.trackAudio || !this.currentTrackUrl) return
+        this.currentTrackUrl = null
+        this.rampExponential(this.trackFade.gain, 0, fadeSeconds)
+
+        window.clearTimeout(this.trackStopTimer)
+        const audio = this.trackAudio
+        this.trackStopTimer = window.setTimeout(
+            () => {
+                // Un start() entretemps a pu relancer la lecture : ne pas l'interrompre.
+                if (!this.running || !this.currentTrackUrl) audio.pause()
+            },
+            secondsToMs(fadeSeconds) + MUSIC.pauseBufferMs,
+        )
+    }
+
     setParams(next: Partial<AmbientParams>): void {
         this.params = { ...this.params, ...next }
         this.applyParams(false)
@@ -1171,11 +1336,16 @@ export class AmbientEngine {
         this.fade.gain.setValueAtTime(this.fade.gain.value, now)
         this.fade.gain.linearRampToValueAtTime(1, now + MIX.fadeIn)
 
-        this.scheduleVoice()
-        this.scheduleMetallic()
-        this.schedulePiano()
-        this.scheduleModulation()
-        this.timers.push(window.setTimeout(this.suspendedVoice, STARTUP.firstVoiceDelayMs))
+        // Suspendue par un deep-link direct sur un projet avec musique (cf.
+        // AudioProvider) : la générative ne doit pas démarrer avant de retomber en
+        // silence quelques centaines de ms plus tard.
+        if (!this.generativeSuspended) {
+            this.scheduleVoice()
+            this.scheduleMetallic()
+            this.schedulePiano()
+            this.scheduleModulation()
+            this.timers.push(window.setTimeout(this.suspendedVoice, STARTUP.firstVoiceDelayMs))
+        }
         // Premier passage dans un patch à volume nul : absorbe la compilation JIT et
         // le premier rendu du convolver SFX, sinon le tout premier tick réel traîne.
         this.timers.push(window.setTimeout(() => this.sfxTick(STARTUP.primingGain, 0), STARTUP.primingDelayMs))
@@ -1184,6 +1354,16 @@ export class AmbientEngine {
         this.lastActivity = performance.now()
         cancelAnimationFrame(this.frame)
         this.frame = requestAnimationFrame(this.tick)
+
+        if (this.currentTrackUrl && this.trackAudio) {
+            window.clearTimeout(this.trackStopTimer)
+            try {
+                await this.trackAudio.play()
+            } catch {
+                // Reprendra au prochain geste utilisateur qui relance start().
+            }
+            this.rampExponential(this.trackFade.gain, 1, MUSIC.crossfadeSeconds)
+        }
     }
 
     stop(): void {
@@ -1203,12 +1383,31 @@ export class AmbientEngine {
         this.fade.gain.cancelScheduledValues(now)
         this.fade.gain.setValueAtTime(this.fade.gain.value, now)
         this.fade.gain.linearRampToValueAtTime(0, now + MIX.fadeOut)
+
+        // La piste ne traverse pas this.fade (elle bypasse l'EQ générative, cf.
+        // constructeur) : sans ceci elle continuerait de jouer après la coupure du son.
+        if (this.trackAudio && this.currentTrackUrl) {
+            this.rampExponential(this.trackFade.gain, 0, MIX.fadeOut)
+            window.clearTimeout(this.trackStopTimer)
+            const audio = this.trackAudio
+            this.trackStopTimer = window.setTimeout(
+                () => {
+                    if (!this.running) audio.pause()
+                },
+                secondsToMs(MIX.fadeOut) + MUSIC.pauseBufferMs,
+            )
+        }
     }
 
     dispose(): void {
         this.stop()
         this.disposed = true
         cancelAnimationFrame(this.frame)
+        window.clearTimeout(this.trackStopTimer)
+        if (this.trackAudio) {
+            this.trackAudio.pause()
+            this.trackAudio.src = ''
+        }
         window.setTimeout(
             () => {
                 void this.ctx.close()

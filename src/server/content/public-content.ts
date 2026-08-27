@@ -7,7 +7,7 @@ import SkillCategoryModel from '@/server/models/SkillCategory'
 import ContactLink from '@/server/models/ContactLink'
 import CV from '@/server/models/CV'
 import Like from '@/server/models/Like'
-import { DetailedProjectType, MinimalProjectType, ProjectMedia } from '@/types/ProjectTypes'
+import { DetailedProjectType, MinimalProjectType, ProjectMedia, ProjectMusic } from '@/types/ProjectTypes'
 import { SkillCategory, SkillChild } from '@/types/SkillsTypes'
 
 export const publicContentTags = {
@@ -52,6 +52,15 @@ interface ProjectMediaSource {
     mobileUrl?: string
 }
 
+interface ProjectMusicSource {
+    url?: string
+    label?: string
+    startAt?: number
+    volume?: number
+    rootOffset?: number
+    creditUrl?: string
+}
+
 interface ProjectWithOptionalOrder {
     _id: Types.ObjectId
     name: string
@@ -68,6 +77,7 @@ interface ProjectWithOptionalOrder {
     medias?: ProjectMediaSource[]
     color?: string
     order?: number
+    music?: ProjectMusicSource
     updatedAt: Date
 }
 
@@ -121,6 +131,21 @@ const mapMinimalProject = (project: ProjectWithOptionalOrder): MinimalProjectTyp
     stack: (project.stack || []).map(mapSkill),
 })
 
+const mapProjectMusic = (music?: ProjectMusicSource): ProjectMusic | undefined => {
+    if (!music?.url) {
+        return undefined
+    }
+
+    return {
+        url: music.url,
+        label: music.label,
+        startAt: music.startAt,
+        volume: music.volume,
+        rootOffset: music.rootOffset,
+        creditUrl: music.creditUrl,
+    }
+}
+
 const mapDetailedProject = (project: ProjectWithOptionalOrder): DetailedProjectType => ({
     id: project._id.toString(),
     name: project.name,
@@ -137,6 +162,7 @@ const mapDetailedProject = (project: ProjectWithOptionalOrder): DetailedProjectT
     githubLink: project.githubLink,
     webLink: project.webLink,
     order: project.order ?? 0,
+    music: mapProjectMusic(project.music),
 })
 
 const getPublicProjectsCached = unstable_cache(

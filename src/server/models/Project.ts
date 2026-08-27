@@ -6,6 +6,15 @@ export interface IProjectMedia {
     mobileUrl?: string
 }
 
+export interface IProjectMusic {
+    url: string
+    label?: string
+    startAt?: number
+    volume?: number
+    rootOffset?: number
+    creditUrl?: string
+}
+
 export interface IProject extends Document {
     name: string
     subtitle?: string
@@ -20,6 +29,7 @@ export interface IProject extends Document {
     mobile_cover_image?: string
     medias: IProjectMedia[]
     color?: string
+    music?: IProjectMusic
     createdAt: Date
     updatedAt: Date
 }
@@ -45,6 +55,18 @@ const ProjectSchema = new Schema<IProject>(
             },
         ],
         color: { type: String, required: false, default: '#f0f0f0' },
+        music: {
+            type: {
+                url: { type: String, required: true },
+                label: { type: String, required: false },
+                startAt: { type: Number, required: false },
+                volume: { type: Number, required: false },
+                rootOffset: { type: Number, required: false },
+                creditUrl: { type: String, required: false },
+            },
+            required: false,
+            default: undefined,
+        },
     },
     { timestamps: true },
 )

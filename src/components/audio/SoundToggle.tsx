@@ -39,7 +39,7 @@ const centerY = (size: Size) => boxHeight(size) / 2
 const flatPath = (size: Size) => `M${startX(size)} ${centerY(size)} L${startX(size) + lineWidth(size)} ${centerY(size)}`
 
 const SoundToggle = () => {
-    const { enabled, toggle, getAnalyser, getOutputLatencyMs } = useAmbientAudio()
+    const { enabled, toggle, getAnalyser, getOutputLatencyMs, currentTrackLabel } = useAmbientAudio()
     const prefersReducedMotion = usePrefersReducedMotion()
     const isCompact = useIsCompactNav()
     const pathRef = useRef<SVGPathElement>(null)
@@ -116,7 +116,12 @@ const SoundToggle = () => {
 
     return (
         <div className="sound-toggle-wrap relative z-7">
-            <span className="sound-toggle-label" aria-hidden="true">
+            {enabled && currentTrackLabel && (
+                <span className="sound-toggle-label sound-toggle-label--track" role="status">
+                    {currentTrackLabel}
+                </span>
+            )}
+            <span className="sound-toggle-label sound-toggle-label--action" aria-hidden="true">
                 {enabled ? 'Désactiver le son' : 'Activer le son'}
             </span>
             <motion.button

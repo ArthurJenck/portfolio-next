@@ -44,6 +44,7 @@ export const GET = route<{ id: string }>(
             githubLink: project.githubLink,
             webLink: project.webLink,
             order: project.order,
+            music: project.music,
         }
 
         return NextResponse.json(response)
@@ -76,6 +77,7 @@ export const PUT = route<{ id: string }>(
             'medias',
             'order',
             'color',
+            'music',
         ]
 
         for (const field of allowedFields) {
@@ -160,6 +162,19 @@ export const PUT = route<{ id: string }>(
             }
         }
 
+        // Si la musique change ou est retirée, supprimer l'ancien mp3 de Vercel Blob
+        if ('music' in updateData) {
+            const oldMusicUrl = currentProject.music?.url
+            const newMusicUrl = (updateData.music as { url?: string } | null)?.url
+            if (oldMusicUrl && oldMusicUrl !== newMusicUrl) {
+                try {
+                    await del(oldMusicUrl)
+                } catch (error) {
+                    console.error('Error deleting old project music from Vercel Blob:', error)
+                }
+            }
+        }
+
         const project = await Project.findByIdAndUpdate(id, updateData, { new: true })
 
         if (!project) return NextResponse.json({ error: 'Not found' }, { status: 404 })
@@ -187,6 +202,15 @@ export const DELETE = route<{ id: string }>(
                 await del(url as string)
             } catch (error) {
                 console.error('Error deleting project cover from Vercel Blob:', error)
+            }
+        }
+
+        // Supprimer le mp3 de la musique du projet, s'il y en a une
+        if (project.music?.url) {
+            try {
+                await del(project.music.url)
+            } catch (error) {
+                console.error('Error deleting project music from Vercel Blob:', error)
             }
         }
 

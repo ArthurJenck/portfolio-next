@@ -5,6 +5,7 @@ import { AmbientAudioContext, type AmbientAudioValue } from './ambient-audio-con
 import SfxDelegate from '@/components/audio/SfxDelegate'
 import type { AmbientEngine } from '@/lib/audio/engine'
 import type { AmbientParams } from '@/lib/audio/audio.types'
+import type { ProjectMusic } from '@/types/ProjectTypes'
 
 const MUTE_KEY = 'ambient-sound-muted'
 const GESTURES = ['pointerdown', 'keydown', 'touchstart'] as const
@@ -18,8 +19,10 @@ const AudioProvider = ({ children }: Props) => {
     const pendingParams = useRef<Partial<AmbientParams>>({})
     const bootRef = useRef<Promise<void> | null>(null)
     const wantedRef = useRef(false)
+    const pendingTrackRef = useRef<ProjectMusic | null>(null)
     const [enabled, setEnabled] = useState(false)
     const [ready, setReady] = useState(false)
+    const [currentTrackLabel, setCurrentTrackLabel] = useState<string | null>(null)
 
     // Sans ce verrou, deux appels concurrents passent tous les deux le test
     // `engineRef.current` avant que l'import dynamique ne résolve : le premier
@@ -30,11 +33,16 @@ const AudioProvider = ({ children }: Props) => {
                 const engine = new AmbientEngine()
                 engineRef.current = engine
                 if (Object.keys(pendingParams.current).length) engine.setParams(pendingParams.current)
+                // Deep-link direct sur un projet avec musique : suspend la générative
+                // avant même start(), pour qu'elle ne soit jamais audible avant que
+                // playTrack() ne prenne le relais juste après.
+                if (pendingTrackRef.current) engine.suspendGenerative(0)
             })
         }
         await bootRef.current
         if (!wantedRef.current) return
         await engineRef.current?.start()
+        if (pendingTrackRef.current) void engineRef.current?.playTrack(pendingTrackRef.current)
         setReady(true)
     }, [])
 
@@ -96,6 +104,26 @@ const AudioProvider = ({ children }: Props) => {
         }
     }, [])
 
+    // pendingTrackRef sert de boîte aux lettres : posée dès le montage de la page
+    // projet (avant tout geste utilisateur), elle est relue par boot() une fois le
+    // moteur prêt. Une fois le moteur existant, les appels ultérieurs l'atteignent
+    // directement.
+    const setTrack = useCallback((track: ProjectMusic | null) => {
+        pendingTrackRef.current = track
+        setCurrentTrackLabel(track?.label ?? null)
+
+        const engine = engineRef.current
+        if (!engine) return
+
+        if (track) {
+            engine.suspendGenerative()
+            void engine.playTrack(track)
+        } else {
+            engine.stopTrack()
+            engine.resumeGenerative()
+        }
+    }, [])
+
     const value = useMemo<AmbientAudioValue>(
         () => ({
             enabled,
@@ -112,8 +140,10 @@ const AudioProvider = ({ children }: Props) => {
             triggerModulation: () => engineRef.current?.triggerModulation(),
             playSfx: (name, options) => engineRef.current?.playSfx(name, options),
             engineRef: () => engineRef.current,
+            setTrack,
+            currentTrackLabel,
         }),
-        [enabled, ready, toggle],
+        [enabled, ready, toggle, setTrack, currentTrackLabel],
     )
 
     return (

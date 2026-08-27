@@ -69,7 +69,14 @@ curl -s -X POST https://arthurjenck.com/api/projects \
     ],
     "githubLink": "https://github.com/...",
     "webLink": "https://...",
-    "color": "#1a1a2e"
+    "color": "#1a1a2e",
+    "music": {
+      "url": "https://xxxx.vercel-storage.com/track.mp3",
+      "label": "Invader — Dance With The Dead",
+      "startAt": 12.5,
+      "volume": 0.5,
+      "rootOffset": -2
+    }
   }'
 
 # Mettre à jour un projet (champs partiels acceptés)
@@ -103,6 +110,7 @@ curl -s https://arthurjenck.com/api/projects/<id>/skills \
 - `mobile_cover_image` est optionnel — si absent, la cover desktop est affichée sur mobile (fallback automatique)
 - `medias[].mobileUrl` est optionnel — si absent, `medias[].url` est affiché sur tous les viewports
 - `date` en ISO 8601 : `"2024-06-01T00:00:00.000Z"`
+- `music` est optionnel — remplace l'ambiance générative par ce mp3 sur la page du projet. `url` seul est requis si présent ; `label` est optionnel — vide, aucun titre ne s'affiche à côté du visualizer (cas d'une ambiance sans crédit à donner, ex : Le Lac de Ronart) ; `startAt` (secondes, décimales acceptées — ex: `12.5`) ne s'applique qu'au premier lancement, la boucle repart ensuite à 0 ; `volume` (0–1, défaut 0.5) ; `rootOffset` (demi-tons vs Ré2, -6 à 5) accorde les SFX de micro-interaction sur la tonalité du morceau. Envoyer `"music": null` retire la musique et supprime le blob associé.
 
 ---
 

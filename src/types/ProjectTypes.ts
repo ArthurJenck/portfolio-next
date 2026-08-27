@@ -6,6 +6,15 @@ export interface ProjectMedia {
     mobileUrl?: string
 }
 
+export interface ProjectMusic {
+    url: string
+    label?: string
+    startAt?: number
+    volume?: number
+    rootOffset?: number
+    creditUrl?: string
+}
+
 export interface DetailedProjectType {
     id: string
     name: string
@@ -22,6 +31,7 @@ export interface DetailedProjectType {
     githubLink?: string
     webLink?: string
     order: number
+    music?: ProjectMusic
 }
 
 export interface MinimalProjectType {
