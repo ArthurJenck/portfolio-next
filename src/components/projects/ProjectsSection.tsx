@@ -1,11 +1,14 @@
 import MobileProjectsList from './MobileProjectsList'
 import ProjectsCarousel from './ProjectsCarousel'
-import SectionTitle from '@/components/SectionTitle'
+import SectionTitle from '@/components/ui/SectionTitle'
 import { ProjectResponse } from '@/types/ProjectTypes'
 import type { CSSProperties } from 'react'
 
+const MIN_DESKTOP_HEIGHT_VH = 100
+const HEIGHT_PER_PROJECT_VH = 40
+
 const Projets = ({ projects }: { projects: ProjectResponse }) => {
-    const desktopHeight = `${Math.max(100, projects.length * 40)}vh`
+    const desktopHeight = `${Math.max(MIN_DESKTOP_HEIGHT_VH, projects.length * HEIGHT_PER_PROJECT_VH)}vh`
 
     return (
         <section

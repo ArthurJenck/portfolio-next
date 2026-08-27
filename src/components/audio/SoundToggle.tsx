@@ -6,6 +6,22 @@ import { useAmbientAudio } from '@/providers/ambient-audio-context'
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
 import { useIsCompactNav } from '@/hooks/useIsCompactNav'
 import './SoundToggle.scss'
+import {
+    DEFAULT_DT_SECONDS,
+    HISTORY_MS,
+    MAX_DT_SECONDS,
+    MS_PER_SECOND,
+    PHASE_AMPLITUDE_GAIN,
+    PHASE_BASE_SPEED,
+    PHASE_SPEED_SCALE,
+    POINTS,
+    REDUCED_MOTION_SPEED,
+    RMS_CURVE_EXPONENT,
+    RMS_GAIN,
+    SENSITIVITY,
+    SMOOTHING,
+    WAVE_FREQUENCY,
+} from './soundToggle.config'
 
 // Repris des barres du burger : 48 × 5 px, et 25 × 3 px sous 1024 px.
 const SIZES = {
@@ -15,11 +31,6 @@ const SIZES = {
 
 type Size = (typeof SIZES)[keyof typeof SIZES]
 
-const POINTS = 40
-const SENSITIVITY = 2.6
-const SMOOTHING = 0.07
-const HISTORY_MS = 600
-
 const boxHeight = (size: Size) => size.amplitude * 2 + size.stroke
 const startX = (size: Size) => size.stroke / 2
 const lineWidth = (size: Size) => size.width - size.stroke
@@ -28,7 +39,7 @@ const centerY = (size: Size) => boxHeight(size) / 2
 const flatPath = (size: Size) => `M${startX(size)} ${centerY(size)} L${startX(size) + lineWidth(size)} ${centerY(size)}`
 
 const SoundToggle = () => {
-    const { enabled, toggle, getAnalyser, getOutputLatencyMs } = useAmbientAudio()
+    const { enabled, toggle, getAnalyser, getOutputLatencyMs, currentTrackLabel } = useAmbientAudio()
     const prefersReducedMotion = usePrefersReducedMotion()
     const isCompact = useIsCompactNav()
     const pathRef = useRef<SVGPathElement>(null)
@@ -49,7 +60,7 @@ const SoundToggle = () => {
 
         const draw = (timestamp: number) => {
             frame = requestAnimationFrame(draw)
-            const dt = lastTime ? Math.min(0.1, (timestamp - lastTime) / 1000) : 0.016
+            const dt = lastTime ? Math.min(MAX_DT_SECONDS, (timestamp - lastTime) / MS_PER_SECOND) : DEFAULT_DT_SECONDS
             lastTime = timestamp
 
             const analyser = getAnalyser()
@@ -62,7 +73,7 @@ const SoundToggle = () => {
                 rms = Math.sqrt(sum / buffer.length)
             }
 
-            const raw = Math.min(1, Math.pow(rms * SENSITIVITY * 3, 0.5))
+            const raw = Math.min(1, Math.pow(rms * SENSITIVITY * RMS_GAIN, RMS_CURVE_EXPONENT))
 
             // L'analyseur observe le graphe, pas les haut-parleurs : sans ce retard
             // l'onde précède le son de toute la latence de sortie (~290 ms en Bluetooth).
@@ -82,8 +93,8 @@ const SoundToggle = () => {
             }
 
             amplitude += (target - amplitude) * (1 - Math.exp(-dt / SMOOTHING))
-            const speed = reducedRef.current ? 0.35 : 1
-            phase += (0.5 + amplitude * 2.6) * dt * 3.6 * speed
+            const speed = reducedRef.current ? REDUCED_MOTION_SPEED : 1
+            phase += (PHASE_BASE_SPEED + amplitude * PHASE_AMPLITUDE_GAIN) * dt * PHASE_SPEED_SCALE * speed
 
             const current = sizeRef.current
             const x0 = startX(current)
@@ -93,7 +104,7 @@ const SoundToggle = () => {
             let d = ''
             for (let i = 0; i < POINTS; i++) {
                 const t = i / (POINTS - 1)
-                const y = axis + Math.sin(t * 7.2 - phase) * amplitude * current.amplitude * Math.sin(Math.PI * t)
+                const y = axis + Math.sin(t * WAVE_FREQUENCY - phase) * amplitude * current.amplitude * Math.sin(Math.PI * t)
                 d += `${i === 0 ? 'M' : 'L'}${(x0 + t * span).toFixed(2)} ${y.toFixed(2)} `
             }
             pathRef.current?.setAttribute('d', d)
@@ -105,7 +116,12 @@ const SoundToggle = () => {
 
     return (
         <div className="sound-toggle-wrap relative z-7">
-            <span className="sound-toggle-label" aria-hidden="true">
+            {enabled && currentTrackLabel && (
+                <span className="sound-toggle-label sound-toggle-label--track" role="status">
+                    {currentTrackLabel}
+                </span>
+            )}
+            <span className="sound-toggle-label sound-toggle-label--action" aria-hidden="true">
                 {enabled ? 'Désactiver le son' : 'Activer le son'}
             </span>
             <motion.button

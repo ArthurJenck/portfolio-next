@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { ASCII_PORTRAIT_ROWS } from './asciiPortrait.data'
+import { ASCII_PORTRAIT_ROWS } from './asciiPortrait.config'
 import { useAsciiPhysics } from './useAsciiPhysics'
 
 const AsciiPortrait = () => {

@@ -16,8 +16,6 @@
     text-transform: uppercase;
     color: var(--white);
     pointer-events: none;
-    opacity: 0;
-    transform: translateX(6px);
     transition:
         opacity 0.35s ease,
         transform 0.35s ease;
@@ -29,10 +27,28 @@
     }
 }
 
-.sound-toggle-wrap:hover .sound-toggle-label,
-.sound-toggle-wrap:has(.sound-toggle:focus-visible) .sound-toggle-label {
+// Titre du morceau au repos, action (ACTIVER/DÉSACTIVER) au hover : l'un remplace
+// l'autre en fondu, jamais les deux affichés en même temps.
+.sound-toggle-label--action {
+    opacity: 0;
+    transform: translateX(6px);
+}
+
+.sound-toggle-label--track {
     opacity: 1;
     transform: translateX(0);
+}
+
+.sound-toggle-wrap:hover .sound-toggle-label--action,
+.sound-toggle-wrap:has(.sound-toggle:focus-visible) .sound-toggle-label--action {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.sound-toggle-wrap:hover .sound-toggle-label--track,
+.sound-toggle-wrap:has(.sound-toggle:focus-visible) .sound-toggle-label--track {
+    opacity: 0;
+    transform: translateX(6px);
 }
 
 .sound-toggle {

@@ -14,6 +14,7 @@ import { FileUploadInput } from '../components/FileUploadInput'
 import { MediasUploadInput } from '../components/MediasUploadInput'
 import { ProjectSkillsInput } from '../components/ProjectSkillsInput'
 import { ColorInput } from '../components/ColorInput'
+import { MusicUploadInput } from '../components/MusicUploadInput'
 
 export const ProjectList = () => (
     <List>
@@ -70,6 +71,11 @@ export const ProjectEdit = () => (
             <ProjectSkillsInput source="stack" label="Stack technique" />
             <TextInput source="githubLink" label="Lien GitHub" />
             <TextInput source="webLink" label="Lien du site web" />
+            <MusicUploadInput
+                source="music"
+                label="Musique du projet"
+                helperText="Optionnel — remplace l'ambiance générative par ce morceau sur la page du projet, en fondu à l'arrivée."
+            />
         </SimpleForm>
     </Edit>
 )
@@ -117,6 +123,11 @@ export const ProjectCreate = () => (
             <ProjectSkillsInput source="stack" label="Stack technique" />
             <TextInput source="githubLink" label="Lien GitHub" />
             <TextInput source="webLink" label="Lien du site web" />
+            <MusicUploadInput
+                source="music"
+                label="Musique du projet"
+                helperText="Optionnel — remplace l'ambiance générative par ce morceau sur la page du projet, en fondu à l'arrivée."
+            />
         </SimpleForm>
     </Create>
 )

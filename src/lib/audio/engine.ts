@@ -1,44 +1,59 @@
 import {
     BASE_HZ,
-    DRONE_DEGREES,
-    ROOT_STEPS,
-    VOICE_CLASSES,
-    createPrng,
-    createSeed,
-    pitchClassDistance,
-    semitoneRatio,
-    type Prng,
-} from './scales'
-import {
+    CENT_SCALE,
+    CLICK_STOP_BUFFER_SECONDS,
     DEFAULT_PARAMS,
+    DISPOSE_BUFFER_MS,
     DRONE,
+    DRONE_DEGREES,
+    ENVELOPE_TAIL_SECONDS,
+    FALLBACK_FRAME_SECONDS,
     IDLE,
     IRREGULARITY,
+    JITTER_SPREAD_GAIN,
+    LOWPASS_FLOOR_HZ,
+    MAX_FRAME_SECONDS,
     METALLIC,
+    MIN_AUDIBLE_GAIN,
     MIX,
+    MUSIC,
     OUTPUT,
     PIANO,
     REVERB,
+    ROOT_STEPS,
+    SCROLL_NORMALIZE_PX,
+    SEMITONES_PER_OCTAVE,
     SFX_BUS,
     SFX_CEILING,
     SFX_EXT,
     SFX_GATE,
     SFX_LIKE,
     SFX_NAV,
+    SFX_NAV_SHAPE,
     SFX_PRESS,
     SFX_RELEASE,
+    SFX_SEED_XOR,
     SFX_TICK,
     SFX_TILE,
     SFX_VARIANCE,
+    SILENCE_GAIN,
+    STARTUP,
     VOICES,
+    VOICE_CLASSES,
     WIND,
+} from './audio.config'
+import {
     clamp01,
+    createPrng,
+    createSeed,
     intimacyFromDepth,
     lerp,
-    type AmbientParams,
-    type SfxName,
-    type SfxOptions,
-} from './params'
+    msToSeconds,
+    pitchClassDistance,
+    secondsToMs,
+    semitoneRatio,
+} from './audio.utils'
+import type { AmbientParams, Prng, SfxName, SfxOptions } from './audio.types'
 
 type DroneStack = {
     gain: GainNode
@@ -102,6 +117,11 @@ export class AmbientEngine {
     private convolver: ConvolverNode
     private bus: GainNode
     private brillance: BiquadFilterNode
+    private compressor: DynamicsCompressorNode
+    // Un seul point de coupure pour tout le contenu génératif (drone + events + vent,
+    // dry et queue de reverb) : dry et wet y convergent tous les deux avant preMix, donc
+    // un unique fondu ici les éteint ensemble sans toucher aux SFX ni à une piste projet.
+    private generativeMute: GainNode
 
     private droneFilter: BiquadFilterNode
     private droneStack: DroneStack | null = null
@@ -121,6 +141,16 @@ export class AmbientEngine {
     private sfxLast = new Map<SfxName, number>()
     private sfxBurst = new Map<SfxName, number>()
     private sfxLastAny = 0
+
+    // Piste projet : lue en parallèle du moteur génératif, sur son propre fondu
+    // (trackFade), routée après l'EQ de sortie taillée pour le drone (cf. constructeur).
+    private trackAudio: HTMLAudioElement | null = null
+    private trackSource: MediaElementAudioSourceNode | null = null
+    private trackGain: GainNode
+    private trackFade: GainNode
+    private currentTrackUrl: string | null = null
+    private trackStopTimer = 0
+    private generativeSuspended = false
 
     private params: AmbientParams = { ...DEFAULT_PARAMS }
     private timers: number[] = []
@@ -171,12 +201,12 @@ export class AmbientEngine {
         this.brillance.frequency.value = OUTPUT.brillanceCeiling
         this.brillance.Q.value = 0.4
 
-        const compressor = ctx.createDynamicsCompressor()
-        compressor.threshold.value = -26
-        compressor.knee.value = 28
-        compressor.ratio.value = 3
-        compressor.attack.value = 0.05
-        compressor.release.value = 0.5
+        this.compressor = ctx.createDynamicsCompressor()
+        this.compressor.threshold.value = -26
+        this.compressor.knee.value = 28
+        this.compressor.ratio.value = 3
+        this.compressor.attack.value = 0.05
+        this.compressor.release.value = 0.5
 
         const limiter = ctx.createDynamicsCompressor()
         limiter.threshold.value = -3
@@ -192,17 +222,31 @@ export class AmbientEngine {
         this.master.connect(rumble)
         rumble.connect(tame)
         tame.connect(this.brillance)
-        this.brillance.connect(compressor)
-        compressor.connect(limiter)
+        this.brillance.connect(this.compressor)
+        this.compressor.connect(limiter)
         limiter.connect(ctx.destination)
 
         this.dry = ctx.createGain()
         this.wet = ctx.createGain()
         this.convolver = ctx.createConvolver()
         this.convolver.buffer = this.createImpulse()
-        this.dry.connect(this.preMix)
+        this.generativeMute = ctx.createGain()
+        this.dry.connect(this.generativeMute)
         this.convolver.connect(this.wet)
-        this.wet.connect(this.preMix)
+        this.wet.connect(this.generativeMute)
+        this.generativeMute.connect(this.preMix)
+
+        // Piste projet : bypasse l'EQ this.master → rumble/tame/brillance (taillée pour
+        // le drone, elle étoufferait un morceau masterisé), mais garde le glue/limiteur
+        // via this.compressor. Le tap vers l'analyser est parallèle, sans sortie propre :
+        // sans lui le visualizer resterait plat pendant toute la lecture.
+        this.trackGain = ctx.createGain()
+        this.trackGain.gain.value = MUSIC.defaultVolume
+        this.trackFade = ctx.createGain()
+        this.trackFade.gain.value = 0
+        this.trackGain.connect(this.trackFade)
+        this.trackFade.connect(this.compressor)
+        this.trackFade.connect(this.analyser)
 
         this.bus = ctx.createGain()
         this.bus.connect(this.dry)
@@ -256,7 +300,7 @@ export class AmbientEngine {
 
         // Un PRNG distinct : partager celui de la composition ferait dépendre la
         // musique générative des mouvements de souris du visiteur.
-        this.sfxRandom = createPrng((seed ^ 0x9e3779b9) >>> 0)
+        this.sfxRandom = createPrng((seed ^ SFX_SEED_XOR) >>> 0)
 
         const { gain, band } = this.createWind()
         this.windGain = gain
@@ -275,7 +319,7 @@ export class AmbientEngine {
     }
 
     getOutputLatencyMs(): number {
-        return (this.ctx.outputLatency || 0) * 1000
+        return secondsToMs(this.ctx.outputLatency || 0)
     }
 
     private currentRootHz(): number {
@@ -288,7 +332,7 @@ export class AmbientEngine {
         colour: number = REVERB.colour,
     ): AudioBuffer {
         const { sampleRate } = this.ctx
-        const predelay = Math.floor((sampleRate * predelayMs) / 1000)
+        const predelay = Math.floor(sampleRate * msToSeconds(predelayMs))
         const tail = Math.floor(sampleRate * seconds)
         const buffer = this.ctx.createBuffer(2, predelay + tail, sampleRate)
         for (let channel = 0; channel < 2; channel++) {
@@ -297,7 +341,7 @@ export class AmbientEngine {
             for (let i = predelay; i < data.length; i++) {
                 const t = (i - predelay) / tail
                 lp += (Math.random() * 2 - 1 - lp) * colour
-                data[i] = lp * Math.pow(1 - t, 2.4)
+                data[i] = lp * Math.pow(1 - t, REVERB.decayExponent)
             }
         }
         return buffer
@@ -305,12 +349,12 @@ export class AmbientEngine {
 
     private createWind(): { gain: GainNode; band: BiquadFilterNode } {
         const ctx = this.ctx
-        const length = ctx.sampleRate * 4
+        const length = ctx.sampleRate * WIND.noiseSeconds
         const buffer = ctx.createBuffer(1, length, ctx.sampleRate)
         const data = buffer.getChannelData(0)
         let lp = 0
         for (let i = 0; i < length; i++) {
-            lp += (Math.random() * 2 - 1 - lp) * 0.55
+            lp += (Math.random() * 2 - 1 - lp) * WIND.noiseSmoothing
             data[i] = lp
         }
 
@@ -321,17 +365,17 @@ export class AmbientEngine {
         const band = ctx.createBiquadFilter()
         band.type = 'bandpass'
         band.frequency.value = WIND.bandBase
-        band.Q.value = 1.3
+        band.Q.value = WIND.bandQ
 
         const cap = ctx.createBiquadFilter()
         cap.type = 'lowpass'
         cap.frequency.value = WIND.cap
-        cap.Q.value = 0.5
+        cap.Q.value = WIND.capQ
 
         const sweep = ctx.createOscillator()
-        sweep.frequency.value = 0.037
+        sweep.frequency.value = WIND.sweepHz
         const sweepAmount = ctx.createGain()
-        sweepAmount.gain.value = 200
+        sweepAmount.gain.value = WIND.sweepAmountHz
         sweep.connect(sweepAmount)
         sweepAmount.connect(band.frequency)
         sweep.start()
@@ -363,9 +407,10 @@ export class AmbientEngine {
                 const osc = ctx.createOscillator()
                 osc.type = 'sawtooth'
                 osc.frequency.value = hz
-                osc.detune.value = (side === 0 ? -1 : 1) * DRONE.detuneCents * (0.7 + this.random() * 0.6)
+                osc.detune.value =
+                    (side === 0 ? -1 : 1) * DRONE.detuneCents * (DRONE.detuneJitterBase + this.random() * DRONE.detuneJitterRange)
                 const voiceGain = ctx.createGain()
-                voiceGain.gain.value = (0.13 / DRONE_DEGREES.length) * (1 - index * 0.13)
+                voiceGain.gain.value = (DRONE.voiceGainBase / DRONE_DEGREES.length) * (1 - index * DRONE.voiceGainFalloff)
                 osc.connect(voiceGain)
                 voiceGain.connect(gain)
                 osc.start()
@@ -385,10 +430,16 @@ export class AmbientEngine {
         if (!stack) return
         const now = this.ctx.currentTime
         stack.gain.gain.cancelScheduledValues(now)
-        stack.gain.gain.setValueCurveAtTime(fadeCurve(false), now, fadeOutSeconds)
+        // setValueCurveAtTime exige une durée strictement positive : suspendGenerative(0)
+        // (deep-link direct sur un projet avec musique) demande une coupure instantanée.
+        if (fadeOutSeconds > 0) {
+            stack.gain.gain.setValueCurveAtTime(fadeCurve(false), now, fadeOutSeconds)
+        } else {
+            stack.gain.gain.setValueAtTime(0, now)
+        }
         stack.oscillators.forEach((osc) => {
             try {
-                osc.stop(now + fadeOutSeconds + 0.2)
+                osc.stop(now + fadeOutSeconds + DRONE.stopBufferSeconds)
             } catch {
                 // l'oscillateur était déjà programmé pour s'arrêter
             }
@@ -396,7 +447,10 @@ export class AmbientEngine {
     }
 
     private modulate = (): void => {
-        if (!this.running) return
+        // Suspendu pendant la lecture d'une piste projet : une modulation ici referait
+        // un droneStack sur un bus muet et changerait rootOffset au hasard, désaccordant
+        // les SFX de la tonalité du morceau en cours.
+        if (!this.running || this.generativeSuspended) return
         if (ROOT_STEPS.length > 1) {
             let next = this.rootOffset
             while (next === this.rootOffset) next = ROOT_STEPS[Math.floor(this.random() * ROOT_STEPS.length)]
@@ -409,14 +463,14 @@ export class AmbientEngine {
     }
 
     private jitter(base: number): number {
-        const spread = 1 + IRREGULARITY * 1.6
+        const spread = 1 + IRREGULARITY * JITTER_SPREAD_GAIN
         const ln = Math.log(spread)
         const normaliser = (spread - 1 / spread) / (2 * ln)
         return (base * Math.exp((this.random() * 2 - 1) * ln)) / normaliser
     }
 
     private schedule(callback: () => void, seconds: number, floorMs: number): void {
-        const id = window.setTimeout(callback, Math.max(floorMs, this.jitter(seconds) * 1000))
+        const id = window.setTimeout(callback, Math.max(floorMs, secondsToMs(this.jitter(seconds))))
         this.timers.push(id)
     }
 
@@ -424,7 +478,7 @@ export class AmbientEngine {
         const sorted = [...VOICE_CLASSES].sort(
             (a, b) => pitchClassDistance(a, this.rootOffset) - pitchClassDistance(b, this.rootOffset),
         )
-        const keep = Math.max(2, Math.round(sorted.length * (1 - this.params.depth * 0.5)))
+        const keep = Math.max(2, Math.round(sorted.length * (1 - this.params.depth * VOICES.poolShrink)))
         return sorted.slice(0, keep)
     }
 
@@ -448,7 +502,7 @@ export class AmbientEngine {
 
         const candidates: number[] = []
         this.voicePool().forEach((pitchClass) => {
-            ;[12, 12, 12, 24].forEach((octave) => {
+            VOICES.octaveCandidates.forEach((octave) => {
                 const semitone = pitchClass + octave
                 const clear = this.activeVoices.every(
                     (voice) => Math.abs(voice.semitone - semitone) >= VOICES.minGapSemitones,
@@ -469,25 +523,25 @@ export class AmbientEngine {
         const osc = ctx.createOscillator()
         osc.type = 'triangle'
         osc.frequency.value = hz
-        osc.detune.value = this.random() * 14 - 7
+        osc.detune.value = this.random() * VOICES.detuneRange - VOICES.detuneCenter
 
         const modulator = ctx.createOscillator()
         modulator.type = 'sine'
-        modulator.frequency.value = hz * 1.487
+        modulator.frequency.value = hz * VOICES.modulatorRatio
         const modulation = ctx.createGain()
-        modulation.gain.value = hz * (0.004 + this.random() * 0.01)
+        modulation.gain.value = hz * (VOICES.modulationDepthBase + this.random() * VOICES.modulationDepthRange)
         modulator.connect(modulation)
         modulation.connect(osc.frequency)
 
         const lowpass = ctx.createBiquadFilter()
         lowpass.type = 'lowpass'
         lowpass.frequency.value = lerp(VOICES.lowpassLow, VOICES.lowpassHigh, this.params.depth)
-        lowpass.Q.value = 0.9
+        lowpass.Q.value = VOICES.lowpassQ
 
         const gain = ctx.createGain()
         gain.gain.value = 0
         const panner = ctx.createStereoPanner()
-        panner.pan.value = this.random() * 1.2 - 0.6
+        panner.pan.value = this.random() * VOICES.panRange - VOICES.panCenter
 
         osc.connect(lowpass)
         lowpass.connect(gain)
@@ -495,18 +549,21 @@ export class AmbientEngine {
         panner.connect(this.eventBus)
 
         const now = ctx.currentTime
-        const attack = 4 + this.random() * 7
-        const hold = 3 + this.random() * 6
-        const release = 6 + this.random() * 8
+        const attack = VOICES.attackBase + this.random() * VOICES.attackRange
+        const hold = VOICES.holdBase + this.random() * VOICES.holdRange
+        const release = VOICES.releaseBase + this.random() * VOICES.releaseRange
         const intimacy = intimacyFromDepth(this.params.depth)
-        const peak = (0.05 + this.random() * 0.05) * (1 - intimacy * 0.25) * (semitone >= 24 ? 0.5 : 1)
+        const peak =
+            (VOICES.peakBase + this.random() * VOICES.peakRange) *
+            (1 - intimacy * VOICES.peakIntimacyMix) *
+            (semitone >= VOICES.upperOctaveSemitone ? VOICES.upperOctaveAttenuation : 1)
 
-        gain.gain.setValueAtTime(0.0001, now)
+        gain.gain.setValueAtTime(SILENCE_GAIN, now)
         gain.gain.exponentialRampToValueAtTime(peak, now + attack)
         gain.gain.setValueAtTime(peak, now + attack + hold)
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + attack + hold + release)
+        gain.gain.exponentialRampToValueAtTime(SILENCE_GAIN, now + attack + hold + release)
 
-        const end = now + attack + hold + release + 0.2
+        const end = now + attack + hold + release + VOICES.stopBufferSeconds
         osc.start(now)
         modulator.start(now)
         osc.stop(end)
@@ -519,7 +576,10 @@ export class AmbientEngine {
     private metallic = (): void => {
         if (!this.running) return
         const ctx = this.ctx
-        const hz = BASE_HZ * semitoneRatio(this.pickPitchClass()) * (this.random() < 0.5 ? 2 : 3)
+        const hz =
+            BASE_HZ *
+            semitoneRatio(this.pickPitchClass()) *
+            (this.random() < METALLIC.harmonicChoiceProbability ? METALLIC.harmonicLow : METALLIC.harmonicHigh)
 
         const carrier = ctx.createOscillator()
         carrier.type = 'sine'
@@ -529,19 +589,19 @@ export class AmbientEngine {
         modulator.type = 'sine'
         modulator.frequency.value = hz * METALLIC.ratio
         const modulation = ctx.createGain()
-        modulation.gain.value = hz * (0.22 + this.random() * 0.58)
+        modulation.gain.value = hz * (METALLIC.modulationDepthBase + this.random() * METALLIC.modulationDepthRange)
         modulator.connect(modulation)
         modulation.connect(carrier.frequency)
 
         const lowpass = ctx.createBiquadFilter()
         lowpass.type = 'lowpass'
         lowpass.frequency.value = lerp(METALLIC.lowpassLow, METALLIC.lowpassHigh, this.params.depth)
-        lowpass.Q.value = 0.6
+        lowpass.Q.value = METALLIC.lowpassQ
 
         const gain = ctx.createGain()
         gain.gain.value = 0
         const panner = ctx.createStereoPanner()
-        panner.pan.value = this.random() * 1.7 - 0.85
+        panner.pan.value = this.random() * METALLIC.panRange - METALLIC.panCenter
 
         carrier.connect(lowpass)
         lowpass.connect(gain)
@@ -549,18 +609,21 @@ export class AmbientEngine {
         panner.connect(this.eventBus)
 
         const now = ctx.currentTime
-        const attack = 0.35 + this.random() * 1.05
-        const decay = 3.5 + this.random() * 5.5
-        const peak = (0.012 + this.random() * 0.026) * METALLIC.level * lerp(0.4, 1, this.params.activity)
+        const attack = METALLIC.attackBase + this.random() * METALLIC.attackRange
+        const decay = METALLIC.decayBase + this.random() * METALLIC.decayRange
+        const peak =
+            (METALLIC.peakBase + this.random() * METALLIC.peakRange) *
+            METALLIC.level *
+            lerp(METALLIC.activityMixFloor, 1, this.params.activity)
 
-        gain.gain.setValueAtTime(0.0001, now)
+        gain.gain.setValueAtTime(SILENCE_GAIN, now)
         gain.gain.exponentialRampToValueAtTime(peak, now + attack)
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + attack + decay)
+        gain.gain.exponentialRampToValueAtTime(SILENCE_GAIN, now + attack + decay)
 
         carrier.start(now)
         modulator.start(now)
-        carrier.stop(now + attack + decay + 0.2)
-        modulator.stop(now + attack + decay + 0.2)
+        carrier.stop(now + attack + decay + METALLIC.stopBufferSeconds)
+        modulator.stop(now + attack + decay + METALLIC.stopBufferSeconds)
 
         this.scheduleMetallic()
     }
@@ -568,22 +631,22 @@ export class AmbientEngine {
     private pianoNote = (delaySeconds = 0): void => {
         if (!this.running) return
         const ctx = this.ctx
-        const f0 = BASE_HZ * semitoneRatio(this.pickPitchClass()) * (this.random() < 0.4 ? 2 : 1)
+        const f0 = BASE_HZ * semitoneRatio(this.pickPitchClass()) * (this.random() < PIANO.octaveUpProbability ? PIANO.octaveUpFactor : 1)
         const now = ctx.currentTime + delaySeconds
 
         const out = ctx.createGain()
         const lowpass = ctx.createBiquadFilter()
         lowpass.type = 'lowpass'
         lowpass.frequency.value = lerp(PIANO.lowpassLow, PIANO.lowpassHigh, this.params.depth)
-        lowpass.Q.value = 0.7
+        lowpass.Q.value = PIANO.lowpassQ
         const panner = ctx.createStereoPanner()
-        panner.pan.value = this.random() * 0.9 - 0.45
+        panner.pan.value = this.random() * PIANO.panRange - PIANO.panCenter
 
         out.connect(lowpass)
         lowpass.connect(panner)
         panner.connect(this.eventBus)
 
-        const peak = (0.05 + this.random() * 0.045) * PIANO.amount
+        const peak = (PIANO.peakBase + this.random() * PIANO.peakRange) * PIANO.amount
 
         for (let n = 1; n <= PIANO.partials; n++) {
             const hz = n * f0 * Math.sqrt(1 + PIANO.inharmonicity * n * n)
@@ -591,60 +654,62 @@ export class AmbientEngine {
             const osc = ctx.createOscillator()
             osc.type = 'sine'
             osc.frequency.value = hz
-            osc.detune.value = this.random() * 8 - 4
+            osc.detune.value = this.random() * PIANO.partialDetuneRange - PIANO.partialDetuneCenter
             const gain = ctx.createGain()
-            const amplitude = peak / Math.pow(n, 1.5)
-            const decay = (5 + this.random() * 4) / (1 + n * 0.55)
-            gain.gain.setValueAtTime(0.0001, now)
-            gain.gain.exponentialRampToValueAtTime(amplitude, now + 0.012)
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.012 + decay)
+            const amplitude = peak / Math.pow(n, PIANO.partialRolloff)
+            const decay = (PIANO.decayBase + this.random() * PIANO.decayRange) / (1 + n * PIANO.decaySharpness)
+            gain.gain.setValueAtTime(SILENCE_GAIN, now)
+            gain.gain.exponentialRampToValueAtTime(amplitude, now + PIANO.attackSeconds)
+            gain.gain.exponentialRampToValueAtTime(SILENCE_GAIN, now + PIANO.attackSeconds + decay)
             osc.connect(gain)
             gain.connect(out)
             osc.start(now)
-            osc.stop(now + 0.012 + decay + 0.1)
+            osc.stop(now + PIANO.attackSeconds + decay + PIANO.stopBufferSeconds)
         }
 
-        const hammerLength = Math.floor(ctx.sampleRate * 0.04)
+        const hammerLength = Math.floor(ctx.sampleRate * PIANO.hammerSeconds)
         const hammerBuffer = ctx.createBuffer(1, hammerLength, ctx.sampleRate)
         const hammerData = hammerBuffer.getChannelData(0)
         for (let i = 0; i < hammerLength; i++) {
-            hammerData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / hammerLength, 3)
+            hammerData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / hammerLength, PIANO.hammerShapeExponent)
         }
         const hammer = ctx.createBufferSource()
         hammer.buffer = hammerBuffer
         const hammerBand = ctx.createBiquadFilter()
         hammerBand.type = 'bandpass'
-        hammerBand.frequency.value = Math.min(f0 * 2.2, 2000)
-        hammerBand.Q.value = 0.8
+        hammerBand.frequency.value = Math.min(f0 * PIANO.hammerBandRatio, PIANO.hammerBandCeiling)
+        hammerBand.Q.value = PIANO.hammerBandQ
         const hammerGain = ctx.createGain()
-        hammerGain.gain.value = peak * 0.16
+        hammerGain.gain.value = peak * PIANO.hammerGainRatio
         hammer.connect(hammerBand)
         hammerBand.connect(hammerGain)
         hammerGain.connect(out)
         hammer.start(now)
 
         if (delaySeconds === 0) {
-            if (this.random() < 0.32) this.pianoNote(0.5 + this.random() * 1.2)
+            if (this.random() < PIANO.retriggerProbability) {
+                this.pianoNote(PIANO.retriggerDelayBase + this.random() * PIANO.retriggerDelayRange)
+            }
             this.schedulePiano()
         }
     }
 
     private scheduleVoice(): void {
-        this.schedule(this.suspendedVoice, lerp(VOICES.intervalLow, VOICES.intervalHigh, this.params.depth), 1800)
+        this.schedule(this.suspendedVoice, lerp(VOICES.intervalLow, VOICES.intervalHigh, this.params.depth), VOICES.scheduleFloorMs)
     }
 
     private scheduleMetallic(): void {
-        const density = lerp(0.25, 1, this.params.activity) * lerp(0.5, 1, this.params.depth)
-        this.schedule(this.metallic, lerp(METALLIC.intervalIdle, METALLIC.intervalDense, density), 2000)
+        const density = lerp(METALLIC.densityActivityFloor, 1, this.params.activity) * lerp(METALLIC.densityDepthFloor, 1, this.params.depth)
+        this.schedule(this.metallic, lerp(METALLIC.intervalIdle, METALLIC.intervalDense, density), METALLIC.scheduleFloorMs)
     }
 
     private schedulePiano(): void {
         const interval = PIANO.intervalIdle * Math.pow(PIANO.intervalDense / PIANO.intervalIdle, PIANO.amount)
-        this.schedule(() => this.pianoNote(0), interval, 1200)
+        this.schedule(() => this.pianoNote(0), interval, PIANO.scheduleFloorMs)
     }
 
     private scheduleModulation(): void {
-        this.schedule(this.modulate, DRONE.modulationSeconds, 8000)
+        this.schedule(this.modulate, DRONE.modulationSeconds, DRONE.modulationFloorMs)
     }
 
     private windTransient(intensity: number): void {
@@ -659,40 +724,40 @@ export class AmbientEngine {
         const data = buffer.getChannelData(0)
         let lp = 0
         for (let i = 0; i < length; i++) {
-            lp += (Math.random() * 2 - 1 - lp) * 0.75
-            data[i] = lp * Math.pow(1 - i / length, 2.5)
+            lp += (Math.random() * 2 - 1 - lp) * WIND.transientSmoothing
+            data[i] = lp * Math.pow(1 - i / length, WIND.transientShapeExponent)
         }
 
         const source = ctx.createBufferSource()
         source.buffer = buffer
         const band = ctx.createBiquadFilter()
         band.type = 'bandpass'
-        band.frequency.value = 700 + intensity * 600
+        band.frequency.value = WIND.transientBandBase + intensity * WIND.transientBandRange
         band.Q.value = 1.1
         const gain = ctx.createGain()
         const panner = ctx.createStereoPanner()
-        panner.pan.value = this.random() * 0.6 - 0.3
+        panner.pan.value = this.random() * WIND.transientPanRange - WIND.transientPanCenter
 
         const at = ctx.currentTime
         const peak = WIND.transientLevel * intensity
-        gain.gain.setValueAtTime(0.0001, at)
-        gain.gain.linearRampToValueAtTime(peak, at + 0.003)
-        gain.gain.exponentialRampToValueAtTime(0.0001, at + duration)
+        gain.gain.setValueAtTime(SILENCE_GAIN, at)
+        gain.gain.linearRampToValueAtTime(peak, at + WIND.transientAttackSeconds)
+        gain.gain.exponentialRampToValueAtTime(SILENCE_GAIN, at + duration)
 
         source.connect(band)
         band.connect(gain)
         gain.connect(panner)
         panner.connect(this.windBus)
         source.start(at)
-        source.stop(at + duration + 0.05)
+        source.stop(at + duration + WIND.transientStopBufferSeconds)
     }
 
     pushScroll(pixels: number): void {
         if (!this.running) return
         this.pxAccum += pixels
         const isOnset = this.windEnergy < WIND.onsetThreshold
-        const intensity = Math.min(1, pixels / 60)
-        if (isOnset && intensity > 0.07) this.windTransient(intensity)
+        const intensity = Math.min(1, pixels / SCROLL_NORMALIZE_PX)
+        if (isOnset && intensity > WIND.transientOnsetIntensity) this.windTransient(intensity)
         this.markActivity()
     }
 
@@ -706,9 +771,9 @@ export class AmbientEngine {
     }
 
     private updateIdle(): void {
-        const idleFor = (performance.now() - this.lastActivity) / 1000
+        const idleFor = msToSeconds(performance.now() - this.lastActivity)
         const target = idleFor > IDLE.afterSeconds ? IDLE.floor : 1
-        if (Math.abs(target - this.lastIdleTarget) < 0.01) return
+        if (Math.abs(target - this.lastIdleTarget) < IDLE.targetEpsilon) return
         this.lastIdleTarget = target
         const now = this.ctx.currentTime
         this.eventBus.gain.cancelScheduledValues(now)
@@ -722,31 +787,31 @@ export class AmbientEngine {
 
         // Un intervalle nul diviserait pxAccum par zéro : windEnergy passerait à NaN
         // et y resterait, faisant échouer setTargetAtTime à chaque frame ensuite.
-        const elapsed = this.lastFrameTime ? (timestamp - this.lastFrameTime) / 1000 : 0.016
+        const elapsed = this.lastFrameTime ? msToSeconds(timestamp - this.lastFrameTime) : FALLBACK_FRAME_SECONDS
         if (elapsed <= 0) return
-        const dt = Math.min(0.1, elapsed)
+        const dt = Math.min(MAX_FRAME_SECONDS, elapsed)
         this.lastFrameTime = timestamp
         this.updateIdle()
 
         const speed = this.pxAccum / dt / WIND.maxSpeed
         const instant = Number.isFinite(speed) ? Math.min(1, speed) : 0
         this.pxAccum = 0
-        const tau = instant > this.windEnergy ? 0.02 : WIND.release
+        const tau = instant > this.windEnergy ? WIND.attackTau : WIND.release
         this.windEnergy += (instant - this.windEnergy) * (1 - Math.exp(-dt / tau))
-        if (this.windEnergy < 0.001) this.windEnergy = 0
+        if (this.windEnergy < WIND.energyFloor) this.windEnergy = 0
 
-        if (Math.abs(this.windEnergy - this.lastWindTarget) < 0.004) return
+        if (Math.abs(this.windEnergy - this.lastWindTarget) < WIND.targetEpsilon) return
         const rising = this.windEnergy > this.lastWindTarget
         this.lastWindTarget = this.windEnergy
 
         const now = this.ctx.currentTime
-        const smoothing = rising ? WIND.attack : 0.05
+        const smoothing = rising ? WIND.attack : WIND.releaseSmoothing
         this.windGain.gain.setTargetAtTime(this.windEnergy * WIND.level, now, smoothing)
         this.windBand.frequency.setTargetAtTime(WIND.bandBase + this.windEnergy * WIND.bandRise, now, smoothing)
     }
 
     private sfxHz(degree: number, octave: number): number {
-        return this.currentRootHz() * semitoneRatio(degree + octave * 12)
+        return this.currentRootHz() * semitoneRatio(degree + octave * SEMITONES_PER_OCTAVE)
     }
 
     private sfxBi(): number {
@@ -754,7 +819,7 @@ export class AmbientEngine {
     }
 
     private varyPitch(hz: number, amount: number, cents: number): number {
-        return hz * semitoneRatio((this.sfxBi() * cents * amount) / 100)
+        return hz * semitoneRatio((this.sfxBi() * cents * amount) / CENT_SCALE)
     }
 
     private varyTime(seconds: number, amount: number): number {
@@ -787,14 +852,14 @@ export class AmbientEngine {
     }
 
     private sfxEnv(gain: GainNode, peak: number, attack: number, seconds: number, now: number): void {
-        const safe = Math.max(0.0002, peak)
-        gain.gain.setValueAtTime(0.0001, now)
+        const safe = Math.max(MIN_AUDIBLE_GAIN, peak)
+        gain.gain.setValueAtTime(SILENCE_GAIN, now)
         gain.gain.linearRampToValueAtTime(safe, now + attack)
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + Math.max(attack + 0.01, seconds))
+        gain.gain.exponentialRampToValueAtTime(SILENCE_GAIN, now + Math.max(attack + ENVELOPE_TAIL_SECONDS, seconds))
     }
 
     private sfxNoise(ms: number, colour: number, shape: number): AudioBuffer {
-        const length = Math.max(2, Math.floor((this.ctx.sampleRate * ms) / 1000))
+        const length = Math.max(2, Math.floor(this.ctx.sampleRate * msToSeconds(ms)))
         const buffer = this.ctx.createBuffer(1, length, this.ctx.sampleRate)
         const data = buffer.getChannelData(0)
         let lp = 0
@@ -815,11 +880,11 @@ export class AmbientEngine {
         osc.frequency.exponentialRampToValueAtTime(hz, now + shape.dropSeconds)
 
         const gain = ctx.createGain()
-        gain.gain.setValueAtTime(Math.max(0.0002, level * shape.bodyGain), now)
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + shape.bodySeconds)
+        gain.gain.setValueAtTime(Math.max(MIN_AUDIBLE_GAIN, level * shape.bodyGain), now)
+        gain.gain.exponentialRampToValueAtTime(SILENCE_GAIN, now + shape.bodySeconds)
         osc.connect(gain)
         osc.start(now)
-        osc.stop(now + shape.bodySeconds + 0.05)
+        osc.stop(now + shape.bodySeconds + CLICK_STOP_BUFFER_SECONDS)
         return gain
     }
 
@@ -845,7 +910,7 @@ export class AmbientEngine {
         first.frequency.value = f1
         first.connect(lowpass)
         first.start(now)
-        first.stop(now + seconds + 0.1)
+        first.stop(now + seconds + p.stopBufferSeconds)
 
         const second = ctx.createOscillator()
         second.type = 'sine'
@@ -855,14 +920,14 @@ export class AmbientEngine {
         second.connect(secondGain)
         secondGain.connect(lowpass)
         second.start(now)
-        second.stop(now + seconds + 0.1)
+        second.stop(now + seconds + p.stopBufferSeconds)
 
         if (p.chiffMs > 0 && p.chiffGain > 0) {
             const chiff = ctx.createBufferSource()
-            chiff.buffer = this.sfxNoise(p.chiffMs, 0.8, 3)
+            chiff.buffer = this.sfxNoise(p.chiffMs, p.chiffColour, p.chiffShape)
             const band = ctx.createBiquadFilter()
             band.type = 'bandpass'
-            band.frequency.value = Math.min(SFX_CEILING, f1 * 1.5)
+            band.frequency.value = Math.min(SFX_CEILING, f1 * p.chiffBandRatio)
             band.Q.value = p.chiffQ
             const chiffGain = ctx.createGain()
             chiffGain.gain.value = p.chiffGain * level
@@ -887,7 +952,7 @@ export class AmbientEngine {
         const lowpass = ctx.createBiquadFilter()
         lowpass.type = 'lowpass'
         lowpass.Q.value = p.openQ
-        lowpass.frequency.setValueAtTime(Math.max(60, hz * p.openFrom), now)
+        lowpass.frequency.setValueAtTime(Math.max(LOWPASS_FLOOR_HZ, hz * p.openFrom), now)
         lowpass.frequency.exponentialRampToValueAtTime(
             Math.min(SFX_CEILING, this.varyColour(hz * p.openTo, p.variance)),
             now + p.openSeconds,
@@ -902,7 +967,7 @@ export class AmbientEngine {
             osc.detune.linearRampToValueAtTime(sign * p.spreadTo, now + p.openSeconds)
             osc.connect(lowpass)
             osc.start(now)
-            osc.stop(now + seconds + 0.15)
+            osc.stop(now + seconds + p.stopBufferSeconds)
         }
 
         const gain = ctx.createGain()
@@ -942,14 +1007,14 @@ export class AmbientEngine {
         const out = ctx.createGain()
 
         const click = ctx.createBufferSource()
-        click.buffer = this.sfxNoise(p.clickMs, p.clickColour, 2.2)
+        click.buffer = this.sfxNoise(p.clickMs, p.clickColour, p.clickShape)
         const band = ctx.createBiquadFilter()
         band.type = 'bandpass'
         band.frequency.value = Math.min(SFX_CEILING, this.varyColour(hz * p.clickRatio, p.variance))
         band.Q.value = p.clickQ
         const clickGain = ctx.createGain()
-        clickGain.gain.setValueAtTime(Math.max(0.0002, peak * p.clickGain), now)
-        clickGain.gain.exponentialRampToValueAtTime(0.0001, now + Math.max(0.008, p.seconds))
+        clickGain.gain.setValueAtTime(Math.max(MIN_AUDIBLE_GAIN, peak * p.clickGain), now)
+        clickGain.gain.exponentialRampToValueAtTime(SILENCE_GAIN, now + Math.max(p.clickMinSeconds, p.seconds))
         click.connect(band)
         band.connect(clickGain)
         clickGain.connect(out)
@@ -1002,7 +1067,7 @@ export class AmbientEngine {
                 osc.connect(gain)
                 gain.connect(out)
                 osc.start(at)
-                osc.stop(at + decay + 0.1)
+                osc.stop(at + decay + p.stopBufferSeconds)
             })
         }
 
@@ -1022,12 +1087,12 @@ export class AmbientEngine {
         const lowpass = ctx.createBiquadFilter()
         lowpass.type = 'lowpass'
         lowpass.Q.value = p.openQ
-        lowpass.frequency.setValueAtTime(Math.max(60, hz * p.openFrom), now)
+        lowpass.frequency.setValueAtTime(Math.max(LOWPASS_FLOOR_HZ, hz * p.openFrom), now)
         lowpass.frequency.exponentialRampToValueAtTime(
             Math.min(SFX_CEILING, this.varyColour(hz * p.openTo, p.variance)),
             now + p.openPeak,
         )
-        lowpass.frequency.exponentialRampToValueAtTime(Math.max(60, hz * p.closeTo), now + seconds)
+        lowpass.frequency.exponentialRampToValueAtTime(Math.max(LOWPASS_FLOOR_HZ, hz * p.closeTo), now + seconds)
 
         const gain = ctx.createGain()
         this.sfxEnv(gain, this.varyLevel(p.gain * level, p.variance), p.attack, seconds, now)
@@ -1038,13 +1103,13 @@ export class AmbientEngine {
             const osc = ctx.createOscillator()
             osc.type = 'triangle'
             osc.frequency.value = hz * semitoneRatio(degree)
-            osc.detune.value = this.sfxBi() * p.varianceCents * 0.5 * p.variance
+            osc.detune.value = this.sfxBi() * p.varianceCents * SFX_NAV_SHAPE.voiceDetuneScale * p.variance
             const voiceGain = ctx.createGain()
-            voiceGain.gain.value = 1 / (1 + index * 0.6)
+            voiceGain.gain.value = 1 / (1 + index * SFX_NAV_SHAPE.voiceGainFalloff)
             osc.connect(voiceGain)
             voiceGain.connect(lowpass)
             osc.start(now + index * p.spread)
-            osc.stop(now + seconds + 0.2)
+            osc.stop(now + seconds + SFX_NAV_SHAPE.stopBufferSeconds)
         })
 
         const spread = still ? 0 : p.panSpread
@@ -1113,6 +1178,132 @@ export class AmbientEngine {
         }
     }
 
+    // exponentialRampToValueAtTime ne peut ni viser ni partir de zéro strict : on
+    // rampe vers SILENCE_GAIN puis on force 0, et on part toujours d'une valeur
+    // courante plancherée au même niveau.
+    private rampExponential(param: AudioParam, target: number, seconds: number): void {
+        const now = this.ctx.currentTime
+        param.cancelScheduledValues(now)
+        // Une rampe de durée nulle (coupure instantanée, ex. deep-link direct sur un
+        // projet avec musique) donnerait un ratio 0/0 à exponentialRampToValueAtTime :
+        // on bascule alors la valeur directement.
+        if (seconds <= 0) {
+            param.setValueAtTime(target, now)
+            return
+        }
+        const current = Math.max(SILENCE_GAIN, param.value)
+        param.setValueAtTime(current, now)
+        if (target <= SILENCE_GAIN) {
+            param.exponentialRampToValueAtTime(SILENCE_GAIN, now + seconds)
+            param.setValueAtTime(0, now + seconds)
+        } else {
+            param.exponentialRampToValueAtTime(target, now + seconds)
+        }
+    }
+
+    // Force la racine utilisée par currentRootHz() (donc par sfxHz()) : c'est ce qui
+    // accorde les SFX de micro-interaction sur la tonalité d'une piste projet.
+    setRootOffset(semitones: number): void {
+        this.rootOffset = semitones
+    }
+
+    // Coupe la générative (drone, voix, métallique, piano, vent) au profit d'une piste
+    // projet. Les SFX ne sont pas concernés : ils vivent sur un bus séparé.
+    suspendGenerative(fadeSeconds: number = MUSIC.crossfadeSeconds): void {
+        if (this.disposed || this.generativeSuspended) return
+        this.generativeSuspended = true
+
+        this.timers.forEach((id) => window.clearTimeout(id))
+        this.timers = []
+        this.activeVoices = []
+
+        const previousDrone = this.droneStack
+        this.droneStack = null
+        this.killDroneStack(previousDrone, fadeSeconds)
+
+        this.rampExponential(this.generativeMute.gain, 0, fadeSeconds)
+    }
+
+    // Relance la générative (nouveau drone stack, boucles de composition) quand plus
+    // aucune piste projet n'est active.
+    resumeGenerative(fadeSeconds: number = MUSIC.crossfadeSeconds): void {
+        if (this.disposed || !this.generativeSuspended) return
+        this.generativeSuspended = false
+
+        this.droneStack = this.createDroneStack(fadeSeconds)
+        this.rampExponential(this.generativeMute.gain, 1, fadeSeconds)
+
+        if (this.running) {
+            this.scheduleVoice()
+            this.scheduleMetallic()
+            this.schedulePiano()
+            this.scheduleModulation()
+        }
+    }
+
+    private ensureTrackNodes(): void {
+        if (this.trackAudio) return
+        const audio = new Audio()
+        audio.crossOrigin = 'anonymous'
+        audio.loop = true
+        audio.preload = 'auto'
+        this.trackAudio = audio
+        this.trackSource = this.ctx.createMediaElementSource(audio)
+        this.trackSource.connect(this.trackGain)
+    }
+
+    // startAt ne s'applique qu'au premier lancement d'une piste : la boucle native de
+    // l'élément <audio> reprend ensuite au timecode 0.
+    async playTrack(
+        track: { url: string; startAt?: number; volume?: number; rootOffset?: number },
+        fadeSeconds: number = MUSIC.crossfadeSeconds,
+    ): Promise<void> {
+        if (this.disposed) return
+        this.ensureTrackNodes()
+        const audio = this.trackAudio
+        if (!audio) return
+
+        window.clearTimeout(this.trackStopTimer)
+
+        const isNewTrack = this.currentTrackUrl !== track.url
+        this.currentTrackUrl = track.url
+
+        if (typeof track.rootOffset === 'number') this.setRootOffset(track.rootOffset)
+        this.trackGain.gain.value = track.volume ?? MUSIC.defaultVolume
+
+        if (isNewTrack) {
+            audio.src = track.url
+            audio.currentTime = track.startAt ?? 0
+        }
+
+        if (this.running) {
+            try {
+                await audio.play()
+            } catch {
+                // Lecture bloquée par la politique d'autoplay : reprendra au prochain
+                // geste utilisateur, qui relance start().
+            }
+        }
+
+        this.rampExponential(this.trackFade.gain, 1, fadeSeconds)
+    }
+
+    stopTrack(fadeSeconds: number = MUSIC.crossfadeSeconds): void {
+        if (!this.trackAudio || !this.currentTrackUrl) return
+        this.currentTrackUrl = null
+        this.rampExponential(this.trackFade.gain, 0, fadeSeconds)
+
+        window.clearTimeout(this.trackStopTimer)
+        const audio = this.trackAudio
+        this.trackStopTimer = window.setTimeout(
+            () => {
+                // Un start() entretemps a pu relancer la lecture : ne pas l'interrompre.
+                if (!this.running || !this.currentTrackUrl) audio.pause()
+            },
+            secondsToMs(fadeSeconds) + MUSIC.pauseBufferMs,
+        )
+    }
+
     setParams(next: Partial<AmbientParams>): void {
         this.params = { ...this.params, ...next }
         this.applyParams(false)
@@ -1120,7 +1311,7 @@ export class AmbientEngine {
 
     private applyParams(immediate: boolean): void {
         const now = this.ctx.currentTime
-        const ramp = immediate ? 0.05 : MIX.paramRamp
+        const ramp = immediate ? MIX.immediateRampSeconds : MIX.paramRamp
         const set = (param: AudioParam, value: number) => {
             param.cancelScheduledValues(now)
             param.setValueAtTime(param.value, now)
@@ -1131,8 +1322,8 @@ export class AmbientEngine {
         set(this.droneFilter.frequency, lerp(DRONE.cutoffLow, DRONE.cutoffHigh, depth))
 
         const intimacy = intimacyFromDepth(depth)
-        set(this.wet.gain, lerp(0.85, 0.18, intimacy))
-        set(this.dry.gain, lerp(0.5, 1, intimacy))
+        set(this.wet.gain, lerp(MIX.wetIntimacyHigh, MIX.wetIntimacyLow, intimacy))
+        set(this.dry.gain, lerp(MIX.dryIntimacyLow, 1, intimacy))
     }
 
     async start(): Promise<void> {
@@ -1145,19 +1336,34 @@ export class AmbientEngine {
         this.fade.gain.setValueAtTime(this.fade.gain.value, now)
         this.fade.gain.linearRampToValueAtTime(1, now + MIX.fadeIn)
 
-        this.scheduleVoice()
-        this.scheduleMetallic()
-        this.schedulePiano()
-        this.scheduleModulation()
-        this.timers.push(window.setTimeout(this.suspendedVoice, 2500))
+        // Suspendue par un deep-link direct sur un projet avec musique (cf.
+        // AudioProvider) : la générative ne doit pas démarrer avant de retomber en
+        // silence quelques centaines de ms plus tard.
+        if (!this.generativeSuspended) {
+            this.scheduleVoice()
+            this.scheduleMetallic()
+            this.schedulePiano()
+            this.scheduleModulation()
+            this.timers.push(window.setTimeout(this.suspendedVoice, STARTUP.firstVoiceDelayMs))
+        }
         // Premier passage dans un patch à volume nul : absorbe la compilation JIT et
         // le premier rendu du convolver SFX, sinon le tout premier tick réel traîne.
-        this.timers.push(window.setTimeout(() => this.sfxTick(0.001, 0), 400))
+        this.timers.push(window.setTimeout(() => this.sfxTick(STARTUP.primingGain, 0), STARTUP.primingDelayMs))
 
         this.lastFrameTime = 0
         this.lastActivity = performance.now()
         cancelAnimationFrame(this.frame)
         this.frame = requestAnimationFrame(this.tick)
+
+        if (this.currentTrackUrl && this.trackAudio) {
+            window.clearTimeout(this.trackStopTimer)
+            try {
+                await this.trackAudio.play()
+            } catch {
+                // Reprendra au prochain geste utilisateur qui relance start().
+            }
+            this.rampExponential(this.trackFade.gain, 1, MUSIC.crossfadeSeconds)
+        }
     }
 
     stop(): void {
@@ -1177,17 +1383,36 @@ export class AmbientEngine {
         this.fade.gain.cancelScheduledValues(now)
         this.fade.gain.setValueAtTime(this.fade.gain.value, now)
         this.fade.gain.linearRampToValueAtTime(0, now + MIX.fadeOut)
+
+        // La piste ne traverse pas this.fade (elle bypasse l'EQ générative, cf.
+        // constructeur) : sans ceci elle continuerait de jouer après la coupure du son.
+        if (this.trackAudio && this.currentTrackUrl) {
+            this.rampExponential(this.trackFade.gain, 0, MIX.fadeOut)
+            window.clearTimeout(this.trackStopTimer)
+            const audio = this.trackAudio
+            this.trackStopTimer = window.setTimeout(
+                () => {
+                    if (!this.running) audio.pause()
+                },
+                secondsToMs(MIX.fadeOut) + MUSIC.pauseBufferMs,
+            )
+        }
     }
 
     dispose(): void {
         this.stop()
         this.disposed = true
         cancelAnimationFrame(this.frame)
+        window.clearTimeout(this.trackStopTimer)
+        if (this.trackAudio) {
+            this.trackAudio.pause()
+            this.trackAudio.src = ''
+        }
         window.setTimeout(
             () => {
                 void this.ctx.close()
             },
-            MIX.fadeOut * 1000 + 300,
+            secondsToMs(MIX.fadeOut) + DISPOSE_BUFFER_MS,
         )
     }
 }

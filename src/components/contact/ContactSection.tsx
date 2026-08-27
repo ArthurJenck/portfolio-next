@@ -1,7 +1,7 @@
 import './Contact.scss'
 import ContactLink from './ContactLink'
-import SectionTitle from '@/components/SectionTitle'
-import { PublicContactLink } from '@/lib/public-content'
+import SectionTitle from '@/components/ui/SectionTitle'
+import { PublicContactLink } from '@/server/content/public-content'
 
 const Contact = ({ contactLinks }: { contactLinks: PublicContactLink[] }) => {
     return (

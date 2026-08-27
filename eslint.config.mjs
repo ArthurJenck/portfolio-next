@@ -23,6 +23,26 @@ const eslintConfig = [
             'react-hooks/exhaustive-deps': 'off',
         },
     },
+    {
+        files: ['src/**/*.ts', 'src/**/*.tsx'],
+        rules: {
+            'no-magic-numbers': [
+                'error',
+                {
+                    ignore: [-1, 0, 1, 2],
+                    ignoreArrayIndexes: true,
+                    ignoreDefaultValues: true,
+                    enforceConst: true,
+                    detectObjects: false,
+                },
+            ],
+        },
+    },
+    {
+        // Fichiers ne contenant que des constantes nommées exportées
+        files: ['src/**/*.config.ts', 'src/config/**/*.ts'],
+        rules: { 'no-magic-numbers': 'off' },
+    },
 ]
 
 export default eslintConfig

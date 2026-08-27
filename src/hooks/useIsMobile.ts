@@ -1,8 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-
-const QUERY = '(max-width: 767px)'
+import { MOBILE_QUERY as QUERY } from '@/config/breakpoints'
 
 export const useIsMobile = (): boolean => {
     const [isMobile, setIsMobile] = useState(false)

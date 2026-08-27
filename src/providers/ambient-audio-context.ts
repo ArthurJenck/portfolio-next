@@ -2,7 +2,8 @@
 
 import { createContext, useContext } from 'react'
 import type { AmbientEngine } from '@/lib/audio/engine'
-import type { AmbientParams, SfxName, SfxOptions } from '@/lib/audio/params'
+import type { AmbientParams, SfxName, SfxOptions } from '@/lib/audio/audio.types'
+import type { ProjectMusic } from '@/types/ProjectTypes'
 
 export type AmbientAudioValue = {
     enabled: boolean
@@ -16,6 +17,8 @@ export type AmbientAudioValue = {
     triggerModulation: () => void
     playSfx: (name: SfxName, options?: SfxOptions) => void
     engineRef: () => AmbientEngine | null
+    setTrack: (track: ProjectMusic | null) => void
+    currentTrackLabel: string | null
 }
 
 export const AmbientAudioContext = createContext<AmbientAudioValue | null>(null)

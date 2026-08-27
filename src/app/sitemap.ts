@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next'
-import { getPublicCv, getPublicProjectSitemapEntries } from '@/lib/public-content'
-import { SITE_URL } from '@/lib/site-config'
+import { getPublicCv, getPublicProjectSitemapEntries } from '@/server/content/public-content'
+import { SITE_URL } from '@/config/site'
 
 const BASE_URL = SITE_URL
 

@@ -1,5 +1,9 @@
 import { usePrefersReducedMotion } from './usePrefersReducedMotion'
 
+const MID_SCROLL_DELAY_MS = 100
+const LATE_SCROLL_DELAY_MS = 250
+const END_SCROLL_DELAY_MS = 400
+
 export const useScroll = () => {
     const prefersReducedMotion = usePrefersReducedMotion()
 
@@ -20,9 +24,9 @@ export const useScroll = () => {
         }
 
         // Dispatcher à plusieurs moments pour capturer le changement de section
-        setTimeout(dispatchEvent, 100) // Pendant le scroll
-        setTimeout(dispatchEvent, 250) // Vers la fin
-        setTimeout(dispatchEvent, 400) // Après le scroll
+        setTimeout(dispatchEvent, MID_SCROLL_DELAY_MS) // Pendant le scroll
+        setTimeout(dispatchEvent, LATE_SCROLL_DELAY_MS) // Vers la fin
+        setTimeout(dispatchEvent, END_SCROLL_DELAY_MS) // Après le scroll
 
         return true
     }

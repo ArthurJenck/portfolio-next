@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
 import { useAmbientAudio } from '@/providers/ambient-audio-context'
+import { panFromHorizontalPosition } from '@/lib/utils'
+import { LONG_PRESS_MS, STACK_OPACITY_STEP, STACK_Z_FAR, STACK_Z_NEAR, TAP_MOVEMENT_THRESHOLD_PX } from './projectTile.config'
 
 gsap.registerPlugin(CustomEase)
 CustomEase.create('tileIn', 'M0,0 C0.42,0,1,1,1,1')
@@ -94,20 +96,20 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
 
             stackItems.forEach((e, i) => {
                 if (e) {
-                    e.style.opacity = i !== totalItems - 1 ? String(0.2 * i + 0.2) : '1'
+                    e.style.opacity = i !== totalItems - 1 ? String(STACK_OPACITY_STEP * (i + 1)) : '1'
                 }
             })
 
             gsap.to(stackItems, {
                 keyframes: [
                     {
-                        z: (index: number) => index * 8 + 8,
+                        z: (index: number) => STACK_Z_NEAR * (index + 1),
                         rotationX: (index: number) => -1 * (index * 2 + 2),
                         duration: 0.2,
                         ease: 'tileIn',
                     },
                     {
-                        z: (index: number) => index * 20 + 20,
+                        z: (index: number) => STACK_Z_FAR * (index + 1),
                         rotationX: 0,
                         duration: 0.7,
                         ease: 'tileOut',
@@ -128,7 +130,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
             gsap.to(stackItems, {
                 keyframes: [
                     {
-                        z: (index: number) => index * 20 + 20 - 8,
+                        z: (index: number) => STACK_Z_FAR * (index + 1) - STACK_Z_NEAR,
                         rotationX: (index: number) => index * 2 + 2,
                         duration: 0.2,
                         ease: 'tileIn',
@@ -173,7 +175,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
 
     const tilePan = (clientX?: number) => {
         const x = clientX ?? (rootRef.current?.getBoundingClientRect().left ?? 0) + width / 2
-        return (x / window.innerWidth) * 1.4 - 0.7
+        return panFromHorizontalPosition(x, window.innerWidth)
     }
 
     const handlePointerDown = (e: React.PointerEvent) => {
@@ -186,7 +188,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
 
         longPressTimer.current = window.setTimeout(() => {
             pointerDownTime.current = -1
-        }, 300)
+        }, LONG_PRESS_MS)
     }
 
     const handlePointerUp = (e: React.PointerEvent) => {
@@ -202,7 +204,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({
         const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
         const holdDuration = Date.now() - pointerDownTime.current
 
-        if (totalMovement < 10 && holdDuration < 300) {
+        if (totalMovement < TAP_MOVEMENT_THRESHOLD_PX && holdDuration < LONG_PRESS_MS) {
             // Le son vit ici et non dans SfxDelegate : lui seul connaît la condition qui
             // sépare un vrai clic d'une fin de drag du carousel.
             playSfx('navInternal', { pan: tilePan(e.clientX), still: prefersReducedMotion })

@@ -3,6 +3,14 @@
 import { useMotionTemplate, useTransform, motion } from 'framer-motion'
 import Image from 'next/image'
 import { useProjectSlider } from './ProjectSliderContext'
+import {
+    BLUR_RANGE,
+    BRIGHTNESS_RANGE,
+    OVERLAY_OPACITY_RANGE,
+    OVERLAY_PROGRESS_RANGE,
+    SATURATION_RANGE,
+    VISUAL_EFFECT_PROGRESS_RANGE,
+} from './projectCover.config'
 
 interface ProjectCoverBackgroundProps {
     name: string
@@ -13,11 +21,11 @@ interface ProjectCoverBackgroundProps {
 const ProjectCoverBackground = ({ name, coverImage, mobileCoverImage }: ProjectCoverBackgroundProps) => {
     const { coverProgress } = useProjectSlider()
 
-    const blurPx = useTransform(coverProgress, [0.25, 1], [0, 5])
-    const brightness = useTransform(coverProgress, [0.25, 1], [1, 0.68])
-    const saturation = useTransform(coverProgress, [0.25, 1], [1, 0.84])
+    const blurPx = useTransform(coverProgress, VISUAL_EFFECT_PROGRESS_RANGE, BLUR_RANGE)
+    const brightness = useTransform(coverProgress, VISUAL_EFFECT_PROGRESS_RANGE, BRIGHTNESS_RANGE)
+    const saturation = useTransform(coverProgress, VISUAL_EFFECT_PROGRESS_RANGE, SATURATION_RANGE)
     const imageFilter = useMotionTemplate`blur(${blurPx}px) brightness(${brightness}) saturate(${saturation})`
-    const overlayOpacity = useTransform(coverProgress, [0, 1], [0.1, 0.3])
+    const overlayOpacity = useTransform(coverProgress, OVERLAY_PROGRESS_RANGE, OVERLAY_OPACITY_RANGE)
 
     return (
         <div className="project-cover-background fixed inset-0 overflow-hidden">

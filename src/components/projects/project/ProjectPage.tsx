@@ -3,6 +3,8 @@ import ProjectSlider from './ProjectSlider'
 import ProjectCover from './ProjectCover'
 import ProjectTextSection from './ProjectTextSection'
 import ProjectMediasStack from './ProjectMediasStack'
+import ProjectMusic from '@/components/audio/ProjectMusic'
+import './ProjectPage.scss'
 
 const ProjectPage = ({ project }: { project: DetailedProjectType }) => {
     const medias = (project.medias ?? []).filter((media) => media.url !== project.cover_image)
@@ -14,6 +16,7 @@ const ProjectPage = ({ project }: { project: DetailedProjectType }) => {
 
     return (
         <div className="project-page">
+            <ProjectMusic music={project.music} />
             <ProjectSlider name={project.name} coverImage={project.cover_image} mobileCoverImage={project.mobile_cover_image}>
                 <ProjectCover name={project.name} />
                 <ProjectTextSection
