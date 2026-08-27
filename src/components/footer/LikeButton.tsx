@@ -4,6 +4,16 @@ import { useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Heart } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import {
+    DEGREES_PER_HALF_TURN,
+    PARTICLE_ANGLE_MAX_DEG,
+    PARTICLE_COUNT,
+    PARTICLE_DISTANCE_MIN,
+    PARTICLE_DISTANCE_RANGE,
+    PARTICLE_ROTATE_CENTER,
+    PARTICLE_ROTATE_RANGE,
+    PULSE_SCALE_KEYFRAMES,
+} from './likeButton.config'
 
 interface Particle {
     id: number
@@ -24,13 +34,13 @@ const LikeButton = ({ initialCount }: { initialCount: number }) => {
         setLiked(true)
         setPulseKey((current) => current + 1)
 
-        const newParticles = Array.from({ length: 6 }, () => {
+        const newParticles = Array.from({ length: PARTICLE_COUNT }, () => {
             particleId.current += 1
             return {
                 id: particleId.current,
-                angle: Math.random() * 360,
-                distance: 22 + Math.random() * 18,
-                rotate: Math.random() * 90 - 45,
+                angle: Math.random() * PARTICLE_ANGLE_MAX_DEG,
+                distance: PARTICLE_DISTANCE_MIN + Math.random() * PARTICLE_DISTANCE_RANGE,
+                rotate: Math.random() * PARTICLE_ROTATE_RANGE - PARTICLE_ROTATE_CENTER,
             }
         })
         setParticles((current) => [...current, ...newParticles])
@@ -64,8 +74,8 @@ const LikeButton = ({ initialCount }: { initialCount: number }) => {
                         animate={{
                             opacity: 0,
                             scale: 1,
-                            x: Math.cos((particle.angle * Math.PI) / 180) * particle.distance,
-                            y: Math.sin((particle.angle * Math.PI) / 180) * particle.distance,
+                            x: Math.cos((particle.angle * Math.PI) / DEGREES_PER_HALF_TURN) * particle.distance,
+                            y: Math.sin((particle.angle * Math.PI) / DEGREES_PER_HALF_TURN) * particle.distance,
                             rotate: particle.rotate,
                         }}
                         transition={{ duration: 0.6, ease: 'easeOut' }}
@@ -77,7 +87,7 @@ const LikeButton = ({ initialCount }: { initialCount: number }) => {
                 <motion.span
                     key={pulseKey}
                     initial={{ scale: 1 }}
-                    animate={{ scale: [1, 1.4, 0.9, 1.15, 1] }}
+                    animate={{ scale: PULSE_SCALE_KEYFRAMES }}
                     transition={{ duration: 0.45, ease: 'easeOut' }}
                     className="relative inline-flex"
                 >

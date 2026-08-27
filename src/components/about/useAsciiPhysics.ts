@@ -1,6 +1,27 @@
 'use client'
 
 import { useEffect, type RefObject } from 'react'
+import {
+    BASE_FORCE,
+    BASE_RADIUS,
+    CELL_CENTER_OFFSET,
+    CHAR_ASPECT,
+    DAMPING,
+    FLOW_MIX,
+    FONT_SIZE_RATIO,
+    MAX_RADIUS,
+    MAX_SPEED,
+    MIN_DIST,
+    MIN_FLOW_SPEED,
+    RADIAL_MIX,
+    RADIUS_SPEED_GAIN,
+    REGION_PAD,
+    REGION_RADIUS_CAP,
+    REST_EPSILON,
+    SPEED_FORCE_GAIN,
+    STIFFNESS,
+    VELOCITY_SMOOTHING,
+} from './asciiPortrait.config'
 
 type Glyph = {
     char: string
@@ -12,24 +33,6 @@ type Glyph = {
     vy: number
     active: boolean
 }
-
-const STIFFNESS = 0.1
-const DAMPING = 0.8
-const REST_EPSILON = 0.05
-const CHAR_ASPECT = 0.58
-
-const BASE_RADIUS = 46
-const MAX_RADIUS = 150
-const RADIUS_SPEED_GAIN = 1.1
-const REGION_PAD = 100
-
-const BASE_FORCE = 3
-const SPEED_FORCE_GAIN = 0.12
-const MAX_SPEED = 90
-const RADIAL_MIX = 0.35
-const FLOW_MIX = 0.75
-
-const VELOCITY_SMOOTHING = 0.4
 
 export function useAsciiPhysics(
     containerRef: RefObject<HTMLDivElement | null>,
@@ -75,7 +78,7 @@ export function useAsciiPhysics(
             cellW = width / colCount
             cellH = cellW / CHAR_ASPECT
             height = cellH * rowCount
-            fontSize = cellH * 0.92
+            fontSize = cellH * FONT_SIZE_RATIO
 
             canvas.width = Math.round(width * dpr)
             canvas.height = Math.round(height * dpr)
@@ -91,8 +94,8 @@ export function useAsciiPhysics(
                 for (let col = 0; col < colCount; col++) {
                     const char = line[col]
                     if (!char || char === ' ') continue
-                    const homeX = (col + 0.5) * cellW
-                    const homeY = (row + 0.5) * cellH
+                    const homeX = (col + CELL_CENTER_OFFSET) * cellW
+                    const homeY = (row + CELL_CENTER_OFFSET) * cellH
                     glyphs.push({ char, homeX, homeY, x: homeX, y: homeY, vx: 0, vy: 0, active: false })
                 }
             }
@@ -119,7 +122,7 @@ export function useAsciiPhysics(
             const rawSpeed = Math.hypot(dt.x, dt.y)
             const speed = pointer.active ? Math.min(rawSpeed, MAX_SPEED) : 0
             const radius = pointer.active ? Math.min(BASE_RADIUS + speed * RADIUS_SPEED_GAIN, MAX_RADIUS) : 0
-            const flowLen = speed > 0.0001 ? speed : 1
+            const flowLen = speed > MIN_FLOW_SPEED ? speed : 1
             const flowX = dt.x / flowLen
             const flowY = dt.y / flowLen
 
@@ -131,7 +134,7 @@ export function useAsciiPhysics(
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
 
-            const regionRadius = Math.min(radius + REGION_PAD, 220)
+            const regionRadius = Math.min(radius + REGION_PAD, REGION_RADIUS_CAP)
             const regionRadiusSq = regionRadius * regionRadius
 
             const touched: Glyph[] = []
@@ -163,7 +166,7 @@ export function useAsciiPhysics(
                     const cdy = g.y - pointer.y
                     const distSq = cdx * cdx + cdy * cdy
                     if (distSq < radius * radius) {
-                        const dist = Math.sqrt(distSq) || 0.001
+                        const dist = Math.sqrt(distSq) || MIN_DIST
                         const falloff = 1 - dist / radius
                         const eased = falloff * falloff
                         const mag = eased * (BASE_FORCE + speed * SPEED_FORCE_GAIN)

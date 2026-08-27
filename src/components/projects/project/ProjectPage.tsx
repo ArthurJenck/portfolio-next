@@ -3,6 +3,7 @@ import ProjectSlider from './ProjectSlider'
 import ProjectCover from './ProjectCover'
 import ProjectTextSection from './ProjectTextSection'
 import ProjectMediasStack from './ProjectMediasStack'
+import './ProjectPage.scss'
 
 const ProjectPage = ({ project }: { project: DetailedProjectType }) => {
     const medias = (project.medias ?? []).filter((media) => media.url !== project.cover_image)

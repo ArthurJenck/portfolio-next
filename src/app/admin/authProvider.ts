@@ -3,6 +3,9 @@
 import { AuthProvider } from 'react-admin'
 import { signIn, signOut } from 'next-auth/react'
 
+const HTTP_UNAUTHORIZED = 401
+const HTTP_FORBIDDEN = 403
+
 export default {
     login: ({ username, password }) => {
         return signIn('credentials', {
@@ -32,7 +35,7 @@ export default {
     },
     checkError: (error) => {
         const status = error.status
-        if (status === 401 || status === 403) {
+        if (status === HTTP_UNAUTHORIZED || status === HTTP_FORBIDDEN) {
             return Promise.reject()
         }
         return Promise.resolve()

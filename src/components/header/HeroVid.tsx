@@ -5,6 +5,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import { useVideoDistortion } from './useVideoDistortion'
 import { onHeroPlay } from '@/lib/hero-playback'
+import { SAFARI_PLAY_DELAY_MS } from './header.config'
 
 // Chemins vers les vidéos dans le dossier public
 const BG_Webm = '/videos/portfolio-bg.webm'
@@ -51,7 +52,7 @@ const HeroVid = () => {
                     video.setAttribute('webkit-playsinline', 'true')
                     video.setAttribute('x-webkit-airplay', 'deny')
 
-                    await new Promise((resolve) => setTimeout(resolve, 100))
+                    await new Promise((resolve) => setTimeout(resolve, SAFARI_PLAY_DELAY_MS))
                 }
 
                 if (cancelled) return

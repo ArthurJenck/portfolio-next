@@ -1,6 +1,18 @@
 'use client'
 
 import { useEffect, type RefObject } from 'react'
+import {
+    ABERRATION,
+    ENERGY_ATTACK,
+    ENERGY_DECAY,
+    FALLBACK_VIDEO_HEIGHT,
+    FALLBACK_VIDEO_WIDTH,
+    IDLE_MS,
+    MOUSE_SMOOTHING,
+    QUAD_VERTEX_COUNT,
+    STRENGTH,
+    VELOCITY_SCALE,
+} from './header.config'
 
 type GLContext = WebGLRenderingContext | WebGL2RenderingContext
 
@@ -89,13 +101,6 @@ function createProgram(gl: GLContext, vertexSrc: string, fragmentSrc: string) {
     }
     return program
 }
-
-const MOUSE_SMOOTHING = 0.12
-const STRENGTH = 0.055
-const ABERRATION = 0.005
-const ENERGY_ATTACK = 0.35
-const ENERGY_DECAY = 0.9
-const IDLE_MS = 60
 
 export function useVideoDistortion(
     containerRef: RefObject<HTMLDivElement | null>,
@@ -229,8 +234,8 @@ export function useVideoDistortion(
 
             smoothMouse.x += (mouse.x - smoothMouse.x) * MOUSE_SMOOTHING
             smoothMouse.y += (mouse.y - smoothMouse.y) * MOUSE_SMOOTHING
-            velocity.x = (smoothMouse.x - prevSmooth.x) * 10
-            velocity.y = (smoothMouse.y - prevSmooth.y) * 10
+            velocity.x = (smoothMouse.x - prevSmooth.x) * VELOCITY_SCALE
+            velocity.y = (smoothMouse.y - prevSmooth.y) * VELOCITY_SCALE
             prevSmooth.x = smoothMouse.x
             prevSmooth.y = smoothMouse.y
 
@@ -245,13 +250,13 @@ export function useVideoDistortion(
             gl.bindTexture(gl.TEXTURE_2D, texture)
             gl.uniform1i(uVideo, 0)
             gl.uniform2f(uResolution, width, height)
-            gl.uniform2f(uVideoResolution, video.videoWidth || 1920, video.videoHeight || 1080)
+            gl.uniform2f(uVideoResolution, video.videoWidth || FALLBACK_VIDEO_WIDTH, video.videoHeight || FALLBACK_VIDEO_HEIGHT)
             gl.uniform2f(uMouse, smoothMouse.x, smoothMouse.y)
             gl.uniform2f(uMouseVelocity, velocity.x, velocity.y)
             gl.uniform1f(uStrength, STRENGTH * energy)
             gl.uniform1f(uAberration, ABERRATION * energy)
 
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, QUAD_VERTEX_COUNT)
 
             if (intersecting && !document.hidden) {
                 rafId = requestAnimationFrame(render)

@@ -4,6 +4,8 @@ import { Copy, Check, X } from 'lucide-react'
 import { useState, useRef } from 'react'
 import { cn } from '@/lib/utils'
 
+const FEEDBACK_DURATION_MS = 1000
+
 interface CopyBtnProps {
     copyText: string
     isHovered: boolean
@@ -27,14 +29,14 @@ const CopyBtn = ({ copyText, isHovered }: CopyBtnProps) => {
             setIsError(false)
             timeoutRef.current = setTimeout(() => {
                 setIsCopied(false)
-            }, 1000)
+            }, FEEDBACK_DURATION_MS)
         } catch (error) {
             console.error('Erreur lors de la copie:', error)
             setIsError(true)
             setIsCopied(false)
             timeoutRef.current = setTimeout(() => {
                 setIsError(false)
-            }, 1000)
+            }, FEEDBACK_DURATION_MS)
         }
     }
 

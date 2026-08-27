@@ -13,6 +13,7 @@ import { ProjectDescription } from './ProjectDescription'
 import {
     CONTAINER_SCALE_TRANSITION,
     DESCRIPTION_HEIGHT,
+    DRAG_END_TIMEOUT_MS,
     DRAG_SCALE,
     ITEM_GAP,
     ITEM_WIDTH,
@@ -21,11 +22,11 @@ import {
     TITLE_SPRING,
     TITLE_TOP_OFFSET,
     VIEW_PADDING,
-} from './config'
+} from './projects.config'
 import { useCarouselBounds } from '@/hooks/useCarouselBounds'
 import { useCarouselDrag } from '@/hooks/useCarouselDrag'
 import { MinimalProjectType } from '@/types/ProjectTypes'
-import { Skeleton } from '@/components/skeleton'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 interface ProjecsCarouselProps {
     projects: MinimalProjectType[]
@@ -179,7 +180,7 @@ const ProjectsCarousel = ({ projects, isLoading = false }: ProjecsCarouselProps)
             dragEndTimeout.current = window.setTimeout(() => {
                 setIsDraggingOrRecentlyDragged(false)
                 dragEndTimeout.current = null
-            }, 300)
+            }, DRAG_END_TIMEOUT_MS)
         }
     }, [isDragging, isDraggingOrRecentlyDragged])
 

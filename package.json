@@ -5,7 +5,7 @@
     "scripts": {
         "dev": "next dev --turbopack",
         "build": "next build --turbopack",
-        "push": "npm run build && git push || echo '❌ Build failed. Aborting push. ❌'",
+        "push": "pnpm build && git push || echo '❌ Build failed. Aborting push. ❌'",
         "start": "next start",
         "lint": "eslint"
     },

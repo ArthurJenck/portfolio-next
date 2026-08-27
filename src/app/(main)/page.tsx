@@ -3,8 +3,8 @@ import Skills from '@/components/skills/SkillsSection'
 import About from '@/components/about/AboutSection'
 import Contact from '@/components/contact/ContactSection'
 import Projets from '@/components/projects/ProjectsSection'
-import FastTravel from '@/components/FastTravel/FastTravel'
-import { getPublicContactLinks, getPublicProjects, getPublicSkillCategories } from '@/lib/public-content'
+import FastTravel from '@/components/fastTravel/FastTravel'
+import { getPublicContactLinks, getPublicProjects, getPublicSkillCategories } from '@/server/content/public-content'
 
 const Home = async () => {
     const [skillCategories, projects, contactLinks] = await Promise.all([

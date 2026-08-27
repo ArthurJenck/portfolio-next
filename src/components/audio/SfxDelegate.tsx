@@ -2,7 +2,8 @@
 
 import { useEffect } from 'react'
 import { useAmbientAudio } from '@/providers/ambient-audio-context'
-import type { SfxName } from '@/lib/audio/params'
+import type { SfxName } from '@/lib/audio/audio.types'
+import { panFromHorizontalPosition } from '@/lib/utils'
 
 type Role = 'link' | 'link-ext' | 'button' | 'tile' | 'like'
 
@@ -43,7 +44,7 @@ const roleOf = (element: Element | null): Role | null => {
 
 const panOf = (element: Element): number => {
     const box = element.getBoundingClientRect()
-    return ((box.left + box.width / 2) / window.innerWidth) * 1.4 - 0.7
+    return panFromHorizontalPosition(box.left + box.width / 2, window.innerWidth)
 }
 
 const SfxDelegate = () => {

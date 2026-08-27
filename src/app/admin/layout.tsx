@@ -1,13 +1,5 @@
 import type { Metadata } from 'next'
-import { Sora } from 'next/font/google'
-import '@/app/globals.css'
 import './admin.css'
-
-const sora = Sora({
-    subsets: ['latin'],
-    weight: ['100', '200', '300', '400', '500', '600', '700', '800'],
-    display: 'swap',
-})
 
 export const metadata: Metadata = {
     title: 'Admin – Arthur Jenck',
@@ -20,9 +12,5 @@ export default function AdminLayout({
 }: Readonly<{
     children: React.ReactNode
 }>) {
-    return (
-        <html lang="fr" data-scroll-behavior="smooth">
-            <body className={sora.className}>{children}</body>
-        </html>
-    )
+    return children
 }

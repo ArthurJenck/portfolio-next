@@ -8,7 +8,7 @@ import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
 import { useIsMobile } from '@/hooks/useIsMobile'
 import { ProjectSliderContext } from './ProjectSliderContext'
 import ProjectCoverBackground from './ProjectCoverBackground'
-import './ProjectPage.scss'
+import { EMBLA_DURATION } from '../projects.config'
 
 interface ProjectSliderProps {
     name: string
@@ -26,7 +26,7 @@ const ProjectSlider = ({ name, coverImage, mobileCoverImage, children }: Project
 
     const plugins = useMemo(() => [WheelGesturesPlugin({ forceWheelAxis: 'y' })], [])
     const [emblaRef, emblaApi] = useEmblaCarousel(
-        { axis: 'y', loop: true, dragFree: false, duration: prefersReducedMotion ? 0 : 25, watchResize: true },
+        { axis: 'y', loop: true, dragFree: false, duration: prefersReducedMotion ? 0 : EMBLA_DURATION, watchResize: true },
         plugins,
     )
 

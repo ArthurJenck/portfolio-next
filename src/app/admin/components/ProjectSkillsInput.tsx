@@ -16,6 +16,8 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSo
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
+const DRAG_OPACITY = 0.5
+
 interface ProjectSkillsInputProps {
     source: string
     label: string
@@ -41,7 +43,7 @@ const SortableSkillItem = ({ skill, onRemove }: SortableSkillItemProps) => {
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
-        opacity: isDragging ? 0.5 : 1,
+        opacity: isDragging ? DRAG_OPACITY : 1,
     }
 
     return (

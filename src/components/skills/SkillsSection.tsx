@@ -2,9 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import SectionTitle from '@/components/SectionTitle'
+import SectionTitle from '@/components/ui/SectionTitle'
 import SkillCategory from './SkillCategory'
 import { SkillResponse } from '@/types/SkillsTypes'
+
+const OPACITY_FADE_PROGRESS = 0.05
 
 const Skills = ({ skillCategories }: { skillCategories: SkillResponse }) => {
     const containerRef = useRef<HTMLDivElement>(null)
@@ -28,7 +30,7 @@ const Skills = ({ skillCategories }: { skillCategories: SkillResponse }) => {
     })
 
     const heightTransform = useTransform(scrollYProgress, [0, 1], [0, height])
-    const opacityTransform = useTransform(scrollYProgress, [0, 0.05], [0, 1])
+    const opacityTransform = useTransform(scrollYProgress, [0, OPACITY_FADE_PROGRESS], [0, 1])
 
     return (
         <section id="skills" className="py-16 relative">

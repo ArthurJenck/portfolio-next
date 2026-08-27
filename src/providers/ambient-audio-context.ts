@@ -2,7 +2,7 @@
 
 import { createContext, useContext } from 'react'
 import type { AmbientEngine } from '@/lib/audio/engine'
-import type { AmbientParams, SfxName, SfxOptions } from '@/lib/audio/params'
+import type { AmbientParams, SfxName, SfxOptions } from '@/lib/audio/audio.types'
 
 export type AmbientAudioValue = {
     enabled: boolean

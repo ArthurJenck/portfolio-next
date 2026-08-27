@@ -1,8 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-
-const QUERY = '(max-width: 1024px)'
+import { COMPACT_NAV_QUERY as QUERY } from '@/config/breakpoints'
 
 export const useIsCompactNav = (): boolean => {
     const [isCompact, setIsCompact] = useState(false)

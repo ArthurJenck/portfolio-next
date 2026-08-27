@@ -1,4 +1,4 @@
-import { getPublicCv } from '@/lib/public-content'
+import { getPublicCv } from '@/server/content/public-content'
 
 const CV = async () => {
     const cv = await getPublicCv()

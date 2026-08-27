@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { AmbientAudioContext, type AmbientAudioValue } from './ambient-audio-context'
 import SfxDelegate from '@/components/audio/SfxDelegate'
 import type { AmbientEngine } from '@/lib/audio/engine'
-import type { AmbientParams } from '@/lib/audio/params'
+import type { AmbientParams } from '@/lib/audio/audio.types'
 
 const MUTE_KEY = 'ambient-sound-muted'
 const GESTURES = ['pointerdown', 'keydown', 'touchstart'] as const

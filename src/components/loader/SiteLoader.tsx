@@ -8,6 +8,7 @@ import './SiteLoader.scss'
 
 const STORAGE_KEY = 'site-loaded'
 const TIMEOUT_MS = 3000
+const POLL_INTERVAL_MS = 100
 const EXIT_DURATION_MS = 400
 
 const waitForWindowLoad = (): Promise<void> =>
@@ -63,7 +64,7 @@ const waitForHeroMedia = (): Promise<void> =>
         if (checkExisting()) return
         const interval = setInterval(() => {
             if (checkExisting()) clearInterval(interval)
-        }, 100)
+        }, POLL_INTERVAL_MS)
     })
 
 // Attend que l'image de couverture d'une page projet soit prête à être affichée
@@ -92,7 +93,7 @@ const waitForCoverMedia = (): Promise<void> =>
         if (checkExisting()) return
         const interval = setInterval(() => {
             if (checkExisting()) clearInterval(interval)
-        }, 100)
+        }, POLL_INTERVAL_MS)
     })
 
 type LoaderPhase = 'loading' | 'exiting' | 'done'

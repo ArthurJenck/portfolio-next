@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { getPublicProjects } from '@/lib/public-content'
-import { ArrowLeft, ArrowRight, MoveLeft, MoveRight } from 'lucide-react'
+import { getPublicProjects } from '@/server/content/public-content'
+import { MoveLeft, MoveRight } from 'lucide-react'
 
 const ProjectPagerNav = async ({ slug }: { slug: string }) => {
     const projects = await getPublicProjects()

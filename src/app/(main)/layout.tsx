@@ -1,15 +1,14 @@
 import type { Metadata } from 'next'
-import '@/app/globals.css'
 import { MotionProvider } from '@/providers/MotionProvider'
 import AudioProvider from '@/providers/AudioProvider'
-import { cn } from '@/lib/utils'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Analytics } from '@vercel/analytics/next'
-import NavBar from '@/components/NavBar'
-import Footer from '@/components/Footer'
+import NavBar from '@/components/nav/NavBar'
+import Footer from '@/components/footer/Footer'
 import SiteLoader from '@/components/loader/SiteLoader'
-import { Sora, Montserrat } from 'next/font/google'
-import { SITE_URL } from '@/lib/site-config'
+import DottedBackground from '@/components/ui/DottedBackground'
+import { SHARE_IMAGE_URL, SITE_URL } from '@/config/site'
+import { HOME_DESCRIPTION, HOME_KEYWORDS, HOME_TITLE, personSchema, websiteSchema } from '@/config/seo'
 
 // Ce script doit s'exécuter avant le premier paint (pas de "next/script" ici) pour éviter
 // tout flash : il pose la classe qui retient le hero (1re visite) ou masque le loader (déjà vu)
@@ -23,48 +22,16 @@ try {
 } catch (e) {}
 `
 
-const sora = Sora({
-    subsets: ['latin'],
-    weight: ['100', '200', '300', '400', '500', '600', '700', '800'],
-    display: 'swap',
-    variable: '--font-sora',
-})
-
-const montserrat = Montserrat({
-    subsets: ['latin'],
-    weight: ['100', '200', '300', '400', '500', '600', '700', '800'],
-    display: 'swap',
-    variable: '--font-montserrat',
-})
-
-const HOME_DESCRIPTION =
-    "Portfolio d'Arthur Jenck, développeur créatif & front-end à Paris. Expériences web immersives avec React, Next.js, TypeScript, GSAP et un vrai soin UX/UI."
-
 export const metadata: Metadata = {
-    metadataBase: new URL(SITE_URL),
     title: {
-        default: 'Arthur Jenck · Développeur Créatif & Front-End à Paris',
+        default: HOME_TITLE,
         template: '%s · Arthur Jenck',
     },
     description: HOME_DESCRIPTION,
     authors: [{ name: 'Arthur Jenck', url: SITE_URL }],
     creator: 'Arthur Jenck',
     robots: { index: true, follow: true },
-    keywords: [
-        'Arthur Jenck',
-        'Développeur Web',
-        'Front-end',
-        'NextJS',
-        'React',
-        'Typescript',
-        'Tailwind',
-        'UX/UI',
-        'Webdesign',
-        'Parisienne',
-        'Région parisienne',
-        'Paris',
-        'France',
-    ],
+    keywords: HOME_KEYWORDS,
     icons: {
         icon: [
             { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
@@ -79,7 +46,7 @@ export const metadata: Metadata = {
         canonical: SITE_URL,
     },
     openGraph: {
-        title: 'Arthur Jenck · Développeur Créatif & Front-End à Paris',
+        title: HOME_TITLE,
         siteName: 'Arthur Jenck',
         type: 'website',
         url: `${SITE_URL}/`,
@@ -87,7 +54,7 @@ export const metadata: Metadata = {
         description: HOME_DESCRIPTION,
         images: [
             {
-                url: 'https://3jrx06emyedlbjzt.public.blob.vercel-storage.com/share-preview.png',
+                url: SHARE_IMAGE_URL,
                 width: 1199,
                 height: 630,
                 alt: "Portfolio d'Arthur Jenck, développeur créatif & front-end à Paris",
@@ -97,9 +64,9 @@ export const metadata: Metadata = {
     twitter: {
         card: 'summary_large_image',
         site: '@ArthurJenck',
-        title: 'Arthur Jenck · Développeur Créatif & Front-End à Paris',
+        title: HOME_TITLE,
         description: HOME_DESCRIPTION,
-        images: ['https://3jrx06emyedlbjzt.public.blob.vercel-storage.com/share-preview.png'],
+        images: [SHARE_IMAGE_URL],
     },
     appleWebApp: {
         title: 'Arthur Jenck',
@@ -108,107 +75,38 @@ export const metadata: Metadata = {
     },
 }
 
-export default function RootLayout({
+export default function SiteLayout({
     children,
 }: Readonly<{
     children: React.ReactNode
 }>) {
     return (
-        <html lang="fr" data-scroll-behavior="smooth" suppressHydrationWarning>
-            <head>
-                <script
-                    type="application/ld+json"
-                    dangerouslySetInnerHTML={{
-                        __html: JSON.stringify({
-                            '@context': 'https://schema.org',
-                            '@type': 'WebSite',
-                            name: 'Arthur Jenck',
-                            alternateName: 'Arthur Jenck – Portfolio',
-                            url: `${SITE_URL}/`,
-                            inLanguage: 'fr-FR',
-                            publisher: {
-                                '@id': `${SITE_URL}/#person`,
-                            },
-                        }),
-                    }}
-                />
-                <script
-                    type="application/ld+json"
-                    dangerouslySetInnerHTML={{
-                        __html: JSON.stringify({
-                            '@context': 'https://schema.org',
-                            '@type': 'Person',
-                            '@id': `${SITE_URL}/#person`,
-                            name: 'Arthur Jenck',
-                            jobTitle: 'Développeur créatif & front-end',
-                            url: `${SITE_URL}/`,
-                            email: 'mailto:arthurjenckdev@gmail.com',
-                            address: {
-                                '@type': 'PostalAddress',
-                                addressLocality: 'Paris',
-                                addressRegion: 'Île-de-France',
-                                addressCountry: 'FR',
-                            },
-                            alumniOf: [
-                                { '@type': 'EducationalOrganization', name: 'ECV Paris' },
-                                { '@type': 'EducationalOrganization', name: 'OpenClassrooms' },
-                                { '@type': 'EducationalOrganization', name: 'Hetic' },
-                            ],
-                            affiliation: {
-                                '@type': 'EducationalOrganization',
-                                name: "Gobelins, l'école de l'image",
-                            },
-                            knowsAbout: [
-                                'React',
-                                'Next.js',
-                                'TypeScript',
-                                'Tailwind CSS',
-                                'GSAP',
-                                'Three.js',
-                                'UX/UI Design',
-                                'Webdesign',
-                                'Framer Motion',
-                                'Node.js',
-                            ],
-                            sameAs: [
-                                'https://github.com/arthurjenck',
-                                'https://www.linkedin.com/in/arthurjenck/',
-                                'https://x.com/ArthurJenck',
-                            ],
-                        }),
-                    }}
-                />
-                <script dangerouslySetInnerHTML={{ __html: loaderInitScript }} />
-                <noscript>
-                    <style>
-                        {'.site-loader { display: none !important; } .hero-typing { width: fit-content !important; animation: none !important; }'}
-                    </style>
-                </noscript>
-            </head>
-            <body className={cn('overflow-x-hidden', sora.className, sora.variable, montserrat.variable)}>
-                <div
-                    className="fixed inset-0 h-svh -z-10 top-svh"
-                    style={{
-                        background: 'var(--primary)',
-                        backgroundImage: `radial-gradient(circle, rgba(175, 175, 175, 0.2) 1px, transparent 1px)`,
-                        backgroundSize: '30px 30px',
-                        backgroundPosition: '0 0',
-                    }}
-                />
-                <SiteLoader />
-                <MotionProvider>
-                    <AudioProvider>
-                        <div className="min-h-screen flex flex-col">
-                            <NavBar />
-                            {children}
-                            <Footer />
-                        </div>
-                    </AudioProvider>
-                    {/* TODO: remettre le debug */}
-                    <Analytics debug={false} />
-                    <SpeedInsights debug={false} />
-                </MotionProvider>
-            </body>
-        </html>
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema()) }}
+            />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema()) }} />
+            <script dangerouslySetInnerHTML={{ __html: loaderInitScript }} />
+            <noscript>
+                <style>
+                    {'.site-loader { display: none !important; } .hero-typing { width: fit-content !important; animation: none !important; }'}
+                </style>
+            </noscript>
+            <DottedBackground />
+            <SiteLoader />
+            <MotionProvider>
+                <AudioProvider>
+                    <div className="min-h-screen flex flex-col">
+                        <NavBar />
+                        {children}
+                        <Footer />
+                    </div>
+                </AudioProvider>
+                {/* TODO: remettre le debug */}
+                <Analytics debug={false} />
+                <SpeedInsights debug={false} />
+            </MotionProvider>
+        </>
     )
 }

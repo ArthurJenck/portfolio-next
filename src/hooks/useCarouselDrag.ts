@@ -6,7 +6,7 @@ import {
     INERTIA_DURATION_MS,
     INERTIA_FACTOR,
     MIN_VELOCITY_FOR_INERTIA,
-} from '../components/projects/config'
+} from '../components/projects/projects.config'
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 

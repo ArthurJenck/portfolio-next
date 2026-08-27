@@ -6,7 +6,7 @@ import {
     SUBTITLE_UNDERLINE_W,
     TAGS_OPACITY_TRANSITION,
     TITLE_SCALE_TRANSITION,
-} from './config'
+} from './projects.config'
 
 interface ProjectDescriptionProps {
     title: string
