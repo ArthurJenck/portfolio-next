@@ -6,7 +6,7 @@ import { Analytics } from '@vercel/analytics/next'
 import NavBar from '@/components/nav/NavBar'
 import Footer from '@/components/footer/Footer'
 import SiteLoader from '@/components/loader/SiteLoader'
-import DottedBackground from '@/components/ui/DottedBackground'
+import SiteBackground from '@/components/background/SiteBackground'
 import { SHARE_IMAGE_URL, SITE_URL } from '@/config/site'
 import { HOME_DESCRIPTION, HOME_KEYWORDS, HOME_TITLE, personSchema, websiteSchema } from '@/config/seo'
 
@@ -93,7 +93,7 @@ export default function SiteLayout({
                     {'.site-loader { display: none !important; } .hero-typing { width: fit-content !important; animation: none !important; }'}
                 </style>
             </noscript>
-            <DottedBackground />
+            <SiteBackground />
             <SiteLoader />
             <MotionProvider>
                 <AudioProvider>

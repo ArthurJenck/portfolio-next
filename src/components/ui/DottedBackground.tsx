@@ -1,7 +1,7 @@
 const DottedBackground = () => {
     return (
         <div
-            className="fixed inset-0 h-svh -z-10 top-svh"
+            className="fixed inset-0 h-svh -z-10"
             style={{
                 background: 'var(--primary)',
                 backgroundImage: 'radial-gradient(circle, rgba(175, 175, 175, 0.2) 1px, transparent 1px)',

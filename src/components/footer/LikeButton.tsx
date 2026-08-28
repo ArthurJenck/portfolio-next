@@ -1,9 +1,9 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import { Heart } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { useRef, useState } from 'react'
 import {
     DEGREES_PER_HALF_TURN,
     PARTICLE_ANGLE_MAX_DEG,
@@ -22,7 +22,13 @@ interface Particle {
     rotate: number
 }
 
-const LikeButton = ({ initialCount }: { initialCount: number }) => {
+interface LikeButtonProps {
+    initialCount: number
+    hideCount?: boolean
+    className?: string
+}
+
+const LikeButton = ({ initialCount, hideCount = false, className }: LikeButtonProps) => {
     const [count, setCount] = useState(initialCount)
     const [liked, setLiked] = useState(false)
     const [pulseKey, setPulseKey] = useState(0)
@@ -61,7 +67,10 @@ const LikeButton = ({ initialCount }: { initialCount: number }) => {
             aria-label="Liker le portfolio"
         >
             <motion.span
-                className="relative flex items-center justify-center size-11 rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.35)]"
+                className={cn(
+                    'relative flex items-center justify-center size-11 rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.35)]',
+                    className,
+                )}
                 transition={{ type: 'spring', stiffness: 400, damping: 12 }}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
@@ -69,7 +78,7 @@ const LikeButton = ({ initialCount }: { initialCount: number }) => {
                 {particles.map((particle) => (
                     <motion.span
                         key={particle.id}
-                        className="absolute pointer-events-none text-[var(--accent-like)]"
+                        className="absolute pointer-events-none text-(--accent-like)"
                         initial={{ opacity: 1, scale: 0.4, x: 0, y: 0, rotate: 0 }}
                         animate={{
                             opacity: 0,
@@ -94,29 +103,34 @@ const LikeButton = ({ initialCount }: { initialCount: number }) => {
                     <Heart
                         className={cn(
                             'size-5 transition-colors duration-300',
-                            liked ? 'text-[var(--accent-like)]' : 'text-[var(--secondary)]',
+                            liked ? 'text-(--accent-like)' : 'text-(--secondary)',
                         )}
                         fill="currentColor"
                     />
                     <span
                         aria-hidden
                         className={cn(
-                            'absolute top-[16%] left-[12%] w-[38%] h-[20%] -rotate-[30deg] rounded-full transition-opacity duration-300 pointer-events-none',
+                            'absolute top-[16%] left-[12%] w-[38%] h-[20%] -rotate-30 rounded-full transition-opacity duration-300 pointer-events-none',
                             liked ? 'opacity-90' : 'opacity-0',
                         )}
-                        style={{ background: 'radial-gradient(ellipse at center, rgba(255,235,240,0.95) 0%, rgba(255,235,240,0) 75%)' }}
+                        style={{
+                            background:
+                                'radial-gradient(ellipse at center, rgba(255,235,240,0.95) 0%, rgba(255,235,240,0) 75%)',
+                        }}
                     />
                 </motion.span>
             </motion.span>
-            <motion.span
-                key={count}
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-                className="text-xs font-bold tabular-nums"
-            >
-                {count}
-            </motion.span>
+            {!hideCount && (
+                <motion.span
+                    key={count}
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="text-xs font-bold tabular-nums"
+                >
+                    {count}
+                </motion.span>
+            )}
         </button>
     )
 }

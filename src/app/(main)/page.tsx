@@ -4,6 +4,7 @@ import About from '@/components/about/AboutSection'
 import Contact from '@/components/contact/ContactSection'
 import Projets from '@/components/projects/ProjectsSection'
 import FastTravel from '@/components/fastTravel/FastTravel'
+import TunnelGate from '@/components/background/TunnelGate'
 import { getPublicContactLinks, getPublicProjects, getPublicSkillCategories } from '@/server/content/public-content'
 
 const Home = async () => {
@@ -17,6 +18,7 @@ const Home = async () => {
         <>
             <FastTravel />
             <Header />
+            <TunnelGate />
             <main>
                 <Skills skillCategories={skillCategories} />
                 <Projets projects={projects} />

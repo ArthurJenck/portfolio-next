@@ -41,10 +41,17 @@ const Header = () => {
         }
     }, [])
     //
+    // Au clic, on scroll jusqu'à la section suivante. On vise la section elle-même et non
+    // une hauteur d'écran : le bloc de transition du tunnel s'intercale entre les deux, et
+    // un saut d'un écran s'arrêterait au milieu.
+    const scrollToNextSection = () => {
+        const next = document.querySelector<HTMLElement>('#skills')
+        scrollTo(next ? next.offsetTop : window.innerHeight)
+    }
+
     return (
         <header
-            // Au clic, on scroll jusqu'à la section suivante
-            onClick={() => scrollTo(window.innerHeight)}
+            onClick={scrollToNextSection}
             onMouseMove={(e) => handleH1Wght(e)}
             onMouseOver={(e) => handleH1Wght(e)}
             className="flex flex-col items-center justify-center scroll-smooth h-svh relative"
