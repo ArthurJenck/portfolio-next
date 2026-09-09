@@ -9,6 +9,10 @@ import type { ProjectMusic } from '@/types/ProjectTypes'
 
 const MUTE_KEY = 'ambient-sound-muted'
 const GESTURES = ['pointerdown', 'keydown', 'touchstart'] as const
+const LOADER_COMPLETE_EVENT = 'site-loader-complete'
+
+type AmbientEngineModule = typeof import('@/lib/audio/engine')
+type AmbientEngineConstructor = AmbientEngineModule['AmbientEngine']
 
 type Props = {
     children: ReactNode
@@ -17,43 +21,84 @@ type Props = {
 const AudioProvider = ({ children }: Props) => {
     const engineRef = useRef<AmbientEngine | null>(null)
     const pendingParams = useRef<Partial<AmbientParams>>({})
-    const bootRef = useRef<Promise<void> | null>(null)
+    const engineImportRef = useRef<Promise<AmbientEngineModule> | null>(null)
+    const engineConstructorRef = useRef<AmbientEngineConstructor | null>(null)
     const wantedRef = useRef(false)
     const pendingTrackRef = useRef<ProjectMusic | null>(null)
+    const loaderCompleteRef = useRef(false)
     const [enabled, setEnabled] = useState(false)
     const [ready, setReady] = useState(false)
     const [currentTrackLabel, setCurrentTrackLabel] = useState<string | null>(null)
 
-    // Sans ce verrou, deux appels concurrents passent tous les deux le test
-    // `engineRef.current` avant que l'import dynamique ne résolve : le premier
-    // moteur devient orphelin et joue indéfiniment, hors de portée de stop().
-    const boot = useCallback(async () => {
-        if (!bootRef.current) {
-            bootRef.current = import('@/lib/audio/engine').then(({ AmbientEngine }) => {
-                const engine = new AmbientEngine()
-                engineRef.current = engine
-                if (Object.keys(pendingParams.current).length) engine.setParams(pendingParams.current)
-                // Deep-link direct sur un projet avec musique : suspend la générative
-                // avant même start(), pour qu'elle ne soit jamais audible avant que
-                // playTrack() ne prenne le relais juste après.
-                if (pendingTrackRef.current) engine.suspendGenerative(0)
-            })
+    const initialize = useCallback((): AmbientEngine | null => {
+        if (engineRef.current) return engineRef.current
+
+        const AmbientEngine = engineConstructorRef.current
+        if (!AmbientEngine) return null
+
+        const engine = new AmbientEngine()
+        engineRef.current = engine
+        if (Object.keys(pendingParams.current).length) engine.setParams(pendingParams.current)
+        // Deep-link direct sur un projet avec musique : suspend la générative
+        // avant même start(), pour qu'elle ne soit jamais audible avant que
+        // playTrack() ne prenne le relais juste après.
+        if (pendingTrackRef.current) {
+            engine.suspendGenerative(0)
+            void engine.playTrack(pendingTrackRef.current)
         }
-        await bootRef.current
-        if (!wantedRef.current) return
-        await engineRef.current?.start()
-        if (pendingTrackRef.current) void engineRef.current?.playTrack(pendingTrackRef.current)
-        setReady(true)
+        return engine
     }, [])
 
+    const preload = useCallback(() => {
+        if (!engineImportRef.current) {
+            engineImportRef.current = import('@/lib/audio/engine').then((module) => {
+                engineConstructorRef.current = module.AmbientEngine
+                return module
+            })
+        }
+        return engineImportRef.current
+    }, [])
+
+    const prepare = useCallback(async (): Promise<AmbientEngine> => {
+        const existing = initialize()
+        if (existing) return existing
+
+        await preload()
+        const engine = initialize()
+        if (!engine) throw new Error('Le moteur audio ne peut pas être initialisé.')
+        return engine
+    }, [initialize, preload])
+
+    const boot = useCallback(async () => {
+        const engine = await prepare()
+        if (!wantedRef.current || !loaderCompleteRef.current) return
+
+        const started = await engine.start()
+        if (!started || !wantedRef.current) {
+            if (!wantedRef.current) engine.stop()
+            return
+        }
+
+        if (pendingTrackRef.current) void engine.playTrack(pendingTrackRef.current)
+        setReady(true)
+        setEnabled(true)
+    }, [prepare])
+
     const apply = useCallback(
-        (next: boolean) => {
+        (next: boolean, fromGesture: boolean = false) => {
             wantedRef.current = next
-            setEnabled(next)
-            if (next) void boot()
-            else engineRef.current?.stop()
+            if (next) {
+                const engine = initialize()
+                if (fromGesture) engine?.unlock()
+                void boot()
+                return
+            }
+
+            setReady(false)
+            setEnabled(false)
+            engineRef.current?.stop()
         },
-        [boot],
+        [boot, initialize],
     )
 
     // Seul le refus est mémorisé, et seulement le temps de l'onglet : une nouvelle
@@ -66,8 +111,26 @@ const AudioProvider = ({ children }: Props) => {
         } catch {
             // stockage indisponible : le refus ne survivra pas au rechargement
         }
-        apply(next)
+        apply(next, true)
     }, [apply])
+
+    useEffect(() => {
+        void preload()
+    }, [preload])
+
+    useEffect(() => {
+        loaderCompleteRef.current =
+            document.documentElement.classList.contains('loader-complete') ||
+            document.documentElement.classList.contains('loader-seen')
+
+        const onLoaderComplete = () => {
+            loaderCompleteRef.current = true
+            if (wantedRef.current) void boot()
+        }
+
+        window.addEventListener(LOADER_COMPLETE_EVENT, onLoaderComplete)
+        return () => window.removeEventListener(LOADER_COMPLETE_EVENT, onLoaderComplete)
+    }, [boot])
 
     // La politique d'autoplay interdit de démarrer sans geste : le son s'arme au
     // chargement et part au premier geste réel, sauf refus exprimé dans l'onglet.
@@ -80,6 +143,12 @@ const AudioProvider = ({ children }: Props) => {
         }
         if (muted) return
 
+        const audioWindow = window as Window & { __portfolioAudioGestureSeen?: boolean }
+        if (audioWindow.__portfolioAudioGestureSeen) {
+            apply(true, true)
+            return
+        }
+
         const detach = () => GESTURES.forEach((type) => window.removeEventListener(type, onGesture))
 
         // Un geste né dans le toggle est laissé à son propre onClick, sinon le
@@ -88,7 +157,7 @@ const AudioProvider = ({ children }: Props) => {
             detach()
             const target = event.target
             if (target instanceof Element && target.closest('.sound-toggle')) return
-            apply(true)
+            apply(true, true)
         }
 
         GESTURES.forEach((type) => window.addEventListener(type, onGesture, { passive: true }))
@@ -99,7 +168,8 @@ const AudioProvider = ({ children }: Props) => {
         return () => {
             engineRef.current?.dispose()
             engineRef.current = null
-            bootRef.current = null
+            engineImportRef.current = null
+            engineConstructorRef.current = null
             wantedRef.current = false
         }
     }, [])

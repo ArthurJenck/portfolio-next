@@ -84,6 +84,10 @@ type ClickShape = SfxShape & {
     bodySeconds: number
 }
 
+type AudioUnlockWindow = Window & {
+    __portfolioAudioContext?: AudioContext
+}
+
 type NavShape = SfxShape & {
     voiceB: number
     voiceC: number
@@ -172,7 +176,9 @@ export class AmbientEngine {
     constructor(seed: number = createSeed()) {
         const Ctor =
             window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
-        this.ctx = new Ctor({ latencyHint: 'interactive' })
+        const audioWindow = window as AudioUnlockWindow
+        const unlockedContext = audioWindow.__portfolioAudioContext
+        this.ctx = unlockedContext && unlockedContext.state !== 'closed' ? unlockedContext : new Ctor({ latencyHint: 'interactive' })
         this.random = createPrng(seed)
         this.rootOffset = ROOT_STEPS[Math.floor(this.random() * ROOT_STEPS.length)]
 
@@ -321,6 +327,13 @@ export class AmbientEngine {
 
     getOutputLatencyMs(): number {
         return secondsToMs(this.ctx.outputLatency || 0)
+    }
+
+    unlock(): void {
+        if (this.disposed || this.ctx.state === 'closed') return
+
+        void this.ctx.resume().catch(() => undefined)
+        if (this.currentTrackUrl && this.trackAudio) void this.trackAudio.play().catch(() => undefined)
     }
 
     private currentRootHz(): number {
@@ -1327,9 +1340,17 @@ export class AmbientEngine {
         set(this.dry.gain, lerp(MIX.dryIntimacyLow, 1, intimacy))
     }
 
-    async start(): Promise<void> {
-        if (this.disposed || this.running) return
-        if (this.ctx.state === 'suspended') await this.ctx.resume()
+    async start(): Promise<boolean> {
+        if (this.disposed) return false
+        if (this.running) return true
+        if (this.ctx.state !== 'running') {
+            try {
+                await this.ctx.resume()
+            } catch {
+                return false
+            }
+        }
+        if (this.ctx.state !== 'running') return false
         this.running = true
 
         const now = this.ctx.currentTime
@@ -1365,6 +1386,8 @@ export class AmbientEngine {
             }
             this.rampExponential(this.trackFade.gain, 1, MUSIC.crossfadeSeconds)
         }
+
+        return true
     }
 
     stop(): void {
@@ -1409,6 +1432,8 @@ export class AmbientEngine {
             this.trackAudio.pause()
             this.trackAudio.src = ''
         }
+        const audioWindow = window as AudioUnlockWindow
+        if (audioWindow.__portfolioAudioContext === this.ctx) delete audioWindow.__portfolioAudioContext
         window.setTimeout(
             () => {
                 void this.ctx.close()

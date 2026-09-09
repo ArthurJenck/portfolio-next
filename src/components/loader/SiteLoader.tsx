@@ -10,6 +10,7 @@ const STORAGE_KEY = 'site-loaded'
 const TIMEOUT_MS = 3000
 const POLL_INTERVAL_MS = 100
 const EXIT_DURATION_MS = 400
+const LOADER_COMPLETE_EVENT = 'site-loader-complete'
 
 const waitForWindowLoad = (): Promise<void> =>
     new Promise((resolve) => {
@@ -116,6 +117,8 @@ const SiteLoader = () => {
                 // sessionStorage indisponible (navigation privée stricte) : tant pis, le loader rejouera
             }
             setPhase('done')
+            document.documentElement.classList.add('loader-complete')
+            window.dispatchEvent(new Event(LOADER_COMPLETE_EVENT))
         }, EXIT_DURATION_MS)
     }
 
@@ -128,6 +131,7 @@ const SiteLoader = () => {
         }
 
         if (alreadySeen) {
+            document.documentElement.classList.add('loader-complete')
             releaseHeroPlay()
             setPhase('done')
             return

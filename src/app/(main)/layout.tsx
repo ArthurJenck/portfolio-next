@@ -16,10 +16,38 @@ const loaderInitScript = `
 try {
     if (sessionStorage.getItem('site-loaded')) {
         document.documentElement.classList.add('loader-seen');
+        document.documentElement.classList.add('loader-complete');
     } else {
         document.documentElement.classList.add('loader-active');
     }
-} catch (e) {}
+} catch (e) {
+    document.documentElement.classList.add('loader-active');
+}
+
+(() => {
+    const gestures = ['pointerdown', 'keydown', 'touchstart'];
+    const unlock = () => {
+        if (window.__portfolioAudioGestureSeen) return;
+        window.__portfolioAudioGestureSeen = true;
+
+        try {
+            const Ctor = window.AudioContext || window.webkitAudioContext;
+            if (Ctor) {
+                let context = window.__portfolioAudioContext;
+                if (!context || context.state === 'closed') {
+                    context = new Ctor({ latencyHint: 'interactive' });
+                    window.__portfolioAudioContext = context;
+                }
+                const resumed = context.resume();
+                if (resumed && typeof resumed.catch === 'function') resumed.catch(() => {});
+            }
+        } catch (e) {}
+
+        gestures.forEach((type) => window.removeEventListener(type, unlock, true));
+    };
+
+    gestures.forEach((type) => window.addEventListener(type, unlock, { capture: true, passive: true }));
+})();
 `
 
 export const metadata: Metadata = {
