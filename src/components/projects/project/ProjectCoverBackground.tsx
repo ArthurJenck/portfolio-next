@@ -1,7 +1,7 @@
 'use client'
 
 import { useMotionTemplate, useTransform, motion } from 'framer-motion'
-import Image from 'next/image'
+import ProjectPicture from './ProjectPicture'
 import { useProjectSlider } from './ProjectSliderContext'
 import {
     BLUR_RANGE,
@@ -30,10 +30,13 @@ const ProjectCoverBackground = ({ name, coverImage, mobileCoverImage }: ProjectC
     return (
         <div className="project-cover-background fixed inset-0 overflow-hidden">
             <motion.div className="absolute inset-0" style={{ filter: imageFilter }}>
-                {mobileCoverImage && (
-                    <Image src={mobileCoverImage} alt={name} fill priority className="object-cover cover-image md:hidden" sizes="100vw" quality={90} />
-                )}
-                <Image src={coverImage} alt={name} fill priority className={`object-cover cover-image${mobileCoverImage ? ' hidden md:block' : ''}`} sizes="100vw" quality={90} />
+                <ProjectPicture
+                    src={coverImage}
+                    mobileSrc={mobileCoverImage}
+                    alt={name}
+                    className="object-cover cover-image"
+                    priority
+                />
             </motion.div>
             <motion.div className="absolute inset-0 bg-black" style={{ opacity: overlayOpacity }} />
         </div>

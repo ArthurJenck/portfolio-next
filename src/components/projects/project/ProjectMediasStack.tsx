@@ -1,5 +1,5 @@
 import { ProjectMedia } from '@/types/ProjectTypes'
-import Image from 'next/image'
+import ProjectPicture from './ProjectPicture'
 
 interface ProjectMediasStackProps {
     medias: ProjectMedia[]
@@ -36,26 +36,12 @@ const ProjectMediasStack = ({ medias, projectName }: ProjectMediasStackProps) =>
                                 />
                             </>
                         ) : (
-                            <>
-                                {media.mobileUrl && (
-                                    <Image
-                                        src={media.mobileUrl}
-                                        alt={`${projectName} - media ${i + 1}`}
-                                        fill
-                                        className="object-cover md:hidden"
-                                        sizes="100vw"
-                                        quality={90}
-                                    />
-                                )}
-                                <Image
-                                    src={media.url}
-                                    alt={`${projectName} - media ${i + 1}`}
-                                    fill
-                                    className={`object-cover${media.mobileUrl ? ' hidden md:block' : ''}`}
-                                    sizes="100vw"
-                                    quality={90}
-                                />
-                            </>
+                            <ProjectPicture
+                                src={media.url}
+                                mobileSrc={media.mobileUrl}
+                                alt={`${projectName} - media ${i + 1}`}
+                                className="object-cover"
+                            />
                         )}
                     </div>
                 </section>
